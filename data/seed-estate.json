@@ -15,9 +15,12 @@
     { "key": "post-death-charge", "merchant": "StreamFlix (fictional)", "type": "capture", "expected_triage": "stop_and_refund", "note": "Single post-death capture to refund" }
   ],
   "sandbox_ids": {
-    "business_account": "TODO after Sandbox setup",
-    "subscription_ids": {},
+    "business_account": "68ZD46FA4UJQ8 (EUR 5000.00, smoke 2026-11-08)",
+    "catalog_product_ids": { "streaming": "PROD-2EY69267NY327020F" },
+    "plan_ids": { "streaming": "P-31T101149C984542GNLYHESY" },
+    "subscription_ids": { "streaming": "I-41J2NEJVN16N (APPROVAL_PENDING - buyer approval needed before cancel; cancel on pending returned 404)" },
+    "order_ids": { "post-death-charge": "89V37027MX014502L (CREATED - buyer approval needed before capture/refund)" },
     "capture_ids": {},
-    "payout_batch_ids": {}
+    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (PENDING, EUR 1.00 to placeholder heir email)" }
   }
 }
