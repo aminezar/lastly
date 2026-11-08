@@ -62,6 +62,35 @@ async function get<T>(path: string): Promise<T> {
   }
 }
 
+async function post<T>(path: string, body?: unknown, requestId?: string): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${await accessToken()}`,
+        'Content-Type': 'application/json',
+        ...(requestId ? { 'PayPal-Request-Id': requestId } : {}),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      if (res.status === 204) return undefined as T;
+      const text = await res.text();
+      return (text ? JSON.parse(text) : undefined) as T;
+    }
+    if (res.status === 401 && attempt === 1) {
+      cachedToken = undefined;
+      continue;
+    }
+    if ((res.status === 429 || res.status >= 500) && attempt < MAX_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 250));
+      continue;
+    }
+    throw new PayPalApiError(res.status, path, await res.text());
+  }
+}
+
 // `path` must already carry whatever flag makes the endpoint report `total_pages`.
 async function listAll<T>(path: string, key: string, pageSize: number): Promise<T[]> {
   const items: T[] = [];
@@ -220,4 +249,142 @@ export type Balances = {
 
 export function getBalances(): Promise<Balances> {
   return get<Balances>('/v1/reporting/balances');
+}
+
+// --- Heirloom estate actions (validated live in Sandbox, 2026-11-08) ------
+
+export type SubscriptionStatus = 'APPROVAL_PENDING' | 'APPROVED' | 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'EXPIRED';
+
+export type Subscription = {
+  id: string;
+  plan_id?: string;
+  custom_id?: string;
+  status: SubscriptionStatus;
+  status_change_note?: string;
+  status_update_time?: string;
+  subscriber?: { email_address?: string; payer_id?: string; name?: { given_name?: string; surname?: string } };
+  billing_info?: {
+    last_payment?: { amount?: Money; time?: string };
+    next_billing_time?: string;
+    outstanding_balance?: Money;
+  };
+  links?: { href: string; rel: string; method: string }[];
+};
+
+export function listSubscriptions(pageSize = 50): Promise<{ subscriptions: Subscription[] }> {
+  return get(`/v1/billing/subscriptions?page_size=${pageSize}`);
+}
+
+export function getSubscription(id: string): Promise<Subscription> {
+  return get<Subscription>(`/v1/billing/subscriptions/${encodeURIComponent(id)}`);
+}
+
+// Caller must check status first: cancelling an APPROVAL_PENDING sub returns 404.
+export function cancelSubscription(id: string, reason: string, requestId?: string): Promise<void> {
+  return post<void>(`/v1/billing/subscriptions/${encodeURIComponent(id)}/cancel`, { reason }, requestId);
+}
+
+export async function createProduct(input: { name: string; type?: 'SERVICE' | 'DIGITAL' | 'PHYSICAL'; category?: string }): Promise<Product> {
+  const created = await post<{ id: string }>('/v1/catalogs/products', {
+    name: input.name,
+    type: input.type ?? 'SERVICE',
+    ...(input.category ? { category: input.category } : {}),
+  });
+  return get<Product>(`/v1/catalogs/products/${encodeURIComponent(created.id)}`);
+}
+
+export async function createPlan(input: { productId: string; name: string; amount: Money; intervalUnit?: IntervalUnit }): Promise<Plan> {
+  const created = await post<{ id: string }>('/v1/billing/plans', {
+    product_id: input.productId,
+    name: input.name,
+    status: 'ACTIVE',
+    billing_cycles: [
+      {
+        frequency: { interval_unit: input.intervalUnit ?? 'MONTH', interval_count: 1 },
+        tenure_type: 'REGULAR',
+        sequence: 1,
+        total_cycles: 0,
+        pricing_scheme: { fixed_price: input.amount },
+      },
+    ],
+    payment_preferences: { auto_bill_outstanding: true, setup_fee_failure_action: 'CONTINUE', payment_failure_threshold: 3 },
+  });
+  return get<Plan>(`/v1/billing/plans/${encodeURIComponent(created.id)}`);
+}
+
+export function createSubscription(input: { planId: string; customId: string; returnUrl: string; cancelUrl: string }): Promise<Subscription> {
+  return post<Subscription>('/v1/billing/subscriptions', {
+    plan_id: input.planId,
+    custom_id: input.customId,
+    application_context: { return_url: input.returnUrl, cancel_url: input.cancelUrl, user_action: 'SUBSCRIBE_NOW' },
+  });
+}
+
+export type OrderCapture = { id: string; status: string; amount?: Money };
+export type Order = {
+  id: string;
+  status: string;
+  links?: { href: string; rel: string; method: string }[];
+  purchase_units?: { reference_id?: string; custom_id?: string; payments?: { captures?: OrderCapture[] } }[];
+};
+
+export function createOrder(input: { customId: string; amount: Money; description: string; returnUrl: string; cancelUrl: string }): Promise<Order> {
+  return post<Order>('/v2/checkout/orders', {
+    intent: 'CAPTURE',
+    purchase_units: [
+      { reference_id: input.customId, custom_id: input.customId, amount: input.amount, description: input.description },
+    ],
+    application_context: { return_url: input.returnUrl, cancel_url: input.cancelUrl, user_action: 'PAY_NOW' },
+  });
+}
+
+export function getOrder(id: string): Promise<Order> {
+  return get<Order>(`/v2/checkout/orders/${encodeURIComponent(id)}`);
+}
+
+export function captureOrder(id: string, requestId?: string): Promise<Order> {
+  return post<Order>(`/v2/checkout/orders/${encodeURIComponent(id)}/capture`, {}, requestId);
+}
+
+// Refunds always return to the original payment source (the estate). Never redirected.
+export type Refund = { id: string; status: string; links?: { href: string; rel: string; method: string }[] };
+export function refundCapturedPayment(captureId: string, input: { note_to_payer?: string; amount?: Money } = {}, requestId?: string): Promise<Refund> {
+  return post<Refund>(`/v2/payments/captures/${encodeURIComponent(captureId)}/refund`, input, requestId);
+}
+
+export type PayoutItem = { receiver: string; amount: Money; note?: string; sender_item_id: string };
+export type PayoutBatch = {
+  batch_header?: { payout_batch_id: string; batch_status: string };
+  items?: unknown[];
+  links?: { href: string; rel: string; method: string }[];
+};
+
+// Payouts has no SDK/controller support anywhere; raw fetch through post() is the documented path.
+export function createPayout(input: { senderBatchId: string; subject: string; message: string; items: PayoutItem[] }, requestId?: string): Promise<PayoutBatch> {
+  return post<PayoutBatch>(
+    '/v1/payments/payouts',
+    {
+      sender_batch_header: {
+        sender_batch_id: input.senderBatchId,
+        email_subject: input.subject,
+        email_message: input.message,
+      },
+      items: input.items.map((item) => ({
+        recipient_type: 'EMAIL',
+        receiver: item.receiver,
+        amount: item.amount,
+        note: item.note,
+        sender_item_id: item.sender_item_id,
+      })),
+    },
+    requestId,
+  );
+}
+
+export function getPayoutBatch(id: string): Promise<PayoutBatch & { batch_header?: { payout_batch_id: string; batch_status: string; time_completed?: string } }> {
+  return get(`/v1/payments/payouts/${encodeURIComponent(id)}`);
+}
+
+export function approveLink(links?: { href: string; rel: string }[]): string | undefined {
+  return links?.find((l) => l.rel === 'approve')?.href;
 }

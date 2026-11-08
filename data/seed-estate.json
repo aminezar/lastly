@@ -4,25 +4,92 @@
     "date_of_death": "2026-10-20",
     "executor_name": "FICTIONAL - pre-authorized Trusted Executor",
     "heirs": [
-      { "label": "Heir 1 (Sandbox personal)", "email": "sb-heir1@example.com", "share_pct": 50 },
-      { "label": "Heir 2 (Sandbox personal)", "email": "sb-heir2@example.com", "share_pct": 50 }
+      {
+        "label": "Heir 1 (Sandbox personal)",
+        "email": "sb-heir1@example.com",
+        "share_pct": 50
+      },
+      {
+        "label": "Heir 2 (Sandbox personal)",
+        "email": "sb-heir2@example.com",
+        "share_pct": 50
+      }
     ]
   },
   "items": [
-    { "key": "streaming", "merchant": "StreamFlix (fictional)", "type": "subscription", "expected_triage": "stop_and_refund", "note": "Charged after 2026-10-20; cancel + refund that capture" },
-    { "key": "family-cloud", "merchant": "FamilyCloud (fictional)", "type": "subscription", "expected_triage": "keep_for_family", "note": "Shared household; handover checkout to surviving partner" },
-    { "key": "gym", "merchant": "FitGym (fictional)", "type": "subscription", "expected_triage": "formal_notice_only", "note": "Contract-bound; AI drafts bereavement letter, do NOT just stop payment" },
-    { "key": "post-death-charge", "merchant": "StreamFlix (fictional)", "type": "capture", "expected_triage": "stop_and_refund", "note": "Single post-death capture to refund" }
+    {
+      "key": "streaming",
+      "merchant": "StreamFlix (fictional)",
+      "type": "subscription",
+      "expected_triage": "stop_and_refund",
+      "note": "Charged after 2026-10-20; cancel + refund that capture"
+    },
+    {
+      "key": "family-cloud",
+      "merchant": "FamilyCloud (fictional)",
+      "type": "subscription",
+      "expected_triage": "keep_for_family",
+      "note": "Shared household; handover checkout to surviving partner"
+    },
+    {
+      "key": "gym",
+      "merchant": "FitGym (fictional)",
+      "type": "subscription",
+      "expected_triage": "formal_notice_only",
+      "note": "Contract-bound; AI drafts bereavement letter, do NOT just stop payment"
+    },
+    {
+      "key": "post-death-charge",
+      "merchant": "StreamFlix (fictional)",
+      "type": "capture",
+      "expected_triage": "stop_and_refund",
+      "note": "Single post-death capture to refund"
+    }
   ],
   "sandbox_ids": {
     "business_account": "68ZD46FA4UJQ8 (sb-jt9zn53786252@business.example.com, EUR 5000.00, verified 2026-11-08)",
     "buyer_personal_account": "TFSL7HRTHXGTQ (sb-rz3k653741808@personal.example.com)",
-    "catalog_product_ids": { "streaming": "PROD-2EY69267NY327020F" },
-    "plan_ids": { "streaming": "P-31T101149C984542GNLYHESY" },
-    "subscription_ids": { "streaming": "I-41J2NEJVN16N (ACTIVE -> CANCELLED 204 at 2026-11-08T13:22:33Z)" },
-    "order_ids": { "post-death-charge": "89V37027MX014502L (APPROVED -> COMPLETED)" },
-    "capture_ids": { "post-death-charge": "37W67583TS5206340 (COMPLETED EUR 9.99)" },
-    "refund_ids": { "post-death-charge": "3LE899970X313934J (COMPLETED EUR 9.99 clawback refund)" },
-    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (SUCCESS, item 8WYS96EWGD6BN / txn 11K76825205999437, EUR 1.00)" }
+    "catalog_product_ids": {
+      "streaming": "PROD-2EY69267NY327020F"
+    },
+    "plan_ids": {
+      "streaming": "P-31T101149C984542GNLYHESY"
+    },
+    "subscription_ids": {
+      "streaming": "I-41J2NEJVN16N (ACTIVE -> CANCELLED 204 at 2026-11-08T13:22:33Z)"
+    },
+    "order_ids": {
+      "post-death-charge": "89V37027MX014502L (APPROVED -> COMPLETED)"
+    },
+    "capture_ids": {
+      "post-death-charge": "37W67583TS5206340 (COMPLETED EUR 9.99)"
+    },
+    "refund_ids": {
+      "post-death-charge": "3LE899970X313934J (COMPLETED EUR 9.99 clawback refund)"
+    },
+    "payout_batch_ids": {
+      "smoke-test": "9YNLGRH6LHK2J (SUCCESS, item 8WYS96EWGD6BN / txn 11K76825205999437, EUR 1.00)"
+    },
+    "pending_demo": {
+      "note": "Created 2026-11-08T15:44:28.166Z. Approve each link as the Sandbox personal buyer, then run --capture. Old entities are never deleted.",
+      "product_ids": {
+        "streaming": "PROD-4H582465FK7836544",
+        "family-cloud": "PROD-467822947N371303D",
+        "gym": "PROD-8B220978EN816864Y"
+      },
+      "plan_ids": {
+        "streaming": "P-6G329370LL3051012NLYJRUY",
+        "family-cloud": "P-0GU9706266555544VNLYJRVQ",
+        "gym": "P-17M53258TD251645ENLYJRWQ"
+      },
+      "subscription_ids": {
+        "streaming": "I-NTFKRFVYL290",
+        "family-cloud": "I-NKWJMV70WHJN",
+        "gym": "I-YS4XP9JYTKYJ"
+      },
+      "order_ids": {
+        "post-death-charge": "89P25378KB126552G"
+      }
+    }
   }
 }
