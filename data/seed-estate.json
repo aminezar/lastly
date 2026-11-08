@@ -15,12 +15,14 @@
     { "key": "post-death-charge", "merchant": "StreamFlix (fictional)", "type": "capture", "expected_triage": "stop_and_refund", "note": "Single post-death capture to refund" }
   ],
   "sandbox_ids": {
-    "business_account": "68ZD46FA4UJQ8 (EUR 5000.00, smoke 2026-11-08)",
+    "business_account": "68ZD46FA4UJQ8 (sb-jt9zn53786252@business.example.com, EUR 5000.00, verified 2026-11-08)",
+    "buyer_personal_account": "TFSL7HRTHXGTQ (sb-rz3k653741808@personal.example.com)",
     "catalog_product_ids": { "streaming": "PROD-2EY69267NY327020F" },
     "plan_ids": { "streaming": "P-31T101149C984542GNLYHESY" },
-    "subscription_ids": { "streaming": "I-41J2NEJVN16N (APPROVAL_PENDING - buyer approval needed before cancel; cancel on pending returned 404)" },
-    "order_ids": { "post-death-charge": "89V37027MX014502L (CREATED - buyer approval needed before capture/refund)" },
-    "capture_ids": {},
-    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (SUCCESS, EUR 1.00, UNCLAIMED to placeholder heir email - no real Sandbox heir account yet)" }
+    "subscription_ids": { "streaming": "I-41J2NEJVN16N (ACTIVE -> CANCELLED 204 at 2026-11-08T13:22:33Z)" },
+    "order_ids": { "post-death-charge": "89V37027MX014502L (APPROVED -> COMPLETED)" },
+    "capture_ids": { "post-death-charge": "37W67583TS5206340 (COMPLETED EUR 9.99)" },
+    "refund_ids": { "post-death-charge": "3LE899970X313934J (COMPLETED EUR 9.99 clawback refund)" },
+    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (SUCCESS, item 8WYS96EWGD6BN / txn 11K76825205999437, EUR 1.00)" }
   }
 }

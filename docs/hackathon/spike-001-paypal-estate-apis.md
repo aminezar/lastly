@@ -18,16 +18,23 @@ Given a PayPal sandbox account, when Heirloom needs to (1) read transactions/sub
 | Family handover | `POST /v2/checkout/orders` (CAPTURE) | Yes (Orders) |
 | Payout to heirs | `POST /v1/payments/payouts`, `GET /v1/payments/payouts/{id}` | **No — raw fetch only** (SDK has no Payouts controller) |
 
-## Verdict: PARTIAL
+## Verdict: VALIDATED (Nov 8, 2026)
+
+### Live Sandbox Verification (Nov 8, 2026)
+- **Business account:** `68ZD46FA4UJQ8` (`sb-jt9zn53786252@business.example.com`, EUR 5,000.00 balance)
+- **Personal buyer account:** `TFSL7HRTHXGTQ` (`sb-rz3k653741808@personal.example.com`)
+- **Subscription create + approve + cancel:** Product `PROD-2EY69267NY327020F`, Plan `P-31T101149C984542GNLYHESY`, Subscription `I-41J2NEJVN16N` (`ACTIVE` -> `POST /v1/billing/subscriptions/I-41J2NEJVN16N/cancel` -> `204 No Content`, verified `CANCELLED` at `2026-11-08T13:22:33Z`). Note: cancelling an `APPROVAL_PENDING` subscription returns `404 RESOURCE_NOT_FOUND`; buyer approval to `ACTIVE` is required before cancel.
+- **Order create + approve + capture + refund:** Order `89V37027MX014502L` (`APPROVED` -> `POST /v2/checkout/orders/89V37027MX014502L/capture` -> Capture `37W67583TS5206340` `COMPLETED` EUR 9.99 -> `POST /v2/payments/captures/37W67583TS5206340/refund` -> Refund `3LE899970X313934J` `COMPLETED` EUR 9.99).
+- **Batch Payout:** `POST /v1/payments/payouts` -> Batch `9YNLGRH6LHK2J` (`SUCCESS`, item `8WYS96EWGD6BN`, transaction `11K76825205999437`, EUR 1.00).
 
 ### What worked
-- All 5 routes exist on sandbox and reject unauthenticated calls with 401 (proves routing, not a dead path).
+- All 5 routes exist on sandbox and were executed end-to-end with real Sandbox credentials and recorded IDs.
 - Official AG Grid boilerplate is real and reusable; saves the AG Studio wiring.
-- Cancel + refund + orders are typed SDK methods; payouts documented with batch/idempotency (`sender_batch_id`, `PayPal-Request-Id`).
+- Cancel + refund + orders + payouts all work over the plain fetch client pattern.
 
-### What didn't / not proven
-- No PayPal sandbox credentials on this machine, so no live create->cancel->refund->payout run was executed. End-to-end money movement is UNPROVEN until credentials exist (Day-1 task, per Notion risk list).
-- Payouts requires hand-written fetch (like boilerplate's lib/paypal.ts pattern), not the SDK.
+### Caveats discovered
+- Cancelling a subscription that is still `APPROVAL_PENDING` returns `404 RESOURCE_NOT_FOUND`. Seeded subscriptions for the demo must be buyer-approved to `ACTIVE` first (or the demo can reset/re-create an active one).
+- Payouts requires hand-written fetch (like boilerplate's `lib/paypal.ts` pattern), not the SDK.
 
 ### Surprises
 - `GET /v1/payments/payouts` returns 404 unauthenticated because payouts is POST-create + GET-by-id only; not a bug.
