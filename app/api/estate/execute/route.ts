@@ -4,7 +4,7 @@
 // Server-only (PayPal secret stays on the server). Idempotency keys are attached to
 // money-moving calls so a retried click cannot double-pay.
 import { NextResponse } from 'next/server';
-import { cancelSubscription, refundCapturedPayment, createPayout, getSubscription, getPayoutBatch } from '@/lib/paypal';
+import { cancelSubscription, suspendSubscription, refundCapturedPayment, createPayout, getSubscription, getPayoutBatch } from '@/lib/paypal';
 
 export async function POST(request: Request) {
   try {
@@ -19,6 +19,11 @@ export async function POST(request: Request) {
     const result: Record<string, unknown> = { ok: true, at: new Date().toISOString() };
     const requestId = (label: string) => `heirloom-exec-${label}-${Date.now()}`;
 
+    // Rehearsal mode: suspend instead of cancel so the seeded sub survives the run
+    // (SUSPENDED -> activate restores it; CANCELLED is final).
+    const rehearsal = (body as { rehearsal?: boolean }).rehearsal === true;
+    result.mode = rehearsal ? 'rehearsal (suspend)' : 'final (cancel)';
+
     if (body.pollBatchId) {
       const batch = await getPayoutBatch(body.pollBatchId);
       result.payoutBatch = { id: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status };
@@ -26,7 +31,9 @@ export async function POST(request: Request) {
     }
 
     if (body.subscriptionId) {
-      await cancelSubscription(body.subscriptionId, body.reason ?? 'Subscriber deceased — Heirloom estate wind-down', requestId('cancel'));
+      const stop = body.reason ?? 'Subscriber deceased — Heirloom estate wind-down';
+      if (rehearsal) await suspendSubscription(body.subscriptionId, stop, requestId('suspend'));
+      else await cancelSubscription(body.subscriptionId, stop, requestId('cancel'));
       const after = await getSubscription(body.subscriptionId);
       result.subscription = { id: after.id, status: after.status, note: after.status_change_note };
     }

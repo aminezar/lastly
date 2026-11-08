@@ -285,6 +285,16 @@ export function cancelSubscription(id: string, reason: string, requestId?: strin
   return post<void>(`/v1/billing/subscriptions/${encodeURIComponent(id)}/cancel`, { reason }, requestId);
 }
 
+// Reversible stop for rehearsals: SUSPENDED subs can be re-activated, so a demo
+// run in suspend mode never consumes the seeded subscription.
+export function suspendSubscription(id: string, reason: string, requestId?: string): Promise<void> {
+  return post<void>(`/v1/billing/subscriptions/${encodeURIComponent(id)}/suspend`, { reason }, requestId);
+}
+
+export function activateSubscription(id: string, reason: string, requestId?: string): Promise<void> {
+  return post<void>(`/v1/billing/subscriptions/${encodeURIComponent(id)}/activate`, { reason }, requestId);
+}
+
 export async function createProduct(input: { name: string; type?: 'SERVICE' | 'DIGITAL' | 'PHYSICAL'; category?: string }): Promise<Product> {
   const created = await post<{ id: string }>('/v1/catalogs/products', {
     name: input.name,
