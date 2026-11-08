@@ -97,7 +97,7 @@
         "at": "2026-11-08T15:48:25.941Z",
         "cancel": "I-NTFKRFVYL290 -> CANCELLED (204)",
         "refund": "6GN742665F933220E (COMPLETED) for capture 3GH37097HC473840V",
-        "payout": "A5MJ6WL3GAHSN (PENDING) EUR 1.00 to sb-rz3k653741808@personal.example.com"
+        "payout": "A5MJ6WL3GAHSN (SUCCESS) EUR 1.00 to sb-rz3k653741808@personal.example.com"
       }
     }
   }
