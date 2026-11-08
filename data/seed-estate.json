@@ -1,0 +1,23 @@
+{
+  "estate": {
+    "deceased_name": "FICTIONAL - replace before demo",
+    "date_of_death": "2026-10-20",
+    "executor_name": "FICTIONAL - pre-authorized Trusted Executor",
+    "heirs": [
+      { "label": "Heir 1 (Sandbox personal)", "email": "sb-heir1@example.com", "share_pct": 50 },
+      { "label": "Heir 2 (Sandbox personal)", "email": "sb-heir2@example.com", "share_pct": 50 }
+    ]
+  },
+  "items": [
+    { "key": "streaming", "merchant": "StreamFlix (fictional)", "type": "subscription", "expected_triage": "stop_and_refund", "note": "Charged after 2026-10-20; cancel + refund that capture" },
+    { "key": "family-cloud", "merchant": "FamilyCloud (fictional)", "type": "subscription", "expected_triage": "keep_for_family", "note": "Shared household; handover checkout to surviving partner" },
+    { "key": "gym", "merchant": "FitGym (fictional)", "type": "subscription", "expected_triage": "formal_notice_only", "note": "Contract-bound; AI drafts bereavement letter, do NOT just stop payment" },
+    { "key": "post-death-charge", "merchant": "StreamFlix (fictional)", "type": "capture", "expected_triage": "stop_and_refund", "note": "Single post-death capture to refund" }
+  ],
+  "sandbox_ids": {
+    "business_account": "TODO after Sandbox setup",
+    "subscription_ids": {},
+    "capture_ids": {},
+    "payout_batch_ids": {}
+  }
+}
