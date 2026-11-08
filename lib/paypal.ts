@@ -271,7 +271,8 @@ export type Subscription = {
   links?: { href: string; rel: string; method: string }[];
 };
 
-export function listSubscriptions(pageSize = 50): Promise<{ subscriptions: Subscription[] }> {
+export function listSubscriptions(pageSize = 20): Promise<{ subscriptions: Subscription[] }> {
+  // PayPal rejects page_size > 20 on this endpoint (INVALID_PARAMETER_VALUE).
   return get(`/v1/billing/subscriptions?page_size=${pageSize}`);
 }
 

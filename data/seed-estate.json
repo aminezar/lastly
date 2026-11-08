@@ -71,24 +71,24 @@
       "smoke-test": "9YNLGRH6LHK2J (SUCCESS, item 8WYS96EWGD6BN / txn 11K76825205999437, EUR 1.00)"
     },
     "pending_demo": {
-      "note": "Created 2026-11-08T15:44:28.166Z. Approve each link as the Sandbox personal buyer, then run --capture. Old entities are never deleted.",
+      "note": "Created 2026-11-08T15:57:39.019Z. Approve each link as the Sandbox personal buyer, then run --capture. Old entities are never deleted.",
       "product_ids": {
-        "streaming": "PROD-4H582465FK7836544",
-        "family-cloud": "PROD-467822947N371303D",
-        "gym": "PROD-8B220978EN816864Y"
+        "streaming": "PROD-3TU61204JR2540547",
+        "family-cloud": "PROD-3Y129720MF068440T",
+        "gym": "PROD-9MU13967YF779800S"
       },
       "plan_ids": {
-        "streaming": "P-6G329370LL3051012NLYJRUY",
-        "family-cloud": "P-0GU9706266555544VNLYJRVQ",
-        "gym": "P-17M53258TD251645ENLYJRWQ"
+        "streaming": "P-0CA05877BB0549432NLYJX2Y",
+        "family-cloud": "P-9AM89302KU3675831NLYJX3Q",
+        "gym": "P-6DH886910X0904054NLYJX4A"
       },
       "subscription_ids": {
-        "streaming": "I-NTFKRFVYL290",
-        "family-cloud": "I-NKWJMV70WHJN",
-        "gym": "I-YS4XP9JYTKYJ"
+        "streaming": "I-97071AR8T6TS",
+        "family-cloud": "I-AKDGPFEWRSNA",
+        "gym": "I-91KEVMRAV679"
       },
       "order_ids": {
-        "post-death-charge": "89P25378KB126552G (COMPLETED)"
+        "post-death-charge": "5XF44889DR525403M"
       },
       "capture_ids": {
         "post-death-charge": "3GH37097HC473840V (COMPLETED 9.99 EUR)"
