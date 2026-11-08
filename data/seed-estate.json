@@ -21,6 +21,6 @@
     "subscription_ids": { "streaming": "I-41J2NEJVN16N (APPROVAL_PENDING - buyer approval needed before cancel; cancel on pending returned 404)" },
     "order_ids": { "post-death-charge": "89V37027MX014502L (CREATED - buyer approval needed before capture/refund)" },
     "capture_ids": {},
-    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (PENDING, EUR 1.00 to placeholder heir email)" }
+    "payout_batch_ids": { "smoke-test": "9YNLGRH6LHK2J (SUCCESS, EUR 1.00, UNCLAIMED to placeholder heir email - no real Sandbox heir account yet)" }
   }
 }
