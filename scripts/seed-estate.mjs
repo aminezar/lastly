@@ -38,7 +38,8 @@ if (mode === '--status') {
     const sub = await call(tok, 'GET', `/v1/billing/subscriptions/${id}`);
     console.log(`${key}: ${id} status=${sub.status} approve=${approveLink(sub.links) ?? '-'}`);
   }
-  for (const [key, id] of Object.entries(p.order_ids)) {
+  for (const [key, stored] of Object.entries(p.order_ids)) {
+    const id = String(stored).split(' ')[0];
     const order = await call(tok, 'GET', `/v2/checkout/orders/${id}`);
     console.log(`${key}: ${id} status=${order.status} approve=${approveLink(order.links) ?? '-'}`);
   }
@@ -48,7 +49,7 @@ if (mode === '--status') {
 if (mode === '--capture') {
   const p = seed.sandbox_ids.pending_demo;
   if (!p?.order_ids?.['post-death-charge']) throw new Error('No pending post-death order.');
-  const orderId = p.order_ids['post-death-charge'];
+  const orderId = String(p.order_ids['post-death-charge']).split(' ')[0];
   const order = await call(tok, 'GET', `/v2/checkout/orders/${orderId}`);
   if (order.status !== 'APPROVED') throw new Error(`Order ${orderId} is ${order.status}; approve it in the browser first.`);
   const captured = await call(tok, 'POST', `/v2/checkout/orders/${orderId}/capture`, {});

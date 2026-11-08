@@ -88,7 +88,16 @@
         "gym": "I-YS4XP9JYTKYJ"
       },
       "order_ids": {
-        "post-death-charge": "89P25378KB126552G"
+        "post-death-charge": "89P25378KB126552G (COMPLETED)"
+      },
+      "capture_ids": {
+        "post-death-charge": "3GH37097HC473840V (COMPLETED 9.99 EUR)"
+      },
+      "executed_cycle": {
+        "at": "2026-11-08T15:48:25.941Z",
+        "cancel": "I-NTFKRFVYL290 -> CANCELLED (204)",
+        "refund": "6GN742665F933220E (COMPLETED) for capture 3GH37097HC473840V",
+        "payout": "A5MJ6WL3GAHSN (PENDING) EUR 1.00 to sb-rz3k653741808@personal.example.com"
       }
     }
   }
