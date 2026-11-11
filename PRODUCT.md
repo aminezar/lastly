@@ -21,7 +21,7 @@ Heirloom is an Estate Resolution Portal. The executor uploads a death certificat
 ## Demo flow (video, <3 min)
 1. Executor opens case: seeded mandate + upload death certificate + notary act. AI reads date of death: **Oct 20, 2026**.
 2. AI scans Sandbox transactions + subscriptions: flags post-death charges, renewals ≤30 days, shared household, contract-bound.
-3. **AG Studio Estate Ledger** triages each item:
+3. **AG Grid Estate Ledger** triages each item:
    - **Stop & Refund** — cancel + clawback refund for post-death charges
    - **Keep for Family** — handover link to surviving partner
    - **Formal Notice Only** — AI drafts bereavement letter (stopping payment alone would create estate debt)

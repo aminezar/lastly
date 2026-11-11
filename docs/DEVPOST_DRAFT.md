@@ -13,7 +13,7 @@ Settle a loved one's PayPal life: stop post-death charges, recover refunds, pay 
 Executor (pre-authorized while the account holder was alive) uploads death certificate + notary act. AI extracts date of death, scans PayPal Sandbox activity, triages each recurring payment: Stop & Refund / Keep for Family / Formal Notice Only. On approval Heirloom cancels subscriptions, refunds post-death charges, creates a handover checkout for family-kept services, drafts bereavement letters for contract-bound services, pays the net estate balance to verified heirs, and exports a notary-ready audit report.
 
 ## How we built it
-Next.js (official PayPal × AG Grid boilerplate), PayPal Sandbox REST via fetch client (`lib/paypal.ts`): Transaction Search, Subscriptions cancel, Captures refund, Orders, Payouts. AG Studio Estate Ledger. AI: [model/tool TBD] for document extraction + triage classification. APIMatic Context Plugin used while building PayPal integration. Hosted on Render [URL TBD].
+Next.js (official PayPal × AG Grid boilerplate), PayPal Sandbox REST via fetch client (`lib/paypal.ts`): Transaction Search, Subscriptions cancel, Captures refund, Orders, Payouts. AG Grid Estate Ledger (`app/heirloom/ledger.tsx`). AI: [model/tool TBD] for document extraction + triage classification. Hosted on Render [URL TBD].
 
 ## Challenges / honest limits
 PayPal Subscriptions/Transaction Search are merchant-scoped: demo estate is seeded under our Sandbox business app and labelled seeded. Executor authority is simulated (seeded Legacy Mandate + document cross-check); production needs notary verification. Refund-to-source is real PayPal behaviour and is the anti-fraud core.
@@ -22,7 +22,7 @@ PayPal Subscriptions/Transaction Search are merchant-scoped: demo estate is seed
 [fill after build]
 
 ## Tools used
-PayPal Sandbox · AG Grid / AG Studio · APIMatic · Render · [AI model] · Next.js/React/TypeScript
+PayPal Sandbox · AG Grid · Render · [AI model] · Next.js/React/TypeScript
 
 ## Try it
 Repo: [URL] · Demo: [URL] · Video: [YouTube URL]

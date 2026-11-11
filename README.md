@@ -36,7 +36,9 @@ Credentials live only in `.env.local` (gitignored) and never leave the server.
 
 ## Tools used
 
-PayPal Sandbox REST API · AG Grid / AG Studio (official `paypaldev/hackathon-paypal-ag-grid-boilerplate` base) · APIMatic (Context Plugin while building PayPal calls) · Next.js / React / TypeScript · AI document extraction + triage · Render (hosting)
+PayPal Sandbox REST API · AG Grid (the Estate Ledger in the executor portal, `app/heirloom/ledger.tsx`) · Next.js / React / TypeScript · AI document extraction + triage · Render (hosting)
+
+Built on the official `paypaldev/hackathon-paypal-ag-grid-boilerplate`. Its AG Studio dashboard at `/dashboard` is kept as it came from the boilerplate; the Heirloom portal itself uses AG Grid.
 
 ## Licence
 
