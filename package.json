@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "demo:reset": "node scripts/reset-estate.mjs",
+    "test:api": "node scripts/test-estate-api.mjs"
   },
   "dependencies": {
     "ag-grid-community": "36.2.0",

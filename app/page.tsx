@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 const dashboard = { href: '/dashboard', label: 'Dashboard', detail: 'AG Studio reports over all of the data below' };
+const heirloom = { href: '/heirloom', label: 'Heirloom executor portal', detail: 'Estate case: triage, execute, payout, audit' };
 
 // One page per PayPal endpoint the demo calls, each in app/(endpoints).
 const endpoints = [
@@ -27,6 +28,7 @@ export default function Home() {
     <main className="mx-auto w-full max-w-3xl p-16 font-paypal text-pp-ink">
       <h1 className="text-[28px] font-semibold text-pp-navy">PayPal REST APIs with AG Grid &amp; AG Studio</h1>
       <ul className="mt-6 divide-y divide-pp-border border-y border-pp-border">
+        <PageLink {...heirloom} />
         <PageLink {...dashboard} />
       </ul>
       <h2 className="mt-10 text-sm font-semibold uppercase tracking-wider text-pp-muted">Endpoints</h2>

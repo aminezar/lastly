@@ -1,0 +1,250 @@
+'use client';
+
+// The way into a case:
+//   1. Sign in (simulated: the demo executor, no password).
+//   2. The case intake: who you are (the Legacy Mandate), the two documents (upload or
+//      use the demo ones), then one check. Opening the case only reads PayPal.
+
+import { useRef, useState } from 'react';
+import { Button, Icon } from './sections';
+import { longDate, type MandateInfo } from './types';
+
+export type DocSlot = { text: string; name: string; demo: boolean } | null;
+type Kind = 'certificate' | 'notary';
+
+const MAX_BYTES = 200_000;
+const TEXT_TYPES = /\.(txt|md|text)$/i;
+
+// --- 1. Sign in --------------------------------------------------------------------
+export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: () => void }) {
+  return (
+    <div className="mx-auto flex min-h-[70vh] max-w-[440px] flex-col justify-center py-16">
+      <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-pp-navy">Sign in to Heirloom</h1>
+      <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person chosen to settle someone&apos;s PayPal affairs after they die.</p>
+
+      <div className="mt-8 rounded-2xl border border-pp-border bg-white p-6 shadow-[0_10px_30px_-18px_rgba(0,20,53,0.35)]">
+        <div className="flex items-center gap-4">
+          <span className="grid size-12 place-items-center rounded-full bg-pp-highlight text-[17px] font-bold text-pp-navy" aria-hidden="true">
+            {mandate.executor_name.split(' ').map((w) => w[0]).join('')}
+          </span>
+          <div>
+            <p className="text-[17px] font-semibold">{mandate.executor_name}</p>
+            <p className="text-[14px] text-pp-muted">Trusted Executor for {mandate.deceased_name}</p>
+          </div>
+        </div>
+        <Button className="mt-6 w-full" onClick={onSignIn}>
+          Continue as {mandate.executor_name.split(' ')[0]} <Icon name="arrow" />
+        </Button>
+      </div>
+      <p className="mt-4 text-center text-[13px] text-pp-muted">Demo sign-in: no password, fictional people.</p>
+    </div>
+  );
+}
+
+// --- 2. Case intake ------------------------------------------------------------------
+
+// What the reader will look for, so the executor knows what a document must contain.
+const NEEDS: Record<Kind, string> = {
+  certificate: 'Name of the person who died and the date of death',
+  notary: 'Name of the deceased, the date of death and the executor',
+};
+
+function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoText: string; onChange: (slot: DocSlot) => void }) {
+  const input = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  async function readFile(file: File) {
+    setError(null);
+    if (!TEXT_TYPES.test(file.name) && file.type !== 'text/plain') {
+      setError(`${file.name} is not a text file. Reading PDFs and photos needs AI, which is not switched on in this demo. Use a .txt file or the demo document.`);
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setError(`${file.name} is larger than 200 KB. A certificate or notary act as text is usually a few KB.`);
+      return;
+    }
+    const text = (await file.text()).trim();
+    if (!text) {
+      setError(`${file.name} is empty.`);
+      return;
+    }
+    props.onChange({ text, name: file.name, demo: false });
+  }
+
+  const { slot } = props;
+  return (
+    <div className="flex flex-col">
+      <h3 className="text-[16px] font-semibold">{props.title}</h3>
+      <p className="mt-1 text-[14px] text-pp-muted md:min-h-[2lh]">Must show: {NEEDS[props.kind].toLowerCase()}.</p>
+
+      {slot ? (
+        <div className="mt-3 flex flex-1 flex-col rounded-xl border border-pp-success/40 bg-[var(--hl-success-bg)]/40">
+          <div className="flex items-center gap-3 border-b border-pp-success/20 px-4 py-3">
+            <span className="grid size-6 place-items-center rounded-full bg-pp-success text-white"><Icon name="check" className="size-3.5" /></span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[15px] font-semibold">{slot.demo ? 'Demo document (fictional)' : slot.name}</p>
+              <p className="text-[13px] text-pp-muted">Ready to check</p>
+            </div>
+            <button type="button" onClick={() => props.onChange(null)} className="hl-focus rounded-full px-3 py-1.5 text-[14px] font-semibold text-pp-blue hover:bg-white">
+              Replace
+            </button>
+          </div>
+          <pre className="max-h-40 overflow-auto whitespace-pre-wrap px-4 py-3 font-[inherit] text-[13px] leading-relaxed text-pp-ink">{slot.text}</pre>
+        </div>
+      ) : (
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            const file = e.dataTransfer.files[0];
+            if (file) void readFile(file);
+          }}
+          className={`mt-3 flex flex-1 flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-8 text-center transition-colors ${dragging ? 'border-pp-blue bg-pp-highlight' : 'border-pp-border bg-white'}`}
+        >
+          <Icon name="upload" className="size-6 text-pp-muted" />
+          <p className="mt-3 text-[15px] font-semibold">Drop a text file here</p>
+          <p className="mt-1 text-[13px] text-pp-muted">.txt, up to 200 KB</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button variant="quiet" className="h-10 px-4 text-[14px]" onClick={() => input.current?.click()}>Choose file</Button>
+            <Button variant="quiet" className="h-10 px-4 text-[14px]" onClick={() => props.onChange({ text: props.demoText, name: 'demo', demo: true })}>
+              Use demo document
+            </Button>
+          </div>
+          <input
+            ref={input}
+            type="file"
+            accept=".txt,.md,text/plain"
+            className="sr-only"
+            aria-label={`Upload ${props.title}`}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void readFile(file);
+              e.target.value = '';
+            }}
+          />
+        </div>
+      )}
+      {error && <p role="alert" className="mt-2 text-[14px] text-pp-danger">{error}</p>}
+    </div>
+  );
+}
+
+export function Intake(props: {
+  mandate: MandateInfo;
+  demo: { certificateText: string; notaryText: string };
+  certificate: DocSlot;
+  notary: DocSlot;
+  onCertificate: (s: DocSlot) => void;
+  onNotary: (s: DocSlot) => void;
+  opening: boolean;
+  error: string | null;
+  onOpen: () => void;
+}) {
+  const { mandate } = props;
+  const ready = Boolean(props.certificate && props.notary);
+
+  return (
+    <div className="mx-auto mt-12 max-w-[980px] pb-8">
+      <h1 className="text-balance text-[34px] font-semibold leading-[1.08] tracking-tight text-pp-navy sm:text-[44px]">
+        Close a PayPal life, one approved step at a time.
+      </h1>
+      <p className="mt-4 max-w-[64ch] text-[18px] leading-relaxed text-pp-muted">
+        Three steps before anything happens: we confirm you are the person {mandate.deceased_name} chose, read the documents, and check that they agree. Nothing changes in PayPal until you approve a plan.
+      </p>
+
+      <ol className="mt-10 space-y-6">
+        <li className="rounded-2xl border border-pp-border bg-white p-6">
+          <StepHead n={1} title="Your Legacy Mandate" done />
+          <div className="mt-4 flex flex-wrap items-start gap-x-10 gap-y-3 sm:pl-10">
+            <div>
+              <p className="text-[13px] text-pp-muted">Signed in as</p>
+              <p className="text-[17px] font-semibold">{mandate.executor_name}</p>
+            </div>
+            <div>
+              <p className="text-[13px] text-pp-muted">Named Trusted Executor by</p>
+              <p className="text-[17px] font-semibold">{mandate.deceased_name}</p>
+            </div>
+            <div>
+              <p className="text-[13px] text-pp-muted">Mandate signed</p>
+              <p className="text-[17px] font-semibold">{mandate.signed ? longDate(mandate.signed) : '—'}</p>
+            </div>
+            <p className="w-full text-[14px] text-pp-muted">
+              While still alive, {mandate.deceased_name} chose who may settle their PayPal affairs. Only that person can open this case. <span className="text-pp-ink">Demo: sign-in and mandate are simulated.</span>
+            </p>
+          </div>
+        </li>
+
+        <li className="rounded-2xl border border-pp-border bg-white p-6">
+          <StepHead n={2} title="Upload the two documents" done={ready} />
+          <div className="mt-5 grid gap-6 sm:pl-10 md:grid-cols-2">
+            <DocumentSlot kind="certificate" title="Death certificate" slot={props.certificate} demoText={props.demo.certificateText} onChange={props.onCertificate} />
+            <DocumentSlot kind="notary" title="Notary act of heredity" slot={props.notary} demoText={props.demo.notaryText} onChange={props.onNotary} />
+          </div>
+        </li>
+
+        <li className="rounded-2xl border border-pp-border bg-white p-6">
+          <StepHead n={3} title="Check and open the case" done={false} />
+          <div className="mt-4 sm:pl-10">
+            <p className="max-w-[70ch] text-[15px] text-pp-muted">
+              Heirloom compares both documents with each other and with the mandate: same person, same date of death, and you as executor. If anything differs, the case stays blocked. Then it reads the recurring payments in PayPal. Nothing is paid, cancelled or refunded yet.
+            </p>
+            {props.error && (
+              <p role="alert" className="mt-4 rounded-lg bg-[#fdecef] px-4 py-3 text-[15px] text-pp-danger">The case could not be opened. {props.error}</p>
+            )}
+            <Button className="mt-5 w-full sm:w-auto sm:min-w-[260px]" onClick={props.onOpen} disabled={!ready || props.opening}>
+              {props.opening ? 'Checking documents and PayPal…' : ready ? (props.error ? 'Try again' : 'Check documents and open the case') : 'Add both documents first'}
+              {ready && !props.opening && <Icon name="arrow" />}
+            </Button>
+          </div>
+        </li>
+      </ol>
+
+      <TrustExplainer />
+    </div>
+  );
+}
+
+function StepHead({ n, title, done }: { n: number; title: string; done: boolean }) {
+  return (
+    <h2 className="flex items-center gap-3 text-[19px] font-semibold">
+      <span className={`grid size-7 shrink-0 place-items-center rounded-full text-[13px] font-bold ${done ? 'bg-pp-success text-white' : 'bg-pp-blue text-white'}`}>
+        {done ? <Icon name="check" className="size-4" /> : n}
+      </span>
+      {title}
+    </h2>
+  );
+}
+
+function TrustExplainer() {
+  return (
+    <details className="group mt-8 rounded-2xl border border-pp-border bg-white">
+      <summary className="hl-focus flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-[17px] font-semibold">
+        How does Heirloom know you are allowed to do this?
+        <Icon name="arrow" className="size-5 shrink-0 text-pp-muted transition-transform group-open:rotate-90" />
+      </summary>
+      <div className="grid gap-6 border-t border-pp-border px-6 py-6 md:grid-cols-3">
+        <div>
+          <h3 className="font-semibold">1. Chosen while alive</h3>
+          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">The account holder names a Trusted Executor in advance, like a legacy contact on a phone. No one else can open a case.</p>
+        </div>
+        <div>
+          <h3 className="font-semibold">2. Documents must agree</h3>
+          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">The death certificate and the notary act must name the same person and date, and the notary act must name you as executor.</p>
+        </div>
+        <div>
+          <h3 className="font-semibold">3. Money cannot be redirected</h3>
+          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">PayPal refunds always go back to the original payment source, and payouts only go to the heirs in the notary act. A forged document gains nothing.</p>
+        </div>
+        <p className="text-[13px] text-pp-muted md:col-span-3">
+          In a real product, PayPal would also confirm the notary act with the notary or the official register before any money moves. In this demo the mandate and sign-in are simulated and the documents are fictional.
+        </p>
+      </div>
+    </details>
+  );
+}

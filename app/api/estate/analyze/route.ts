@@ -1,17 +1,22 @@
 // Heirloom API: analyze an estate case.
 // POST /api/estate/analyze { certificateText?, notaryText? }
-// Reads PayPal Sandbox balances + subscriptions, extracts the date of death from the
-// uploaded documents (AI when configured, deterministic fallback otherwise), and
-// triages each item with explicit rules. No money moves here.
+// Reads both documents and cross-checks them against each other and the seeded Legacy
+// Mandate (any mismatch blocks execution), reads the PayPal Sandbox balance plus every
+// seeded subscription and capture by ID, and triages each item with explicit rules.
+// No money moves here.
 import { NextResponse } from 'next/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { getBalances, listSubscriptions } from '@/lib/paypal';
-import { extractDocuments, classifyWithRules, demoDocuments, type MerchantFacts } from '@/lib/estate';
+import { getBalances, getCapture, getSubscription } from '@/lib/paypal';
+import { classifyWithRules, crossCheck, demoDocuments, extractDocuments, parseDocument, type Mandate, type MerchantFacts } from '@/lib/estate';
 
 type SeedItem = { key: string; merchant: string; note: string; type?: string };
 type SeedFile = {
-  estate: { date_of_death: string; heirs: { email: string; share_pct: number }[] };
+  estate: {
+    heirs: { label?: string; email: string; share_pct: number }[];
+    legacy_mandate: Mandate;
+    sandbox_payout_receiver: { label: string; email: string };
+  };
   items: SeedItem[];
   sandbox_ids: { pending_demo?: { subscription_ids?: Record<string, string>; capture_ids?: Record<string, string> } };
 };
@@ -21,48 +26,66 @@ async function loadSeed(): Promise<SeedFile> {
   return JSON.parse(raw) as SeedFile;
 }
 
+// Seed values look like "I-97071AR8T6TS" or "2YN56543KW1035009 (COMPLETED …)".
+const firstToken = (v?: string) => v?.split(' ')[0];
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json().catch(() => ({}))) as { certificateText?: string; notaryText?: string };
     const seed = await loadSeed();
-    const docs = body.certificateText || body.notaryText ? body : demoDocuments();
-    const extraction = await extractDocuments(docs);
+    const demo = demoDocuments();
+    const empty = !body.certificateText?.trim() && !body.notaryText?.trim();
+    const docs = empty ? demo : { certificateText: body.certificateText ?? '', notaryText: body.notaryText ?? '' };
+    // Label honestly: the fictional demo documents are reported as such even when sent explicitly.
+    const usingDemo = docs.certificateText.trim() === demo.certificateText.trim() && docs.notaryText.trim() === demo.notaryText.trim();
 
-    const [balances, subs] = await Promise.all([getBalances(), listSubscriptions(20)]);
-    // List summaries omit custom_id, so read the .env free alternative: fetch detail
-    // for each ACTIVE/recent subscription to map seed keys by custom_id.
-    const { getSubscription } = await import('@/lib/paypal');
-    const details = await Promise.all(subs.subscriptions.map((s) => getSubscription(s.id).catch(() => undefined)));
-    const byCustomSuffix = new Map<string, NonNullable<(typeof details)[number]>>();
-    for (const sub of details) {
-      if (!sub) continue;
-      for (const item of seed.items) if (sub.custom_id?.includes(item.key)) byCustomSuffix.set(item.key, sub);
-    }
+    // Rules read each document separately; the AI (when keyed) only adds its own reading.
+    const certificate = parseDocument(docs.certificateText);
+    const notary = parseDocument(docs.notaryText);
+    const mandate = seed.estate.legacy_mandate;
+    const checks = crossCheck(certificate, notary, mandate);
+    const verified = checks.every((c) => c.pass);
+    const extraction = usingDemo ? { source: 'demo-documents' as const } : await extractDocuments(docs);
+    const dateOfDeath = certificate.dateOfDeath;
 
-    const items = seed.items.map((item) => {
-      const sub = byCustomSuffix.get(item.key);
-      const captureRaw = seed.sandbox_ids.pending_demo?.capture_ids?.[item.key];
-      const captureId = captureRaw ? captureRaw.split(' ')[0] : undefined;
+    const ids = seed.sandbox_ids.pending_demo ?? {};
+    const [balances, ...looked] = await Promise.all([
+      getBalances(),
+      ...seed.items.map(async (item) => {
+        const subId = firstToken(ids.subscription_ids?.[item.key]);
+        const capId = item.type === 'capture' ? firstToken(ids.capture_ids?.[item.key]) : undefined;
+        const [sub, cap] = await Promise.all([
+          subId ? getSubscription(subId).catch(() => undefined) : undefined,
+          capId ? getCapture(capId).catch(() => undefined) : undefined,
+        ]);
+        return { item, sub, cap, capId };
+      }),
+    ]);
+
+    const items = looked.map(({ item, sub, cap, capId }) => {
       const facts: MerchantFacts = {
         merchant: item.merchant,
         customId: sub?.custom_id,
         status: sub?.status,
-        amount: sub?.billing_info?.last_payment?.amount?.value,
-        captureId: item.type === 'capture' ? captureId : undefined,
-        chargedAt: 'after death',
+        amount: sub?.billing_info?.last_payment?.amount?.value ?? cap?.amount?.value,
+        captureId: capId,
+        chargedAt: cap?.create_time,
         note: item.note,
       };
-      const decision = classifyWithRules(facts, extraction.date_of_death);
+      const decision = classifyWithRules(facts, dateOfDeath);
       return {
         key: item.key,
         merchant: item.merchant,
         subscriptionId: sub?.id,
-        status: sub?.status ?? 'SEEDED',
+        status: sub?.status ?? (cap ? 'CAPTURE' : 'NOT_FOUND'),
+        amount: sub?.billing_info?.last_payment?.amount ?? cap?.amount,
+        nextBillingAt: sub?.billing_info?.next_billing_time,
         triage: decision.triage,
         confidence: decision.confidence,
         reason: decision.reason,
+        noAction: decision.noAction ?? false,
         note: item.note,
-        ...(item.type === 'capture' ? { captureId } : {}),
+        ...(capId ? { captureId: capId, captureStatus: cap?.status ?? 'NOT_FOUND', chargedAt: cap?.create_time } : {}),
       };
     });
 
@@ -70,18 +93,17 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       case: {
-        deceased_name: extraction.deceased_name ?? 'Jean Dupont (fictional)',
-        date_of_death: extraction.date_of_death ?? seed.estate.date_of_death,
-        executor_name: extraction.executor_name ?? 'Marie Dupont',
+        // Straight from the documents: nothing is filled in when a document lacks a fact.
+        deceased_name: certificate.deceased ?? notary.deceased ?? null,
+        date_of_death: dateOfDeath ?? null,
+        executor_name: notary.executor ?? null,
         heirs: seed.estate.heirs,
-        documentsSource: extraction.source,
+        documentsSource: usingDemo ? 'demo-documents' : extraction.source === 'ai' ? 'ai' : 'pasted-text',
       },
+      verification: { verified, checks, mandate },
+      payoutReceiver: seed.estate.sandbox_payout_receiver,
       balance: eur ? { amount: eur.total_balance?.value, currency: 'EUR' } : undefined,
       items,
-      mandate: {
-        pre_authorized_executor: extraction.executor_name ?? 'Marie Dupont',
-        check: 'Documents cross-checked against the seeded Legacy Mandate. Mismatch would block execution.',
-      },
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

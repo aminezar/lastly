@@ -1,0 +1,205 @@
+'use client';
+
+// The estate ledger: one AG Grid row per recurring payment on the navy board. Four columns
+// tell one story per row: the payment, what Heirloom will do and why, what PayPal says,
+// and the result. The PayPal cell is a status pill that replays its entrance when
+// PayPal answers.
+
+import { useMemo } from 'react';
+import {
+  CellStyleModule,
+  ClientSideRowModelModule,
+  RowAutoHeightModule,
+  RowStyleModule,
+  themeQuartz,
+  type ColDef,
+  type ICellRendererParams,
+  type RowClassParams,
+} from 'ag-grid-community';
+import { AgGridProvider, AgGridReact } from 'ag-grid-react';
+import { TRIAGE_LABEL, merchantName, money, planFor, type LedgerRow } from './types';
+
+const modules = [ClientSideRowModelModule, RowAutoHeightModule, RowStyleModule, CellStyleModule];
+
+const theme = themeQuartz.withParams({
+  fontFamily: 'var(--pp-font)',
+  fontSize: 15,
+  backgroundColor: 'var(--hl-board)',
+  foregroundColor: '#ffffff',
+  textColor: '#ffffff',
+  headerBackgroundColor: 'var(--hl-board)',
+  headerTextColor: 'var(--hl-board-muted)',
+  headerFontSize: 13,
+  headerFontWeight: 600,
+  borderColor: 'var(--hl-board-line)',
+  rowBorder: { color: 'var(--hl-board-line)' },
+  wrapperBorder: false,
+  wrapperBorderRadius: 0,
+  rowHoverColor: 'transparent',
+  accentColor: 'var(--pp-sky)',
+  cellHorizontalPadding: 24,
+  headerHeight: 48,
+});
+
+// The PayPal column shows only states PayPal itself reports.
+export function paypalStatus(row: LedgerRow): string {
+  if (row.progress.paypalStatus) return row.progress.paypalStatus;
+  if (row.captureId) return row.captureStatus === 'COMPLETED' ? 'CHARGED' : (row.captureStatus ?? 'UNKNOWN');
+  return row.status;
+}
+
+// PayPal's status codes in readable words, with one colour per meaning.
+const STATUS: Record<string, { label: string; tone: 'neutral' | 'good' | 'warn' | 'off' | 'bad' | 'live' }> = {
+  ACTIVE: { label: 'Active', tone: 'neutral' },
+  SUSPENDED: { label: 'Paused', tone: 'warn' },
+  CANCELLED: { label: 'Cancelled', tone: 'off' },
+  EXPIRED: { label: 'Expired', tone: 'off' },
+  CHARGED: { label: 'Charged', tone: 'warn' },
+  REFUNDED: { label: 'Refunded', tone: 'good' },
+  PARTIALLY_REFUNDED: { label: 'Partly refunded', tone: 'warn' },
+  APPROVAL_PENDING: { label: 'Waiting for family', tone: 'live' },
+  SENDING: { label: 'Sending…', tone: 'live' },
+  'NOT CHANGED': { label: 'Not changed', tone: 'bad' },
+};
+
+const PILL: Record<(typeof STATUS)[string]['tone'], string> = {
+  neutral: 'bg-white/10 text-white',
+  good: 'bg-[var(--hl-done-on-board)]/20 text-[var(--hl-done-on-board)]',
+  warn: 'bg-[var(--hl-warn-on-board)]/15 text-[var(--hl-warn-on-board)]',
+  off: 'bg-white/5 text-[var(--hl-board-muted)]',
+  bad: 'bg-[var(--hl-error-on-board)]/15 text-[var(--hl-error-on-board)]',
+  live: 'bg-[var(--pp-sky)]/20 text-[#9fdcff]',
+};
+
+export function StatusPill({ code }: { code: string }) {
+  const s = STATUS[code] ?? { label: code.charAt(0) + code.slice(1).toLowerCase().replace(/_/g, ' '), tone: 'neutral' as const };
+  return (
+    // Keyed by the code so a change replays the entrance: the moment PayPal answers.
+    <span key={code} className={`hl-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[14px] font-semibold ${PILL[s.tone]}`}>
+      <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+      {s.label}
+    </span>
+  );
+}
+
+function PaymentCell({ data }: ICellRendererParams<LedgerRow>) {
+  if (!data) return null;
+  const detail = data.captureId ? `One charge · ${money(data.amount)}` : data.amount ? `${money(data.amount)} / month` : 'Subscription';
+  return (
+    <div className="py-4 leading-tight">
+      <div className="text-[17px] font-semibold">{merchantName(data.merchant)}</div>
+      <div className="mt-1 text-[14px] text-[var(--hl-board-text)]">{detail}</div>
+    </div>
+  );
+}
+
+const DOT: Record<LedgerRow['triage'], string> = {
+  stop_and_refund: 'bg-[var(--hl-stop-dot)]',
+  keep_for_family: 'bg-[var(--hl-keep-dot)]',
+  formal_notice_only: 'bg-[var(--hl-notice-dot)]',
+};
+
+const nothingToDo = (row: LedgerRow) => row.progress.step === 'skipped' && !row.progress.at;
+
+function PlanCell({ data }: ICellRendererParams<LedgerRow>) {
+  if (!data) return null;
+  const idle = nothingToDo(data);
+  return (
+    <div className="flex items-center gap-3 py-4">
+      <span className={`size-2.5 shrink-0 rounded-full ${idle ? 'bg-white/20' : DOT[data.triage]}`} title={TRIAGE_LABEL[data.triage]} aria-hidden="true" />
+      <span className={`text-[16px] font-semibold ${idle ? 'text-[var(--hl-board-muted)]' : ''}`}>{idle ? 'Nothing to do' : planFor(data, data.rehearsal)}</span>
+      <span className="sr-only">({TRIAGE_LABEL[data.triage]})</span>
+    </div>
+  );
+}
+
+function PayPalCell({ data }: ICellRendererParams<LedgerRow>) {
+  if (!data) return null;
+  const id = data.progress.resultId ?? data.subscriptionId ?? data.captureId;
+  return (
+    <div className="flex flex-col items-start gap-1.5 py-4">
+      <StatusPill code={paypalStatus(data)} />
+      {id && <span className="font-mono text-[12px] tracking-wide text-[var(--hl-board-muted)]">{id}</span>}
+    </div>
+  );
+}
+
+function ResultCell({ data }: ICellRendererParams<LedgerRow>) {
+  if (!data) return null;
+  const { step, message, at } = data.progress;
+  if (step === 'ready') return <span className="text-[var(--hl-board-muted)]" aria-label="Not started">—</span>;
+  const color =
+    step === 'error' ? 'text-[var(--hl-error-on-board)]'
+    : step === 'done' ? 'text-[var(--hl-done-on-board)]'
+    : step === 'running' ? 'text-white'
+    : 'text-[var(--hl-board-muted)]';
+  const text = message ?? (step === 'excluded' ? 'Left out' : step === 'running' ? 'Sending to PayPal…' : '');
+  return (
+    <div className={`py-4 text-[14px] leading-snug ${color}`}>
+      <div className={step === 'done' || step === 'error' ? 'font-semibold' : ''}>{text}</div>
+      {at && <div className="mt-0.5 tabular-nums text-[var(--hl-board-muted)]">{new Date(at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>}
+    </div>
+  );
+}
+
+// rowClassRules (unlike getRowClass) are re-evaluated whenever a row's data changes.
+const rowClassRules = {
+  'hl-row-running': ({ data }: RowClassParams<LedgerRow>) => data?.progress.step === 'running',
+  'hl-row-excluded': ({ data }: RowClassParams<LedgerRow>) => data?.progress.step === 'excluded',
+};
+
+export function Ledger({ rows }: { rows: LedgerRow[] }) {
+  const columns = useMemo<ColDef<LedgerRow>[]>(
+    () => [
+      { headerName: 'Payment', field: 'merchant', cellRenderer: PaymentCell, width: 260, autoHeight: true },
+      { headerName: 'Plan', field: 'triage', cellRenderer: PlanCell, flex: 1, minWidth: 280, autoHeight: true },
+      { headerName: 'PayPal', colId: 'paypal', valueGetter: ({ data }) => (data ? paypalStatus(data) : ''), cellRenderer: PayPalCell, width: 240, autoHeight: true },
+      { headerName: 'Result', colId: 'result', valueGetter: ({ data }) => data?.progress.message, cellRenderer: ResultCell, width: 240, autoHeight: true },
+    ],
+    [],
+  );
+
+  return (
+    <AgGridProvider modules={modules}>
+      <AgGridReact<LedgerRow>
+        theme={theme}
+        rowData={rows}
+        columnDefs={columns}
+        getRowId={({ data }) => data.key}
+        rowClassRules={rowClassRules}
+        domLayout="autoHeight"
+        suppressCellFocus
+        enableCellTextSelection
+        defaultColDef={{ sortable: false, resizable: false, suppressMovable: true, cellStyle: { display: 'flex', alignItems: 'center', lineHeight: 'normal', whiteSpace: 'normal' } }}
+      />
+    </AgGridProvider>
+  );
+}
+
+// Below the md breakpoint the four columns stack into one card per payment, so nothing
+// scrolls sideways on a phone. Same data, same pills, same order.
+export function LedgerCards({ rows }: { rows: LedgerRow[] }) {
+  return (
+    <ol className="divide-y divide-[var(--hl-board-line)]">
+      {rows.map((r) => {
+        const idle = nothingToDo(r);
+        return (
+          <li key={r.key} className={`px-5 py-5 ${r.progress.step === 'running' ? 'bg-[#0b2a80]' : ''} ${r.progress.step === 'excluded' ? 'opacity-45' : ''}`}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[17px] font-semibold">{merchantName(r.merchant)}{r.captureId ? ' charge' : ''}</span>
+              <span className="text-[14px] tabular-nums text-[var(--hl-board-text)]">{money(r.amount)}{r.captureId ? '' : '/mo'}</span>
+            </div>
+            <p className={`mt-2 flex items-center gap-2 text-[16px] font-semibold ${idle ? 'text-[var(--hl-board-muted)]' : ''}`}>
+              <span className={`size-2.5 rounded-full ${idle ? 'bg-white/20' : DOT[r.triage]}`} aria-hidden="true" />
+              {idle ? 'Nothing to do' : planFor(r, r.rehearsal)}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <StatusPill code={paypalStatus(r)} />
+              {r.progress.message && <span className="text-[13px] text-[var(--hl-board-text)]">{r.progress.message}</span>}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}

@@ -1,76 +1,141 @@
-// Heirloom API: run the approved estate actions against PayPal Sandbox.
-// POST /api/estate/execute { subscriptionId?, captureId?, payout?: { receiver, amount, note } }
-// Every action is optional so the client can run them one by one and show each real ID.
-// Server-only (PayPal secret stays on the server). Idempotency keys are attached to
-// money-moving calls so a retried click cannot double-pay.
+// Heirloom API: run ONE approved estate action against PayPal Sandbox per call, so the
+// client can show each real PayPal ID as it lands.
+// POST /api/estate/execute {
+//   runId,                                   // one per opened case; makes retries idempotent
+//   subscriptionId?, rehearsal?, confirmFinal?,  // stop: suspend (rehearsal) or cancel (final)
+//   captureId?,                              // refund a post-death charge to its source
+//   handover?: { key, merchant },            // new subscription on the same plan for the family
+//   payout?: { receiver, amount, currency?, refundIds[] },  // gated: heir + recovered cap
+//   pollBatchId?
+// }
+// Server-only: the PayPal secret never leaves the server.
 import { NextResponse } from 'next/server';
-import { cancelSubscription, suspendSubscription, refundCapturedPayment, createPayout, getSubscription, getPayoutBatch } from '@/lib/paypal';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import {
+  approveLink,
+  cancelSubscription,
+  createPayout,
+  createSubscription,
+  getPayoutBatch,
+  getRefund,
+  getSubscription,
+  PayPalApiError,
+  refundCapturedPayment,
+  suspendSubscription,
+} from '@/lib/paypal';
+
+type Body = {
+  runId?: string;
+  subscriptionId?: string;
+  rehearsal?: boolean;
+  confirmFinal?: boolean;
+  reason?: string;
+  captureId?: string;
+  handover?: { key: string; merchant: string };
+  payout?: { receiver: string; amount: string; currency?: string; refundIds?: string[] };
+  pollBatchId?: string;
+};
+
+type Seed = {
+  estate: { sandbox_payout_receiver: { email: string } };
+  sandbox_ids: { pending_demo?: { plan_ids?: Record<string, string> } };
+};
+
+const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as {
-      subscriptionId?: string;
-      captureId?: string;
-      reason?: string;
-      payout?: { receiver: string; amount: string; currency?: string; note?: string };
-      pollBatchId?: string;
-    };
-
-    const result: Record<string, unknown> = { ok: true, at: new Date().toISOString() };
-    const requestId = (label: string) => `heirloom-exec-${label}-${Date.now()}`;
-
-    // Rehearsal mode: suspend instead of cancel so the seeded sub survives the run
-    // (SUSPENDED -> activate restores it; CANCELLED is final).
-    const rehearsal = (body as { rehearsal?: boolean }).rehearsal === true;
-    result.mode = rehearsal ? 'rehearsal (suspend)' : 'final (cancel)';
+    const body = (await request.json().catch(() => ({}))) as Body;
+    const at = new Date().toISOString();
+    const runId = (body.runId ?? '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
 
     if (body.pollBatchId) {
       const batch = await getPayoutBatch(body.pollBatchId);
-      result.payoutBatch = { id: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status };
-      return NextResponse.json(result);
+      return NextResponse.json({ ok: true, at, payoutBatch: { id: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status } });
     }
 
+    if (!runId) return fail(400, 'runId is required so a retried action cannot run twice.');
+    // Same run + same action + same target = same PayPal-Request-Id, so PayPal replays
+    // the first result instead of acting again.
+    const key = (action: string, target: string) => `heirloom-${runId}-${action}-${target}`.slice(0, 108);
+
     if (body.subscriptionId) {
-      const stop = body.reason ?? 'Subscriber deceased — Heirloom estate wind-down';
-      if (rehearsal) await suspendSubscription(body.subscriptionId, stop, requestId('suspend'));
-      else await cancelSubscription(body.subscriptionId, stop, requestId('cancel'));
+      const rehearsal = body.rehearsal !== false;
+      if (!rehearsal && body.confirmFinal !== true) return fail(400, 'Final mode cancels permanently and needs confirmFinal: true.');
+      const reason = body.reason ?? 'Subscriber deceased — Heirloom estate wind-down';
+      if (rehearsal) await suspendSubscription(body.subscriptionId, reason, key('suspend', body.subscriptionId));
+      else await cancelSubscription(body.subscriptionId, reason, key('cancel', body.subscriptionId));
       const after = await getSubscription(body.subscriptionId);
-      result.subscription = { id: after.id, status: after.status, note: after.status_change_note };
+      return NextResponse.json({ ok: true, at, mode: rehearsal ? 'rehearsal' : 'final', subscription: { id: after.id, status: after.status } });
     }
 
     if (body.captureId) {
       const refund = await refundCapturedPayment(
         body.captureId,
-        { note_to_payer: 'Post-death charge clawback refund (Heirloom estate resolution)' },
-        requestId('refund'),
+        { note_to_payer: 'Post-death charge refunded to the original payment source (Heirloom estate resolution)' },
+        key('refund', body.captureId),
       );
-      result.refund = { id: refund.id, status: refund.status, captureId: body.captureId };
+      // The create response is minimal; read the refund back for its real amount.
+      const detail = await getRefund(refund.id).catch(() => undefined);
+      return NextResponse.json({ ok: true, at, refund: { id: refund.id, status: detail?.status ?? refund.status, captureId: body.captureId, amount: detail?.amount } });
     }
 
-    if (body.payout?.receiver && body.payout.amount) {
+    const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as Seed;
+
+    if (body.handover?.key) {
+      // Keep for Family: the family member approves a NEW subscription on the same plan.
+      // The deceased's subscription is left running until that approval; nothing is moved.
+      const planId = seed.sandbox_ids.pending_demo?.plan_ids?.[body.handover.key];
+      if (!planId) return fail(400, `No Sandbox plan recorded for "${body.handover.key}".`);
+      const origin = new URL(request.url).origin;
+      const sub = await createSubscription({
+        planId,
+        customId: `heirloom-handover-${body.handover.key}-${runId}`.slice(0, 127),
+        returnUrl: `${origin}/heirloom?handover=approved`,
+        cancelUrl: `${origin}/heirloom?handover=cancelled`,
+      });
+      return NextResponse.json({ ok: true, at, handover: { subscriptionId: sub.id, status: sub.status, approveUrl: approveLink(sub.links), planId } });
+    }
+
+    if (body.payout) {
+      const { receiver, amount, currency = 'EUR', refundIds = [] } = body.payout;
+      // Gate 1: only the recorded heir account can be paid.
+      if (receiver?.toLowerCase() !== seed.estate.sandbox_payout_receiver.email.toLowerCase())
+        return fail(403, 'Payouts go only to the heir account recorded for this estate.');
+      // Gate 2: never more than what refunds actually recovered, re-read from PayPal.
+      const refunds = await Promise.all(refundIds.slice(0, 10).map((id) => getRefund(id).catch(() => undefined)));
+      const recovered = refunds
+        .filter((r) => r?.status === 'COMPLETED' && r.amount?.currency_code === currency)
+        .reduce((sum, r) => sum + Number(r!.amount!.value), 0);
+      const value = Number(amount);
+      if (!/^\d+(\.\d{1,2})?$/.test(amount ?? '') || value <= 0) return fail(400, 'Enter an amount greater than zero, with at most two decimals.');
+      if (value > recovered + 1e-9)
+        return fail(400, `The payout (${value.toFixed(2)} ${currency}) is more than the refunds PayPal confirms as recovered (${recovered.toFixed(2)} ${currency}).`);
+
+      // The batch ID is derived from the refunds being paid out. PayPal rejects a repeated
+      // sender_batch_id, so the same recovered money can never be paid out twice, even
+      // from a new case run or another browser.
+      const paidRefunds = refunds.filter((r) => r?.status === 'COMPLETED').map((r) => r!.id).sort();
+      const senderBatchId = `heirloom-${createHash('sha256').update(paidRefunds.join(',')).digest('hex').slice(0, 32)}`;
       const batch = await createPayout(
         {
-          senderBatchId: `heirloom-estate-${Date.now()}`,
+          senderBatchId,
           subject: 'Heirloom estate payout',
           message: 'Recovered estate balance share (Heirloom demo)',
-          items: [
-            {
-              receiver: body.payout.receiver,
-              amount: { value: body.payout.amount, currency_code: body.payout.currency ?? 'EUR' },
-              note: body.payout.note ?? 'Heirloom estate payout',
-              sender_item_id: `heir-${Date.now()}`,
-            },
-          ],
+          items: [{ receiver, amount: { value: value.toFixed(2), currency_code: currency }, note: 'Heirloom estate payout', sender_item_id: `heir-${runId}`.slice(0, 63) }],
         },
-        requestId('payout'),
-      );
-      result.payout = { batchId: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status, receiver: body.payout.receiver, amount: body.payout.amount };
+        key('payout', 'heir'),
+      ).catch((e: unknown) => {
+        if (e instanceof PayPalApiError && /"field":"SENDER_BATCH_ID"/.test(e.message)) return null;
+        throw e;
+      });
+      if (!batch) return fail(409, 'These recovered refunds have already been paid out. Nothing was sent again.');
+      return NextResponse.json({ ok: true, at, payout: { batchId: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status, receiver, amount: value.toFixed(2), recovered: recovered.toFixed(2) } });
     }
 
-    if (!body.subscriptionId && !body.captureId && !body.payout) {
-      return NextResponse.json({ ok: false, error: 'Provide subscriptionId, captureId, payout, or pollBatchId.' }, { status: 400 });
-    }
-    return NextResponse.json(result);
+    return fail(400, 'Provide subscriptionId, captureId, handover, payout, or pollBatchId.');
   } catch (error) {
     return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : String(error) }, { status: 502 });
   }

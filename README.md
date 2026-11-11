@@ -14,7 +14,11 @@ Requires Node 20.9+ and a PayPal Sandbox REST app ([developer.paypal.com](https:
 npm install
 cp .env.example .env.local   # fill in PAYPAL_CLIENT_ID / PAYPAL_SECRET (Sandbox)
 node scripts/paypal-smoke.mjs   # verify credentials before building
-npm run dev                     # http://localhost:3000
+npm run dev                     # http://localhost:3000/heirloom
+
+node scripts/test-estate-api.mjs     # 26 contract tests (read-only / rejected before PayPal)
+node scripts/test-estate-flow.mjs    # live Sandbox money flow (refund, payout, handover); rehearsal only
+node scripts/reset-estate.mjs        # after a rehearsal: re-activate paused subs + fresh capture
 ```
 
 Credentials live only in `.env.local` (gitignored) and never leave the server.
@@ -25,6 +29,10 @@ Credentials live only in `.env.local` (gitignored) and never leave the server.
 - Executor authority is **simulated**: a seeded Legacy Mandate (named while alive) + AI cross-check of death certificate × notary act. Production requires real notary/legal verification.
 - PayPal refunds return only to the original payment source — that real behaviour is the anti-fraud core: a forged upload cannot redirect money.
 - If Sandbox Payouts is unavailable on the test account, that step is labelled simulated in the UI. No PayPal response is ever faked.
+- **Who plays whom in the Sandbox.** One Sandbox business account plays every merchant (StreamFlix, FamilyCloud, FitGym): refunds come from it and the heir payout is sent from it. One Sandbox personal account plays the deceased's payer account and also receives the heir payout (it is the only real Sandbox personal account; the `heirs[]` emails are placeholders). In production only PayPal itself could act across merchants like this, so Heirloom is presented as a bereavement feature PayPal could build, not a third-party app.
+- **Document check is rules, not magic.** The portal reads the death certificate and the notary act separately and compares deceased, date of death and executor with each other and with the seeded Legacy Mandate. Any mismatch blocks the case. With no AI key configured, this runs on plain-text rules and the UI says so.
+- **Payout guard.** The server only pays the recorded heir account, never more than the refunds PayPal confirms as completed, and derives the payout ID from those refunds so the same money can never be paid out twice.
+- **Family handover** creates a new subscription on the same plan for the family member to approve; the deceased's subscription keeps running until then. It is not a transfer of the original subscription.
 
 ## Tools used
 

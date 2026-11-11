@@ -12,6 +12,8 @@ export type TriageDecision = {
   confidence: 'high' | 'medium';
   source: 'ai' | 'rules';
   reason: string;
+  // True when the rules found nothing to do (e.g. a charge taken before the date of death).
+  noAction?: boolean;
 };
 
 export type DocumentExtraction = {
@@ -148,6 +150,15 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       reason: 'Shared household service: keep it running and hand billing over to the surviving family member.',
     };
   }
+  if (item.captureId && item.chargedAt && dateOfDeath && item.chargedAt.slice(0, 10) < dateOfDeath) {
+    return {
+      triage: 'stop_and_refund',
+      confidence: 'high',
+      source: 'rules',
+      reason: `Charged on ${item.chargedAt.slice(0, 10)}, before the date of death (${dateOfDeath}): a valid charge, nothing to refund.`,
+      noAction: true,
+    };
+  }
   if (item.captureId) {
     return {
       triage: 'stop_and_refund',
@@ -162,4 +173,62 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
     source: 'rules',
     reason: 'Personal recurring payment with no shared use or contract flag: cancel it, and refund any post-death charge.',
   };
+}
+
+// --- Document cross-check (deterministic, auditable) -------------------------------
+// Each document is read on its own, then the facts are compared with each other and with
+// the seeded Legacy Mandate. Any mismatch or missing fact blocks execution. This runs the
+// same with or without an AI key; it is the check the portal displays, never a fixed claim.
+
+export type ParsedDocument = { deceased?: string; dateOfDeath?: string; executor?: string };
+export type Mandate = { deceased_name: string; executor_name: string; signed?: string };
+export type TrustCheck = { id: 'death-date' | 'deceased' | 'executor'; label: string; pass: boolean; detail: string };
+
+const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';
+// Name words are joined by spaces/tabs only, never a line break, so the next line's first
+// word ("Date of death…") is not read as part of the name.
+const NAME = "([A-Z][A-Za-zÀ-ÿ'’-]+(?:[ \\t]+[A-Z][A-Za-zÀ-ÿ'’-]+)+)";
+
+function findDate(text: string): string | undefined {
+  const iso = text.match(/(20\d{2})-(\d{1,2})-(\d{1,2})/);
+  const long = text.match(new RegExp(`(\\d{1,2}) (${MONTHS}) (20\\d{2})`, 'i'));
+  const m = iso ?? long;
+  return m ? normalizeDate(m) : undefined;
+}
+
+export function parseDocument(text: string): ParsedDocument {
+  const deceased =
+    text.match(new RegExp(`Deceased[ \\t]*:[ \\t]*${NAME}`))?.[1] ??
+    text.match(new RegExp(`estate of[ \\t]+${NAME}`, 'i'))?.[1];
+  const executor = text.match(new RegExp(`Executor[^:\\n]*:[ \\t]*${NAME}`, 'i'))?.[1];
+  // Prefer a date on a "death"/"deceased" line; fall back to the first date in the text.
+  const deathLine = text.split('\n').find((l) => /death|deceased|overlijden|décès|deces/i.test(l) && findDate(l));
+  return { deceased, executor, dateOfDeath: deathLine ? findDate(deathLine) : findDate(text) };
+}
+
+const same = (a?: string, b?: string) =>
+  Boolean(a && b && a.replace(/\s+/g, ' ').trim().toLowerCase() === b.replace(/\s+/g, ' ').trim().toLowerCase());
+
+export function crossCheck(certificate: ParsedDocument, notary: ParsedDocument, mandate: Mandate): TrustCheck[] {
+  const show = (v?: string) => v ?? 'not found';
+  return [
+    {
+      id: 'death-date',
+      label: 'Certificate and notary act give the same date of death',
+      pass: Boolean(certificate.dateOfDeath && certificate.dateOfDeath === notary.dateOfDeath),
+      detail: `Certificate: ${show(certificate.dateOfDeath)} · Notary act: ${show(notary.dateOfDeath)}`,
+    },
+    {
+      id: 'deceased',
+      label: 'Both documents name the person on the Legacy Mandate',
+      pass: same(certificate.deceased, mandate.deceased_name) && same(notary.deceased, mandate.deceased_name),
+      detail: `Certificate: ${show(certificate.deceased)} · Notary act: ${show(notary.deceased)} · Mandate: ${mandate.deceased_name}`,
+    },
+    {
+      id: 'executor',
+      label: 'Notary act names the executor from the Legacy Mandate',
+      pass: same(notary.executor, mandate.executor_name),
+      detail: `Notary act: ${show(notary.executor)} · Mandate: ${mandate.executor_name}`,
+    },
+  ];
 }

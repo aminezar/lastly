@@ -61,3 +61,60 @@ body {
   --color-pp-danger: var(--pp-danger);
   --font-paypal: var(--pp-font);
 }
+
+/*
+ * Heirloom executor portal (app/heirloom). Same PayPal tokens; the ledger sits on a navy
+ * board with readable PayPal status pills.
+ */
+.hl {
+  --hl-header: var(--pp-ink);
+  --hl-header-text: #dbe5f5;
+  --hl-header-muted: #a9b8d4;
+  --hl-board: var(--pp-navy);
+  --hl-board-deep: #00154d;
+  --hl-board-line: #17337d;
+  --hl-board-line-strong: #3a5aa6;
+  --hl-board-text: #c9d5ec;
+  --hl-board-muted: #9fb3d9;
+  --hl-final: #a3122b;
+  --hl-blocked-bg: #4a0f1d;
+  --hl-stop-dot: #ff9b8f;
+  --hl-keep-dot: #7cc8ff;
+  --hl-notice-dot: #ffc56b;
+  --hl-done-on-board: #5fd3a1;
+  --hl-warn-on-board: #f7c873;
+  --hl-error-on-board: #ff9aa9;
+  --hl-success-bg: #dff3ea;
+  --hl-success-ink: #005c3d;
+  font-family: "PayPal Open", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.hl ::selection { background: var(--pp-highlight); color: var(--pp-ink); }
+.hl-board ::selection, .bg-\[var\(--hl-header\)\] ::selection { background: var(--pp-sky); color: #fff; }
+.hl { scrollbar-color: #b8c3d1 transparent; caret-color: var(--pp-blue); }
+.hl a { text-underline-offset: 4px; }
+
+.hl-focus:focus-visible,
+.hl-focus-within:focus-within {
+  outline: 2px solid var(--pp-sky);
+  outline-offset: 3px;
+}
+
+.hl-board { background: var(--hl-board); }
+.hl-grid .ag-row { transition: background-color 400ms ease-out, opacity 300ms ease-out; }
+.hl-grid .ag-row.hl-row-running { background: #0b2a80; }
+.hl-grid .ag-row.hl-row-excluded { opacity: 0.45; }
+.hl-grid .ag-header-cell-text { letter-spacing: 0.01em; }
+
+@media print {
+  .hl { background: #fff; }
+  nextjs-portal { display: none; }
+}
+
+/* Status pill: replays a short entrance whenever PayPal reports a new state. */
+@keyframes hl-pill-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.96); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.hl-pill { animation: hl-pill-in 420ms cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) { .hl-pill { animation: none; } }

@@ -363,6 +363,16 @@ export function refundCapturedPayment(captureId: string, input: { note_to_payer?
   return post<Refund>(`/v2/payments/captures/${encodeURIComponent(captureId)}/refund`, input, requestId);
 }
 
+export function getCapture(id: string): Promise<OrderCapture & { create_time?: string }> {
+  return get(`/v2/payments/captures/${encodeURIComponent(id)}`);
+}
+
+// Read back a refund for its amount: the create call's minimal response omits it.
+export type RefundDetail = Refund & { amount?: Money; create_time?: string };
+export function getRefund(id: string): Promise<RefundDetail> {
+  return get<RefundDetail>(`/v2/payments/refunds/${encodeURIComponent(id)}`);
+}
+
 export type PayoutItem = { receiver: string; amount: Money; note?: string; sender_item_id: string };
 export type PayoutBatch = {
   batch_header?: { payout_batch_id: string; batch_status: string };
@@ -383,7 +393,8 @@ export function createPayout(input: { senderBatchId: string; subject: string; me
       items: input.items.map((item) => ({
         recipient_type: 'EMAIL',
         receiver: item.receiver,
-        amount: item.amount,
+        // Payouts names the field `currency`, unlike Orders/Payments (`currency_code`).
+        amount: { value: item.amount.value, currency: item.amount.currency_code },
         note: item.note,
         sender_item_id: item.sender_item_id,
       })),

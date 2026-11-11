@@ -7,14 +7,27 @@
       {
         "label": "Heir 1 (Sandbox personal)",
         "email": "sb-heir1@example.com",
-        "share_pct": 50
+        "share_pct": 50,
+        "name": "Marie Dupont"
       },
       {
         "label": "Heir 2 (Sandbox personal)",
         "email": "sb-heir2@example.com",
-        "share_pct": 50
+        "share_pct": 50,
+        "name": "Luc Dupont"
       }
-    ]
+    ],
+    "legacy_mandate": {
+      "deceased_name": "Jean Dupont",
+      "executor_name": "Marie Dupont",
+      "signed": "2025-05-03",
+      "note": "Seeded Legacy Mandate (simulated for the demo)"
+    },
+    "sandbox_payout_receiver": {
+      "label": "Heir stand-in (Sandbox personal account)",
+      "email": "sb-rz3k653741808@personal.example.com",
+      "note": "Only real Sandbox personal account available; the heirs[] emails are placeholders. In this demo the same account also plays the deceased's payer account."
+    }
   },
   "items": [
     {
@@ -91,7 +104,7 @@
         "post-death-charge": "5XF44889DR525403M (COMPLETED)"
       },
       "capture_ids": {
-        "post-death-charge": "2YN56543KW1035009 (COMPLETED 9.99 EUR, zero-click card seed)"
+        "post-death-charge": "8KC16025PN130005L (COMPLETED 9.99 EUR, zero-click card seed)"
       },
       "executed_cycle": {
         "at": "2026-11-08T15:48:25.941Z",
@@ -100,9 +113,9 @@
         "payout": "A5MJ6WL3GAHSN (SUCCESS) EUR 1.00 to sb-rz3k653741808@personal.example.com"
       },
       "last_zero_click_capture": {
-        "order_id": "6NL768665J640311H",
-        "capture_id": "2YN56543KW1035009",
-        "at": "2026-11-08T16:15:16.769Z"
+        "order_id": "11C96855XF656642F",
+        "capture_id": "8KC16025PN130005L",
+        "at": "2026-11-11T00:43:07.640Z"
       }
     }
   }
