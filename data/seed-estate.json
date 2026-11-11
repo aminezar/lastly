@@ -86,17 +86,17 @@
     "pending_demo": {
       "note": "Created 2026-11-08T15:57:39.019Z. Approve each link as the Sandbox personal buyer, then run --capture. Old entities are never deleted.",
       "product_ids": {
-        "streaming": "PROD-3TU61204JR2540547",
+        "streaming": "PROD-79A15899LT425331P",
         "family-cloud": "PROD-3Y129720MF068440T",
         "gym": "PROD-9MU13967YF779800S"
       },
       "plan_ids": {
-        "streaming": "P-0CA05877BB0549432NLYJX2Y",
+        "streaming": "P-34W48432TN8048406NL2LIBY",
         "family-cloud": "P-9AM89302KU3675831NLYJX3Q",
         "gym": "P-6DH886910X0904054NLYJX4A"
       },
       "subscription_ids": {
-        "streaming": "I-97071AR8T6TS",
+        "streaming": "I-MN83BBV5ENFM",
         "family-cloud": "I-AKDGPFEWRSNA",
         "gym": "I-91KEVMRAV679"
       },

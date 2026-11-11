@@ -6,6 +6,9 @@
 //   node scripts/seed-estate.mjs          # create product+plan+subscription+order, print links
 //   (open each printed approve link, log in as the Sandbox PERSONAL buyer, approve)
 //   node scripts/seed-estate.mjs --status # re-check statuses and print approve links again
+//   node scripts/seed-estate.mjs --only streaming
+//                                         # recreate ONE cancelled subscription; keeps the other
+//                                         # subscriptions, the order and the capture as they are
 //
 // After approval, run --capture to create the refundable post-death capture, then
 // the executor demo can cancel/refund for real. IDs are written to
@@ -63,11 +66,16 @@ if (mode === '--capture') {
   process.exit(0);
 }
 
-const items = [
+const allItems = [
   { key: 'streaming', name: 'StreamFlix (fictional)', amount: '9.99' },
   { key: 'family-cloud', name: 'FamilyCloud (fictional)', amount: '12.00' },
   { key: 'gym', name: 'FitGym (fictional)', amount: '39.00' },
 ];
+const only = mode === '--only' ? process.argv[3] : null;
+if (mode === '--only' && !allItems.some((i) => i.key === only)) {
+  throw new Error(`--only needs one of: ${allItems.map((i) => i.key).join(', ')}`);
+}
+const items = only ? allItems.filter((i) => i.key === only) : allItems;
 const products = {};
 const plans = {};
 const subs = {};
@@ -90,6 +98,16 @@ for (const item of items) {
   subs[item.key] = sub.id;
   console.log(`\n${item.key}: product=${product.id} plan=${plan.id} subscription=${sub.id} (${sub.status})`);
   console.log(`APPROVE ${item.key}: ${approveLink(sub.links)}`);
+}
+if (only) {
+  const p = seed.sandbox_ids.pending_demo ?? {};
+  await writePending({
+    product_ids: { ...(p.product_ids ?? {}), ...products },
+    plan_ids: { ...(p.plan_ids ?? {}), ...plans },
+    subscription_ids: { ...(p.subscription_ids ?? {}), ...subs },
+  });
+  console.log(`\nNext: approve the ${only} link as the Sandbox PERSONAL buyer, then: node scripts/seed-estate.mjs --status`);
+  process.exit(0);
 }
 const order = await call(tok, 'POST', '/v2/checkout/orders', {
   intent: 'CAPTURE',
