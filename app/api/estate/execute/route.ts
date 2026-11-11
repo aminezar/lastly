@@ -1,4 +1,4 @@
-// Heirloom API: run ONE approved estate action against PayPal Sandbox per call, so the
+// Lastly API: run ONE approved estate action against PayPal Sandbox per call, so the
 // client can show each real PayPal ID as it lands.
 // POST /api/estate/execute {
 //   runId,                                   // one per opened case; makes retries idempotent
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       const rehearsal = body.rehearsal !== false;
       if (!rehearsal && body.confirmFinal !== true) return fail(400, 'Final mode cancels permanently and needs confirmFinal: true.');
       if (!rehearsal && publicDemo()) return fail(403, 'Final mode is turned off on the public demo, so the next visitor gets the same case. Rehearsal pauses the subscription instead.');
-      const reason = body.reason ?? 'Subscriber deceased — Heirloom estate wind-down';
+      const reason = body.reason ?? 'Subscriber deceased — Lastly estate wind-down';
       if (rehearsal) await suspendSubscription(body.subscriptionId, reason, key('suspend', body.subscriptionId));
       else await cancelSubscription(body.subscriptionId, reason, key('cancel', body.subscriptionId));
       const after = await getSubscription(body.subscriptionId);
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     if (body.captureId) {
       const refund = await refundCapturedPayment(
         body.captureId,
-        { note_to_payer: 'Post-death charge refunded to the original payment source (Heirloom estate resolution)' },
+        { note_to_payer: 'Post-death charge refunded to the original payment source (Lastly estate resolution)' },
         key('refund', body.captureId),
       );
       // The create response is minimal; read the refund back for its real amount.
@@ -124,9 +124,9 @@ export async function POST(request: Request) {
       const batch = await createPayout(
         {
           senderBatchId,
-          subject: 'Heirloom estate payout',
-          message: 'Recovered estate balance share (Heirloom demo)',
-          items: [{ receiver, amount: { value: value.toFixed(2), currency_code: currency }, note: 'Heirloom estate payout', sender_item_id: `heir-${runId}`.slice(0, 63) }],
+          subject: 'Lastly estate payout',
+          message: 'Recovered estate balance share (Lastly demo)',
+          items: [{ receiver, amount: { value: value.toFixed(2), currency_code: currency }, note: 'Lastly estate payout', sender_item_id: `heir-${runId}`.slice(0, 63) }],
         },
         key('payout', 'heir'),
       ).catch((e: unknown) => {

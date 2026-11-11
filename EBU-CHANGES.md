@@ -1,6 +1,6 @@
 # EBU-CHANGES
 
-What changed in the Heirloom system, apart from the frontend. Short version; full log in `docs/heirloom-changelog.md`.
+What changed in the Lastly system, apart from the frontend. Short version; full log in `docs/heirloom-changelog.md`.
 
 ## Trust and checks
 - **Real document check.** The death certificate and notary act are each read separately. Deceased, date of death and executor must match each other and the Legacy Mandate. Any mismatch blocks the case. Before this, the checks were shown but never actually performed.

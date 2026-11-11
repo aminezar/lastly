@@ -1,4 +1,4 @@
-# Heirloom — Product Spec
+# Lastly — Product Spec
 
 **Tagline:** Nobody should keep paying after they're gone.
 
@@ -9,7 +9,7 @@ After a death, recurring PayPal payments keep charging someone who is gone. Refu
 The pre-authorized family executor / next-of-kin. Not a merchant, not PayPal support.
 
 ## Pitch (Devpost opening)
-Heirloom is an Estate Resolution Portal. The executor uploads a death certificate + notary act; AI extracts date of death, scans PayPal activity, triages every recurring payment, and executes approved actions live in PayPal Sandbox (cancel, refund, handover), then pays the recovered net balance to verified heirs with a notary-ready audit report.
+Lastly is an Estate Resolution Portal. The executor uploads a death certificate + notary act; AI extracts date of death, scans PayPal activity, triages every recurring payment, and executes approved actions live in PayPal Sandbox (cancel, refund, handover), then pays the recovered net balance to verified heirs with a notary-ready audit report.
 
 ## Trust model
 1. **Legacy Mandate:** while alive, user names a Trusted Executor (Apple Legacy Contact model). Only that person can start a case.

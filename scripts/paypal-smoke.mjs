@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Heirloom Sandbox smoke test — proves credentials + which PayPal flows actually work.
+// Lastly Sandbox smoke test — proves credentials + which PayPal flows actually work.
 // Usage: cp .env.example .env.local (fill values) && node scripts/paypal-smoke.mjs
 // Reads PAYPAL_CLIENT_ID / PAYPAL_SECRET from .env.local or environment. Never prints secrets.
 import { readFileSync, existsSync } from 'node:fs';

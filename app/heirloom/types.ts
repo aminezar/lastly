@@ -43,7 +43,7 @@ export type Step = 'ready' | 'excluded' | 'running' | 'done' | 'skipped' | 'erro
 
 export type RowProgress = {
   step: Step;
-  // Real PayPal state after the action (never a Heirloom label).
+  // Real PayPal state after the action (never a Lastly label).
   paypalStatus?: string;
   // A PayPal ID this row produced (refund, handover subscription).
   resultId?: string;
@@ -87,7 +87,7 @@ export const merchantName = (raw: string) => raw.replace(fictional, '');
 export const longDate = (iso: string) =>
   new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-// What Heirloom will do for a row, in plain words, before anything runs.
+// What Lastly will do for a row, in plain words, before anything runs.
 export function planFor(item: EstateItem, rehearsal: boolean): string {
   if (item.noAction) return 'Nothing to do';
   if (item.triage === 'formal_notice_only') return 'Send a formal notice';

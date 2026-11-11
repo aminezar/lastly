@@ -1,4 +1,4 @@
-// Heirloom API: AI review of the plan.
+// Lastly API: AI review of the plan.
 // POST /api/estate/review { items: ReviewItem[], dateOfDeath? }
 // Returns one plain-language explanation per payment, written by the model from the PayPal
 // facts and the rule's decision, plus any concern for a human to check. Reads and writes

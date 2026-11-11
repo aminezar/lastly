@@ -1,4 +1,4 @@
-// Heirloom API: AI-written formal bereavement notice for one contract-bound merchant.
+// Lastly API: AI-written formal bereavement notice for one contract-bound merchant.
 // POST /api/estate/letter { merchant, merchantNote?, subscriptionId?, amount?, nextBillingAt?,
 //                           deceasedName, dateOfDeath, executorName }
 // → { ok: true, letter, model, source: 'ai' } or { ok: false, error } (503 when no AI key).

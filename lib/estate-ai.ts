@@ -1,4 +1,4 @@
-// Heirloom AI helpers (server-only): the two places a model does real work.
+// Lastly AI helpers (server-only): the two places a model does real work.
 //   1. writeNoticeLetter — writes the formal bereavement notice for one contract-bound
 //      merchant from the verified case facts.
 //   2. transcribeDocument — reads an uploaded PDF or photo of a document and returns its
@@ -41,7 +41,7 @@ async function respond(content: unknown[], maxTokens: number, instructions: stri
 
 export type NoticeFacts = {
   merchant: string;
-  merchantNote?: string; // what Heirloom knows about the service (e.g. "Contract-bound")
+  merchantNote?: string; // what Lastly knows about the service (e.g. "Contract-bound")
   subscriptionId?: string;
   amount?: string; // "29.00 EUR"
   nextBillingAt?: string;

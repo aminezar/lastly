@@ -1,4 +1,4 @@
-// Heirloom API: AI reading of an uploaded PDF or photo of a death certificate / notary act.
+// Lastly API: AI reading of an uploaded PDF or photo of a death certificate / notary act.
 // POST /api/estate/read-document  multipart/form-data { file }
 // → { ok: true, text, model, source: 'ai' } or { ok: false, error }.
 // The model only transcribes. The transcript is shown to the executor and then goes

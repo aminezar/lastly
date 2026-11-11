@@ -61,7 +61,7 @@ if (SPARE) {
   check('rehearsal suspend → SUSPENDED', s.data.subscription?.status === 'SUSPENDED', `${s.status} ${s.data.subscription?.status ?? s.data.error}`);
   loadEnvLocal();
   const tok = await token();
-  await call(tok, 'POST', `/v1/billing/subscriptions/${SPARE}/activate`, { reason: 'Heirloom flow test reset' });
+  await call(tok, 'POST', `/v1/billing/subscriptions/${SPARE}/activate`, { reason: 'Lastly flow test reset' });
   const back = await call(tok, 'GET', `/v1/billing/subscriptions/${SPARE}`);
   check('spare re-activated', back.status === 'ACTIVE', back.status);
 }

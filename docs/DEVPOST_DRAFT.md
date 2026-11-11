@@ -1,7 +1,7 @@
-# Devpost Draft — Heirloom (fill in brackets, submit by Nov 10)
+# Devpost Draft — Lastly (fill in brackets, submit by Nov 10)
 
 ## Title
-Heirloom — Nobody should keep paying after they're gone
+Lastly — Nobody should keep paying after they're gone
 
 ## Tagline (short)
 Settle a loved one's PayPal life: stop post-death charges, recover refunds, pay heirs — in one guided flow.
@@ -10,7 +10,7 @@ Settle a loved one's PayPal life: stop post-death charges, recover refunds, pay 
 [1 paragraph: recurring payments keep charging after death; families find out months later; every merchant contacted by hand.]
 
 ## What it does
-Executor (pre-authorized while the account holder was alive) uploads death certificate + notary act. AI extracts date of death, scans PayPal Sandbox activity, triages each recurring payment: Stop & Refund / Keep for Family / Formal Notice Only. On approval Heirloom cancels subscriptions, refunds post-death charges, creates a handover checkout for family-kept services, drafts bereavement letters for contract-bound services, pays the net estate balance to verified heirs, and exports a notary-ready audit report.
+Executor (pre-authorized while the account holder was alive) uploads death certificate + notary act. AI extracts date of death, scans PayPal Sandbox activity, triages each recurring payment: Stop & Refund / Keep for Family / Formal Notice Only. On approval Lastly cancels subscriptions, refunds post-death charges, creates a handover checkout for family-kept services, drafts bereavement letters for contract-bound services, pays the net estate balance to verified heirs, and exports a notary-ready audit report.
 
 ## How we built it
 Next.js (official PayPal × AG Grid boilerplate), PayPal Sandbox REST via fetch client (`lib/paypal.ts`): Transaction Search, Subscriptions cancel, Captures refund, Orders, Payouts. AG Grid Estate Ledger (`app/heirloom/ledger.tsx`). AI: [model/tool TBD] for document extraction + triage classification. Hosted on Render: https://heirloom-vxgl.onrender.com/heirloom

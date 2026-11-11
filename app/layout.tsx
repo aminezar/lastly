@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// Heirloom's serif voice: landing page headings and the portal's key titles (.hl-serif).
+// Lastly's serif voice: landing page headings and the portal's key titles (.hl-serif).
 const fraunces = Fraunces({
   variable: "--font-serif",
   subsets: ["latin"],

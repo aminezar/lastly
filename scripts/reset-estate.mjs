@@ -16,7 +16,7 @@ const subIds = Object.entries(pending.subscription_ids ?? {});
 for (const [key, id] of subIds) {
   const sub = await call(tok, 'GET', `/v1/billing/subscriptions/${id}`);
   if (sub.status === 'SUSPENDED') {
-    await call(tok, 'POST', `/v1/billing/subscriptions/${id}/activate`, { reason: 'Heirloom demo reset' });
+    await call(tok, 'POST', `/v1/billing/subscriptions/${id}/activate`, { reason: 'Lastly demo reset' });
     const after = await call(tok, 'GET', `/v1/billing/subscriptions/${id}`);
     console.log(`${key}: ${id} SUSPENDED -> ${after.status}`);
   } else {

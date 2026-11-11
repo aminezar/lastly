@@ -1,4 +1,4 @@
-// Heirloom API: analyze an estate case.
+// Lastly API: analyze an estate case.
 // POST /api/estate/analyze { certificateText?, notaryText? }
 // Reads both documents and cross-checks them against each other and the seeded Legacy
 // Mandate (any mismatch blocks execution), reads the PayPal Sandbox balance plus every

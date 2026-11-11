@@ -61,7 +61,7 @@ export function TopBar({ mode, hasCase, user, onReset, onSignOut, busy }: { mode
   return (
     <div className="border-b border-white/10 bg-[var(--hl-header)] text-white print:hidden">
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center gap-4 px-6 lg:px-10">
-        <Link href="/" className="hl-serif hl-focus rounded text-[21px] text-white">Heirloom</Link>
+        <Link href="/" className="hl-serif hl-focus rounded text-[21px] text-white">Lastly</Link>
         {hasCase && (
           <span className={`ml-2 hidden rounded-full px-3 py-1 text-[12px] font-semibold sm:inline ${mode === 'rehearsal' ? 'bg-white/10 text-[var(--hl-header-muted)]' : 'bg-[var(--hl-final)] text-white'}`}>
             {mode === 'rehearsal' ? 'Rehearsal' : 'Final'}
@@ -283,7 +283,7 @@ export function Settlement(props: {
     <section aria-labelledby="settle-title" className="mt-10">
       <h2 id="settle-title" className="hl-serif text-[28px] text-pp-navy">Pay the heirs</h2>
       <p className="mt-1 max-w-[70ch] text-[15px] text-pp-muted">
-        Money recovered by refunds goes back to the estate first. Heirloom then releases it to the heirs named in the notary act.
+        Money recovered by refunds goes back to the estate first. Lastly then releases it to the heirs named in the notary act.
       </p>
       <div className="mt-5 overflow-hidden rounded-xl border border-pp-border bg-white">
         <div className="grid gap-px bg-pp-border md:grid-cols-[1fr_1.3fr]">
@@ -450,7 +450,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
                         ? 'The AI is writing this letter from the verified facts…'
                         : 'Preview of the template. When you approve the plan, the AI writes the letter for this merchant from the verified facts.'
                       : letter?.source === 'ai'
-                        ? 'Review every line, then send it yourself. Nothing is sent by Heirloom.'
+                        ? 'Review every line, then send it yourself. Nothing is sent by Lastly.'
                         : 'AI was unavailable, so this is the fixed template. Review it, then send it yourself.'}
                   </span>
                   {ready && (
@@ -519,7 +519,7 @@ export function PrintReport({ analysis, audit, mode }: { analysis: Analysis; aud
   const c = analysis.case;
   return (
     <div className="hidden text-black print:block">
-      <h1 className="text-2xl font-bold">Heirloom estate resolution: audit report</h1>
+      <h1 className="text-2xl font-bold">Lastly estate resolution: audit report</h1>
       <p className="mt-1 text-sm">PayPal Sandbox demo · fictional estate · executor authority simulated · {mode === 'rehearsal' ? 'rehearsal (subscriptions paused)' : 'final (subscriptions cancelled)'}</p>
       <dl className="mt-4 grid grid-cols-3 gap-4 text-sm">
         <div><dt className="font-semibold">Estate of</dt><dd>{(c.deceased_name ?? '—').replace(fictional, '')}</dd></div>

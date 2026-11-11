@@ -1,27 +1,27 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-// Heirloom's front door: what the problem is, who it's for, how the portal works and why it
+// Lastly's front door: what the problem is, who it's for, how the portal works and why it
 // is safe, then a way into the demo case. The boilerplate's developer pages stay reachable
 // at the bottom ("Under the hood").
 
 export const metadata: Metadata = {
-  title: { absolute: "Heirloom · Nobody should keep paying after they're gone" },
+  title: { absolute: "Lastly · Nobody should keep paying after they're gone" },
   description:
-    'Heirloom helps the person chosen to settle a PayPal life: stop post-death charges, recover refunds, hand over what the family keeps, and pay the heirs, one approved step at a time.',
+    'Lastly helps the person chosen to settle a PayPal life: stop post-death charges, recover refunds, hand over what the family keeps, and pay the heirs, one approved step at a time.',
 };
 
 const steps = [
   {
     n: '1',
     title: 'Prove who you are',
-    body: 'The executor uploads the death certificate and the notary act. AI reads both, and Heirloom checks that they agree with each other and with the Legacy Mandate the account holder signed while alive.',
+    body: 'The executor uploads the death certificate and the notary act. AI reads both, and Lastly checks that they agree with each other and with the Legacy Mandate the account holder signed while alive.',
     api: 'AI document reading',
   },
   {
     n: '2',
     title: 'See every payment, with a reason',
-    body: 'Heirloom reads the recurring payments and sorts each one: stop and refund, keep for the family, or send a formal notice. Every decision says why.',
+    body: 'Lastly reads the recurring payments and sorts each one: stop and refund, keep for the family, or send a formal notice. Every decision says why.',
     api: 'Subscriptions · Captures · Balances',
   },
   {
@@ -92,7 +92,7 @@ export default function Home() {
   return (
     <div className="hl-home flex min-h-full flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-[1200px] items-center gap-4 px-6 py-6 lg:px-10">
-        <span className="font-[family-name:var(--font-serif)] text-[24px] font-semibold tracking-tight text-[var(--home-ink)]">Heirloom</span>
+        <span className="font-[family-name:var(--font-serif)] text-[24px] font-semibold tracking-tight text-[var(--home-ink)]">Lastly</span>
         <span className="ml-auto hidden text-[13px] text-[var(--home-muted)] sm:block">PayPal Sandbox demo · fictional estate</span>
         <Link href="/heirloom" className="home-focus ml-auto inline-flex h-10 items-center gap-2 rounded-full bg-[var(--home-ink)] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0a2a6e] sm:ml-4">
           Open the portal <Arrow />
@@ -108,7 +108,7 @@ export default function Home() {
               Nobody should keep paying after they&rsquo;re gone.
             </h1>
             <p className="mt-6 max-w-[34em] text-pretty text-[18px] leading-relaxed text-[var(--home-body)]">
-              When someone dies, their subscriptions keep charging, refunds go unclaimed and the balance sits locked. Heirloom gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
+              When someone dies, their subscriptions keep charging, refunds go unclaimed and the balance sits locked. Lastly gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/heirloom" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
@@ -153,7 +153,7 @@ export default function Home() {
                 <p className="text-[20px] font-semibold tabular-nums">€9.99</p>
               </div>
             </div>
-            <figcaption className="sr-only">Illustration of the Heirloom plan for a fictional estate.</figcaption>
+            <figcaption className="sr-only">Illustration of the Lastly plan for a fictional estate.</figcaption>
           </figure>
         </section>
 
@@ -206,7 +206,7 @@ export default function Home() {
                   Built so a forged document can&rsquo;t move a cent.
                 </h2>
                 <p className="mt-5 text-[15px] leading-relaxed text-[#c9d5ec]">
-                  Settling an estate is a target for fraud. Heirloom leans on how PayPal already moves money, and adds checks a person signs off on.
+                  Settling an estate is a target for fraud. Lastly leans on how PayPal already moves money, and adds checks a person signs off on.
                 </p>
               </div>
               <div className="grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">

@@ -63,7 +63,7 @@ body {
 }
 
 /*
- * Heirloom executor portal (app/heirloom). Same PayPal tokens; the ledger sits on a navy
+ * Lastly executor portal (app/heirloom). Same PayPal tokens; the ledger sits on a navy
  * board with readable PayPal status pills.
  */
 .hl {
@@ -120,7 +120,7 @@ body {
 @media (prefers-reduced-motion: reduce) { .hl-pill { animation: none; } }
 
 /*
- * Heirloom landing page (app/page.tsx): warm paper, navy ink, a serif for the voice.
+ * Lastly landing page (app/page.tsx): warm paper, navy ink, a serif for the voice.
  */
 .hl-home {
   --home-paper: #fbf8f3;

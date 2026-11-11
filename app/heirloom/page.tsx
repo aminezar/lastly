@@ -8,11 +8,11 @@ import { Portal } from './portal';
 import type { MandateInfo } from './types';
 
 export const metadata: Metadata = {
-  title: 'Heirloom executor portal',
+  title: 'Lastly executor portal',
   description: 'Resolve a PayPal estate: stop, refund, hand over, notify, and pay the heirs, with an audit report.',
 };
 
-export default async function HeirloomPage() {
+export default async function LastlyPage() {
   // Rendered per request so the public-demo flag is read from the running server's environment.
   await connection();
   // The seeded Legacy Mandate and the fictional demo documents, read on the server.

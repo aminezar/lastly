@@ -1,4 +1,4 @@
-# Render Blueprint for the hosted Heirloom demo (PayPal Sandbox only).
+# Render Blueprint for the hosted Lastly demo (PayPal Sandbox only).
 # New > Blueprint in the Render dashboard, pick this repo, then paste the secret values when asked.
 services:
   - type: web

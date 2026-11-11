@@ -9,7 +9,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 <!-- END:nextjs-agent-rules -->
 
 <!-- BEGIN:heirloom-rules -->
-# Heirloom — hackathon rules (read after PRODUCT.md)
+# Lastly — hackathon rules (read after PRODUCT.md)
 
 PayPal AI Hackathon. Deadline **Nov 12, 2026 21:00 Brussels**; internal submission Nov 10. Do not invent progress.
 

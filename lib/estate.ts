@@ -1,4 +1,4 @@
-// Heirloom shared server logic: document extraction, triage rules, and action types.
+// Lastly shared server logic: document extraction, triage rules, and action types.
 // Server-only. The AI is used for document reading and per-case reasons when a key is
 // configured; the triage decision itself follows explicit rules so the outcome is
 // deterministic and auditable whether or not a model is available.
@@ -145,7 +145,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'formal_notice_only',
       confidence: 'high',
       source: 'rules',
-      reason: 'Contract-bound service: cancelling payment alone would create estate debt, so Heirloom drafts a formal bereavement notice instead.',
+      reason: 'Contract-bound service: cancelling payment alone would create estate debt, so Lastly drafts a formal bereavement notice instead.',
     };
   }
   if (note.includes('shared') || note.includes('household') || note.includes('family')) {

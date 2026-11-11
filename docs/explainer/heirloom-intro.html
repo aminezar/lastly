@@ -2,7 +2,7 @@
 <html lang="en" data-register="paper">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Heirloom — complete guide for a new teammate</title>
+<title>Lastly — complete guide for a new teammate</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Cpath d='M18 40V24l14-8 14 8v16l-14 8-14-8Z' fill='none' stroke='%23fbbf24' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2338bdf8'/%3E%3C/svg%3E">
 <meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,8 +368,8 @@ summary { cursor: pointer; font: 500 var(--t-label) var(--font-mono); margin-bot
 <nav class="ve-toc" aria-label="Sections"><div><a href="#problem">1 · Problem</a><a href="#flow">2 · How it works</a><a href="#triage">3 · Three rules</a><a href="#trust">4 · Anti-fraud</a><a href="#terms">5 · Tech glossary</a><a href="#repo">6 · Repo outline</a><a href="#done">7 · Built vs next</a></div><span class="pos"></span></nav>
 <main>
 <header>
-<p class="eyebrow">Heirloom · Teammate onboarding guide · 8 Nov 2026</p>
-<h1>When someone dies, their PayPal keeps paying. Heirloom settles the account safely.</h1>
+<p class="eyebrow">Lastly · Teammate onboarding guide · 8 Nov 2026</p>
+<h1>When someone dies, their PayPal keeps paying. Lastly settles the account safely.</h1>
 <p class="lead">You can read this cold. It explains <b>what problem we solve, how the product works, why a scammer cannot abuse it, what every technical term means, and what every file in the repository does right now.</b></p>
 <p class="meta">Repo: github.com/aminezar/heirloom · Local folder: ~/code/heirloom · Stack: Next.js + PayPal Sandbox + AG Grid + OpenAI</p>
 </header>
@@ -400,8 +400,8 @@ summary { cursor: pointer; font: 500 var(--t-label) var(--font-mono); margin-bot
 </section>
 
 <section id="flow">
-<div class="sec-head"><p class="ve-label caps">2 · How Heirloom works</p><h2>One guided portal for the family’s chosen executor</h2></div>
-<p><b>Heirloom</b> is an Estate Resolution Portal. The person who uses it is the <b>executor</b> — typically a son, daughter, or surviving partner who was pre-authorized by the account holder while they were still alive (just like Apple’s “Legacy Contact” or Google’s “Inactive Account Manager”).</p>
+<div class="sec-head"><p class="ve-label caps">2 · How Lastly works</p><h2>One guided portal for the family’s chosen executor</h2></div>
+<p><b>Lastly</b> is an Estate Resolution Portal. The person who uses it is the <b>executor</b> — typically a son, daughter, or surviving partner who was pre-authorized by the account holder while they were still alive (just like Apple’s “Legacy Contact” or Google’s “Inactive Account Manager”).</p>
 <figure class="ve-steps">
 <div class="frame"><svg class="ve-svg ve-flow" style="--min: 1053px; --max: 1596px" viewBox="0 0 1228 96" role="img" aria-label="The executor uploads documents, the AI reads the date of death, the table sorts each payment, PayPal runs the approved actions, and heirs receive the balance."><g><path class="ve-e" data-s="1" pathLength="1" d="M156 48H280"/><text class="ve-el" data-s="1" x="218" y="39">1. uploads</text></g><g><path class="ve-e" data-s="2" pathLength="1" d="M420 48H544"/><text class="ve-el" data-s="2" x="482" y="39">2. flags</text></g><g><path class="ve-e is-hot" data-s="4" pathLength="1" d="M684 48H808"/><text class="ve-el" data-s="4" x="746" y="39">3. approves</text></g><g><path class="ve-e" data-s="5" pathLength="1" d="M948 48H1072"/><text class="ve-el" data-s="5" x="1010" y="39">4. pays out</text></g><circle class="ve-tok" data-s="1" r="5" style="offset-path: path('M156 48H280')"/><circle class="ve-tok" data-s="2" r="5" style="offset-path: path('M420 48H544')"/><circle class="ve-tok" data-s="4" r="5" style="offset-path: path('M684 48H808')"/><circle class="ve-tok" data-s="5" r="5" style="offset-path: path('M948 48H1072')"/><g class="ve-n is-key" data-ref="exec" data-s="0 1" transform="translate(16 16)"><rect class="sh" width="140" height="64" rx="6"/><text x="70" y="25">Executor</text><text class="sub" x="70" y="46">executor</text></g><g class="ve-n" data-ref="ai" data-s="1" transform="translate(280 16)"><rect class="sh" width="140" height="64" rx="6"/><text x="70" y="25">AI reader</text><text class="sub" x="70" y="46">reads PDFs</text></g><g class="ve-n" data-ref="table" data-s="2 3" transform="translate(544 16)"><rect class="sh" width="140" height="64" rx="6"/><text x="70" y="25">Estate table</text><text class="sub" x="70" y="46">review screen</text></g><g class="ve-n" data-ref="pp" data-s="4" transform="translate(808 16)"><rect class="sh" width="140" height="64" rx="6"/><text x="70" y="25">PayPal</text><text class="sub" x="70" y="46">payment API</text></g><g class="ve-n" data-ref="heirs" data-s="5" transform="translate(1072 16)"><rect class="sh" width="140" height="64" rx="6"/><text x="70" y="25">Heirs</text><text class="sub" x="70" y="46">bank / PayPal</text></g></svg></div>
 <div class="ve-player"><ol class="ve-cap">
@@ -417,7 +417,7 @@ summary { cursor: pointer; font: 500 var(--t-label) var(--font-mono); margin-bot
 
 <section id="triage">
 <div class="sec-head"><p class="ve-label caps">3 · The 3-way triage rules</p><h2>Each recurring payment gets the action that actually fits</h2></div>
-<p>Instead of cancelling everything blindly, Heirloom classifies every subscription or post-death charge into one of three actions:</p>
+<p>Instead of cancelling everything blindly, Lastly classifies every subscription or post-death charge into one of three actions:</p>
 <figure>
 <div class="cases">
 <div class="case" data-st="risk"><span class="chip risk">Rule 1 · Stop + refund</span><h3>StreamFlix — personal</h3><div style="display:flex;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:var(--r-2)"><span>Charged 25 Oct (after death)</span><b>−9.99 EUR</b></div><div style="padding:8px 4px;font-weight:700">Action: Cancel plan + claw back 9.99 EUR to estate</div></div>
@@ -494,7 +494,7 @@ summary { cursor: pointer; font: 500 var(--t-label) var(--font-mono); margin-bot
 </ul></li>
 <li><b>app/</b> — frontend pages (Next.js App Router)
 <ul>
-<li><code>page.tsx</code> &amp; <code>dashboard/</code> <span class="chip warn">step C next</span> — Currently shows the starter PayPal × AG Grid dashboard. In Step C we turn this into the Heirloom Executor Portal UI.</li>
+<li><code>page.tsx</code> &amp; <code>dashboard/</code> <span class="chip warn">step C next</span> — Currently shows the starter PayPal × AG Grid dashboard. In Step C we turn this into the Lastly Executor Portal UI.</li>
 <li><code>(endpoints)/</code> <span class="chip ok">starter</span> — Raw debug tables for `/balances`, `/transactions`, `/plans`, `/products`, `/invoices`.</li>
 </ul></li>
 <li><b>docs/</b> — project notes and reference docs (`DEVPOST_DRAFT.md`, `hackathon/spike-001-paypal-estate-apis.md`).</li>

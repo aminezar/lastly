@@ -1,4 +1,4 @@
-// Contract tests for the Heirloom estate API against a running dev server + PayPal Sandbox.
+// Contract tests for the Lastly estate API against a running dev server + PayPal Sandbox.
 // Safe by default: every test here is read-only or is rejected before PayPal is called.
 //   node scripts/test-estate-api.mjs [baseUrl]
 // Money-moving flows are covered by scripts/test-estate-flow.mjs (opt-in).

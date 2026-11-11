@@ -251,7 +251,7 @@ export function getBalances(): Promise<Balances> {
   return get<Balances>('/v1/reporting/balances');
 }
 
-// --- Heirloom estate actions (validated live in Sandbox, 2026-11-08) ------
+// --- Lastly estate actions (validated live in Sandbox, 2026-11-08) ------
 
 export type SubscriptionStatus = 'APPROVAL_PENDING' | 'APPROVED' | 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'EXPIRED';
 

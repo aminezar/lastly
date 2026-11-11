@@ -1,7 +1,7 @@
 'use client';
 
 // The estate ledger: one AG Grid row per recurring payment on the navy board. Four columns
-// tell one story per row: the payment, what Heirloom will do and why, what PayPal says,
+// tell one story per row: the payment, what Lastly will do and why, what PayPal says,
 // and the result. The PayPal cell is a status pill that replays its entrance when
 // PayPal answers.
 

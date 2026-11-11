@@ -1,4 +1,4 @@
-// Heirloom AI plan review (server-only). After the rules triage each payment, a model reads
+// Lastly AI plan review (server-only). After the rules triage each payment, a model reads
 // the same PayPal facts and the rule's decision, and writes a short explanation for the
 // executor of why that action fits. It also says whether the facts support the decision;
 // when they don't, the portal shows its concern for a human to check. The AI never changes

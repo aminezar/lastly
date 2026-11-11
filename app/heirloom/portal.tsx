@@ -1,6 +1,6 @@
 'use client';
 
-// Heirloom executor portal. One page, five stages: verify documents → approve the plan →
+// Lastly executor portal. One page, five stages: verify documents → approve the plan →
 // act in PayPal → pay the heirs → report. Every PayPal ID on screen comes from a real
 // Sandbox response via /api/estate/*; nothing here invents one.
 
@@ -38,7 +38,7 @@ const newRunId = () => `${Date.now().toString(36)}${Math.random().toString(36).s
 function friendlyError(message: string): string {
   if (/PAYPAL_CLIENT_ID|PAYPAL_SECRET/.test(message)) return 'PayPal is not connected yet: the Sandbox keys are missing on the server (.env.local).';
   if (/401|invalid_client/i.test(message)) return 'PayPal rejected the Sandbox keys on the server.';
-  if (/Failed to fetch|NetworkError/i.test(message)) return 'Could not reach the Heirloom server. Check that it is running, then try again.';
+  if (/Failed to fetch|NetworkError/i.test(message)) return 'Could not reach the Lastly server. Check that it is running, then try again.';
   const issue = message.match(/"issue":"([^"]+)"/)?.[1] ?? message.match(/"message":"([^"]+)"/)?.[1];
   return issue ? `PayPal said: ${issue}` : message;
 }
@@ -270,7 +270,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
   function downloadReport() {
     if (!analysis) return;
     const report = {
-      title: 'Heirloom estate resolution: audit report',
+      title: 'Lastly estate resolution: audit report',
       environment: 'PayPal Sandbox demo, fictional estate, executor authority simulated',
       mode: mode === 'rehearsal' ? 'rehearsal (subscriptions paused, reversible)' : 'final (subscriptions cancelled)',
       case: analysis.case,
@@ -279,7 +279,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       actions: audit.map((entry) => ({ at: entry.at, item: entry.item, action: entry.action, paypalId: entry.paypalId, status: entry.status, amount: entry.amount })),
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }));
-    Object.assign(document.createElement('a'), { href: url, download: `heirloom-audit-${analysis.case.date_of_death ?? 'case'}.json` }).click();
+    Object.assign(document.createElement('a'), { href: url, download: `lastly-audit-${analysis.case.date_of_death ?? 'case'}.json` }).click();
     URL.revokeObjectURL(url);
   }
 

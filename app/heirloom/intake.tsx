@@ -22,7 +22,7 @@ const MAX_AI_BYTES = 8 * 1024 * 1024;
 export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: () => void }) {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-[440px] flex-col justify-center py-16">
-      <h1 className="hl-serif text-[36px] leading-tight text-pp-navy">Sign in to Heirloom</h1>
+      <h1 className="hl-serif text-[36px] leading-tight text-pp-navy">Sign in to Lastly</h1>
       <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person chosen to settle someone&apos;s PayPal affairs after they die.</p>
 
       <div className="mt-8 rounded-2xl border border-pp-border bg-white p-6 shadow-[0_10px_30px_-18px_rgba(0,20,53,0.35)]">
@@ -258,7 +258,7 @@ export function Intake(props: {
           <StepHead n={3} title="Check and open the case" done={false} />
           <div className="mt-4 sm:pl-10">
             <p className="max-w-[70ch] text-[15px] text-pp-muted">
-              Heirloom compares both documents with each other and with the mandate: same person, same date of death, and you as executor. If anything differs, the case stays blocked. Then it reads the recurring payments in PayPal. Nothing is paid, cancelled or refunded yet.
+              Lastly compares both documents with each other and with the mandate: same person, same date of death, and you as executor. If anything differs, the case stays blocked. Then it reads the recurring payments in PayPal. Nothing is paid, cancelled or refunded yet.
             </p>
             {props.error && (
               <p role="alert" className="mt-4 rounded-lg bg-[#fdecef] px-4 py-3 text-[15px] text-pp-danger">The case could not be opened. {props.error}</p>
@@ -291,7 +291,7 @@ function TrustExplainer() {
   return (
     <details className="group mt-8 rounded-2xl border border-pp-border bg-white">
       <summary className="hl-focus flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-[17px] font-semibold">
-        How does Heirloom know you are allowed to do this?
+        How does Lastly know you are allowed to do this?
         <Icon name="arrow" className="size-5 shrink-0 text-pp-muted transition-transform group-open:rotate-90" />
       </summary>
       <div className="grid gap-6 border-t border-pp-border px-6 py-6 md:grid-cols-3">

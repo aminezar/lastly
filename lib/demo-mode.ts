@@ -45,7 +45,7 @@ async function reset(ids: Ids, captureKeys: string[]) {
       const id = firstToken(raw);
       if (!id) return;
       const sub = await getSubscription(id).catch(() => undefined);
-      if (sub?.status === 'SUSPENDED') await activateSubscription(id, 'Heirloom public demo reset').catch((e) => console.warn(`[demo] could not re-activate ${id}: ${String(e)}`));
+      if (sub?.status === 'SUSPENDED') await activateSubscription(id, 'Lastly public demo reset').catch((e) => console.warn(`[demo] could not re-activate ${id}: ${String(e)}`));
     }),
     ...captureKeys.map(async (key) => {
       const id = firstToken(current.capture_ids?.[key]);
