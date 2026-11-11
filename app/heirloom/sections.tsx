@@ -346,12 +346,17 @@ export function Settlement(props: {
 // --- Resolved ----------------------------------------------------------------------------
 export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRow[]; recovered: Money; paid?: string; onDownload: () => void }) {
   const done = rows.filter((r) => r.progress.step === 'done');
-  const stopped = done.filter((r) => r.subscriptionId && r.triage === 'stop_and_refund').length;
+  const stoppedRows = done.filter((r) => r.subscriptionId && r.triage === 'stop_and_refund');
+  const stopped = stoppedRows.length;
+  // What the stopped subscriptions would have charged the estate over the next twelve months.
+  const yearly = stoppedRows.reduce((sum, r) => sum + Number(r.amount?.value ?? 0) * 12, 0);
+  const yearlyCurrency = stoppedRows.find((r) => r.amount)?.amount?.currency_code ?? recovered.currency_code;
   const handed = done.filter((r) => r.triage === 'keep_for_family').length;
   const notices = done.filter((r) => r.triage === 'formal_notice_only').length;
   // Only what actually happened: a zero or an empty figure is noise on the closing screen.
   const stats = [
     { label: 'Subscriptions stopped', value: String(stopped), show: stopped > 0 },
+    { label: 'Future charges stopped, per year', value: money({ value: yearly.toFixed(2), currency_code: yearlyCurrency }), show: yearly > 0 },
     { label: 'Refunded to the estate', value: money(recovered), show: Number(recovered.value) > 0 },
     { label: 'Handed to family', value: String(handed), show: handed > 0 },
     { label: 'Formal notices', value: String(notices), show: notices > 0 },
