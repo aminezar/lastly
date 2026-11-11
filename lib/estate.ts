@@ -99,12 +99,18 @@ export async function extractDocuments(input: {
         max_output_tokens: 800,
       }),
     });
-    if (!res.ok) return extractDemo();
+    if (!res.ok) {
+      // Log why (status + OpenAI's error message, never the key) so a silent fallback is debuggable.
+      const err = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+      console.warn(`[AI] document reading fell back to rules: OpenAI ${res.status} ${err.error?.code ?? ''} ${err.error?.message ?? ''}`.trim());
+      return extractDemo();
+    }
     const data = (await res.json()) as { output_text?: string; output?: { content?: { text?: string }[] }[] };
     const text = data.output_text ?? data.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? '').join('') ?? '';
     const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as Omit<DocumentExtraction, 'source'>;
     return { ...json, source: 'ai' };
-  } catch {
+  } catch (error) {
+    console.warn(`[AI] document reading fell back to rules: ${error instanceof Error ? error.message : String(error)}`);
     return extractDemo();
   }
 }
