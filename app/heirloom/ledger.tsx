@@ -232,7 +232,7 @@ function ResultCell({ data }: ICellRendererParams<LedgerRow>) {
   const text = message ?? (step === 'excluded' ? 'Left out' : step === 'running' ? 'Sending to PayPal…' : '');
   return (
     <div className={`py-4 text-[14px] leading-snug ${color}`}>
-      <div className={step === 'done' || step === 'error' ? 'font-semibold' : ''}>{text}</div>
+      <div key={step} className={step === 'done' || step === 'error' ? 'hl-pill font-semibold' : ''}>{text}</div>
       {at && <div className="mt-0.5 tabular-nums text-[var(--hl-board-muted)]">{new Date(at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>}
     </div>
   );
@@ -242,6 +242,8 @@ function ResultCell({ data }: ICellRendererParams<LedgerRow>) {
 const rowClassRules = {
   'hl-row-running': ({ data }: RowClassParams<LedgerRow>) => data?.progress.step === 'running',
   'hl-row-excluded': ({ data }: RowClassParams<LedgerRow>) => data?.progress.step === 'excluded',
+  // Added once when PayPal confirms the action, so its flash plays exactly at that moment.
+  'hl-row-done': ({ data }: RowClassParams<LedgerRow>) => data?.progress.step === 'done' && Boolean(data.progress.at),
 };
 
 export function Ledger({ rows }: { rows: LedgerRow[] }) {

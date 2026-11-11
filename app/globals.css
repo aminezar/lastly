@@ -143,3 +143,12 @@ body {
 }
 .home-row { animation: home-row-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 @media (prefers-reduced-motion: reduce) { .home-row { animation: none; } }
+
+/* Ledger row flip: a green wash and edge mark when PayPal confirms the action (the video moment). */
+@keyframes hl-row-confirmed {
+  0% { background-color: rgba(95, 211, 161, 0.22); box-shadow: inset 4px 0 0 #5fd3a1; }
+  70% { box-shadow: inset 4px 0 0 #5fd3a1; }
+  100% { background-color: transparent; box-shadow: inset 4px 0 0 rgba(95, 211, 161, 0.55); }
+}
+.hl-grid .ag-row.hl-row-done { animation: hl-row-confirmed 1800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .hl-grid .ag-row.hl-row-done { animation: none; box-shadow: inset 4px 0 0 rgba(95, 211, 161, 0.55); } }
