@@ -84,12 +84,14 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     setProgress(progressRef.current);
   };
 
-  async function openCase() {
+  async function openCase(docs?: { certificate: DocSlot; notary: DocSlot }) {
+    const cert = docs?.certificate ?? certificate;
+    const act = docs?.notary ?? notary;
     setOpening(true);
     setOpenError(null);
     try {
-      if (!certificate || !notary) return;
-      const body = { certificateText: certificate.text, notaryText: notary.text };
+      if (!cert || !act) return;
+      const body = { certificateText: cert.text, notaryText: act.text };
       const data = await call<Analysis>('/api/estate/analyze', body);
       runId.current = newRunId();
       const initial = Object.fromEntries(data.items.map((i) => [i.key, initialProgress(i)]));
@@ -284,7 +286,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
   const actionableCount = rows.filter((r) => ['ready', 'excluded', 'error'].includes(r.progress.step)).length;
 
   return (
-    <div className="hl flex min-h-full flex-1 flex-col bg-pp-canvas text-pp-ink">
+    <div className="hl flex min-h-full flex-1 flex-col bg-[var(--hl-paper)] text-pp-ink">
       <TopBar
         mode={mode}
         hasCase={Boolean(analysis)}
@@ -332,14 +334,24 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
             }}
             opening={opening}
             error={openError}
-            onOpen={openCase}
+            onOpen={() => openCase()}
+            onQuickDemo={() => {
+              // One click for a visiting judge: both fictional demo documents, then the same check as always.
+              const docs = {
+                certificate: { text: demo.certificateText, name: 'demo', demo: true },
+                notary: { text: demo.notaryText, name: 'demo', demo: true },
+              };
+              setCertificate(docs.certificate);
+              setNotary(docs.notary);
+              void openCase(docs);
+            }}
           />
         ) : (
           <>
             <section id="plan" aria-labelledby="plan-title" className="hl-board mt-10 scroll-mt-20 overflow-hidden rounded-2xl text-white shadow-[0_18px_40px_-20px_rgba(0,20,53,0.6)]">
               <div className="flex flex-col gap-4 px-6 pb-5 pt-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8">
                 <div className="min-w-0 flex-1">
-                  <h2 id="plan-title" className="text-[22px] font-semibold tracking-tight">What happens to each payment</h2>
+                  <h2 id="plan-title" className="hl-serif text-[26px]">What happens to each payment</h2>
                   <p className="mt-1 text-[15px] text-[var(--hl-board-text)]" aria-live="polite">
                     {running
                       ? `Working in PayPal · ${running.index} of ${running.total} · ${running.label}`

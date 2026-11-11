@@ -22,7 +22,7 @@ const MAX_AI_BYTES = 8 * 1024 * 1024;
 export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: () => void }) {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-[440px] flex-col justify-center py-16">
-      <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-pp-navy">Sign in to Heirloom</h1>
+      <h1 className="hl-serif text-[36px] leading-tight text-pp-navy">Sign in to Heirloom</h1>
       <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person chosen to settle someone&apos;s PayPal affairs after they die.</p>
 
       <div className="mt-8 rounded-2xl border border-pp-border bg-white p-6 shadow-[0_10px_30px_-18px_rgba(0,20,53,0.35)]">
@@ -198,18 +198,31 @@ export function Intake(props: {
   opening: boolean;
   error: string | null;
   onOpen: () => void;
+  onQuickDemo?: () => void;
 }) {
   const { mandate } = props;
   const ready = Boolean(props.certificate && props.notary);
 
   return (
     <div className="mx-auto mt-12 max-w-[980px] pb-8">
-      <h1 className="text-balance text-[34px] font-semibold leading-[1.08] tracking-tight text-pp-navy sm:text-[44px]">
+      <h1 className="hl-serif text-balance text-[36px] leading-[1.06] text-pp-navy sm:text-[50px]">
         Close a PayPal life, one approved step at a time.
       </h1>
       <p className="mt-4 max-w-[64ch] text-[18px] leading-relaxed text-pp-muted">
         Three steps before anything happens: we confirm you are the person {mandate.deceased_name} chose, read the documents, and check that they agree. Nothing changes in PayPal until you approve a plan.
       </p>
+
+      {props.onQuickDemo && !props.certificate && !props.notary && (
+        <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-[#e6dfd2] bg-[#f4efe6] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[16px] font-semibold text-pp-navy">Just looking around?</p>
+            <p className="mt-1 text-[15px] text-pp-muted">Open the case with both fictional demo documents. The same checks run.</p>
+          </div>
+          <Button onClick={props.onQuickDemo} disabled={props.opening} className="sm:min-w-[240px]">
+            {props.opening ? 'Checking documents…' : 'Open the demo case'} <Icon name="arrow" />
+          </Button>
+        </div>
+      )}
 
       <ol className="mt-10 space-y-6">
         <li className="rounded-2xl border border-pp-border bg-white p-6">

@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Fraunces } from 'next/font/google';
 
 // Heirloom's front door: what the problem is, who it's for, how the portal works and why it
 // is safe, then a way into the demo case. The boilerplate's developer pages stay reachable
 // at the bottom ("Under the hood").
-
-const serif = Fraunces({ subsets: ['latin'], variable: '--font-serif', axes: ['opsz', 'SOFT'] });
 
 export const metadata: Metadata = {
   title: { absolute: "Heirloom · Nobody should keep paying after they're gone" },
@@ -93,7 +90,7 @@ function Arrow() {
 
 export default function Home() {
   return (
-    <div className={`${serif.variable} hl-home flex min-h-full flex-1 flex-col`}>
+    <div className="hl-home flex min-h-full flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-[1200px] items-center gap-4 px-6 py-6 lg:px-10">
         <span className="font-[family-name:var(--font-serif)] text-[24px] font-semibold tracking-tight text-[var(--home-ink)]">Heirloom</span>
         <span className="ml-auto hidden text-[13px] text-[var(--home-muted)] sm:block">PayPal Sandbox demo · fictional estate</span>

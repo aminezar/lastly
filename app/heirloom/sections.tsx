@@ -3,6 +3,7 @@
 // Presentational pieces of the executor portal. State lives in portal.tsx; these only
 // render it. Order on the page follows the journey: case → plan → act → settle → records.
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { draftNotice } from './letter';
 import { fictional, longDate, merchantName, money, planFor, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money } from './types';
@@ -60,7 +61,7 @@ export function TopBar({ mode, hasCase, user, onReset, onSignOut, busy }: { mode
   return (
     <div className="border-b border-white/10 bg-[var(--hl-header)] text-white print:hidden">
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center gap-4 px-6 lg:px-10">
-        <span className="text-[18px] font-bold tracking-tight">Heirloom</span>
+        <Link href="/" className="hl-serif hl-focus rounded text-[21px] text-white">Heirloom</Link>
         {hasCase && (
           <span className={`ml-2 hidden rounded-full px-3 py-1 text-[12px] font-semibold sm:inline ${mode === 'rehearsal' ? 'bg-white/10 text-[var(--hl-header-muted)]' : 'bg-[var(--hl-final)] text-white'}`}>
             {mode === 'rehearsal' ? 'Rehearsal' : 'Final'}
@@ -94,7 +95,7 @@ export function CaseHero({ analysis }: { analysis: Analysis }) {
       <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-end justify-between gap-x-10 gap-y-6 px-6 py-8 lg:px-10">
         <div>
           <p className="text-[15px] text-[var(--hl-header-muted)]">Estate of</p>
-          <h1 className="mt-1 text-balance text-[34px] font-semibold leading-[1.05] tracking-tight sm:text-[40px]">{name}</h1>
+          <h1 className="hl-serif mt-1 text-balance text-[38px] leading-[1.05] sm:text-[46px]">{name}</h1>
           <p className="mt-3 text-[16px] text-[var(--hl-header-text)]">
             {c.date_of_death ? <>Died {longDate(c.date_of_death)}</> : <>Date of death not found</>}
             <span className="mx-2 text-[var(--hl-header-muted)]">·</span>
@@ -280,7 +281,7 @@ export function Settlement(props: {
   const busy = payout.step === 'sending' || payout.step === 'polling';
   return (
     <section aria-labelledby="settle-title" className="mt-10">
-      <h2 id="settle-title" className="text-[24px] font-semibold tracking-tight text-pp-navy">Pay the heirs</h2>
+      <h2 id="settle-title" className="hl-serif text-[28px] text-pp-navy">Pay the heirs</h2>
       <p className="mt-1 max-w-[70ch] text-[15px] text-pp-muted">
         Money recovered by refunds goes back to the estate first. Heirloom then releases it to the heirs named in the notary act.
       </p>
@@ -371,7 +372,7 @@ export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRo
           <span className="grid size-12 place-items-center rounded-full bg-[var(--hl-done-on-board)] text-[var(--hl-header)]">
             <Icon name="check" className="size-6" />
           </span>
-          <h2 id="resolved-title" className="text-[34px] font-semibold tracking-tight sm:text-[40px]">Estate resolved</h2>
+          <h2 id="resolved-title" className="hl-serif text-[38px] sm:text-[46px]">Estate resolved</h2>
         </div>
         <p className="mt-3 text-[16px] text-[var(--hl-board-text)]">Every approved step is confirmed by PayPal.</p>
         <dl className="mt-8 flex flex-wrap gap-x-14 gap-y-6">
@@ -412,7 +413,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
 
   return (
     <section aria-labelledby="records-title" className="mt-12 print:hidden">
-      <h2 id="records-title" className="text-[24px] font-semibold tracking-tight text-pp-navy">Records</h2>
+      <h2 id="records-title" className="hl-serif text-[28px] text-pp-navy">Records</h2>
       <div role="tablist" aria-label="Records" className="mt-4 flex gap-6 border-b border-pp-border">
         {tabs.map((t, i) => (
           <button
