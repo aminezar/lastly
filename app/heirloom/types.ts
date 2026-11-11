@@ -53,7 +53,11 @@ export type RowProgress = {
   refunded?: Money;
   refundId?: string;
   approveUrl?: string;
+  // Formal notice: written by the AI from the verified facts, or the fixed template when the AI is unavailable.
+  letter?: NoticeLetter;
 };
+
+export type NoticeLetter = { text: string; source: 'ai' | 'template'; model?: string; fallbackReason?: string };
 
 export type LedgerRow = EstateItem & { progress: RowProgress; rehearsal: boolean };
 

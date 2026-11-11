@@ -6,14 +6,17 @@
 //      use the demo ones), then one check. Opening the case only reads PayPal.
 
 import { useRef, useState } from 'react';
-import { Button, Icon } from './sections';
+import { AiBadge, Button, Icon } from './sections';
 import { longDate, type MandateInfo } from './types';
 
-export type DocSlot = { text: string; name: string; demo: boolean } | null;
+// `aiModel` is set when the text was transcribed from a PDF or photo by the AI.
+export type DocSlot = { text: string; name: string; demo: boolean; aiModel?: string } | null;
 type Kind = 'certificate' | 'notary';
 
 const MAX_BYTES = 200_000;
 const TEXT_TYPES = /\.(txt|md|text)$/i;
+const AI_TYPES = /\.(pdf|png|jpe?g|webp)$/i;
+const MAX_AI_BYTES = 8 * 1024 * 1024;
 
 // --- 1. Sign in --------------------------------------------------------------------
 export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: () => void }) {
@@ -53,11 +56,45 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [reading, setReading] = useState<string | null>(null);
+
+  // PDFs and photos are transcribed by the AI on the server; the transcript is then
+  // checked by the same rules as a typed document.
+  async function readWithAi(file: File) {
+    if (file.size > MAX_AI_BYTES) {
+      setError(`${file.name} is larger than 8 MB.`);
+      return;
+    }
+    setReading(file.name);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/estate/read-document', { method: 'POST', body: form });
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; text?: string; model?: string; error?: string };
+      if (!res.ok || !data.ok || !data.text) {
+        setError(
+          res.status === 503
+            ? `Reading PDFs and photos needs AI, which is not switched on here. Use a .txt file or the demo document.`
+            : `The AI could not read ${file.name}${data.error ? ` (${data.error})` : ''}. Try again, or use a .txt file.`,
+        );
+        return;
+      }
+      props.onChange({ text: data.text, name: file.name, demo: false, aiModel: data.model });
+    } catch {
+      setError(`The AI could not read ${file.name}. Check your connection and try again.`);
+    } finally {
+      setReading(null);
+    }
+  }
 
   async function readFile(file: File) {
     setError(null);
+    if (AI_TYPES.test(file.name) || file.type === 'application/pdf' || file.type.startsWith('image/')) {
+      await readWithAi(file);
+      return;
+    }
     if (!TEXT_TYPES.test(file.name) && file.type !== 'text/plain') {
-      setError(`${file.name} is not a text file. Reading PDFs and photos needs AI, which is not switched on in this demo. Use a .txt file or the demo document.`);
+      setError(`${file.name} is not a PDF, photo or text file. Use a PDF, PNG, JPEG or .txt file, or the demo document.`);
       return;
     }
     if (file.size > MAX_BYTES) {
@@ -84,7 +121,14 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
             <span className="grid size-6 place-items-center rounded-full bg-pp-success text-white"><Icon name="check" className="size-3.5" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[15px] font-semibold">{slot.demo ? 'Demo document (fictional)' : slot.name}</p>
-              <p className="text-[13px] text-pp-muted">Ready to check</p>
+              {slot.aiModel ? (
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <AiBadge label={`Read by AI · ${slot.aiModel}`} />
+                  <span className="text-[13px] text-pp-muted">Check the text below matches your document.</span>
+                </div>
+              ) : (
+                <p className="text-[13px] text-pp-muted">Ready to check</p>
+              )}
             </div>
             <button type="button" onClick={() => props.onChange(null)} className="hl-focus rounded-full px-3 py-1.5 text-[14px] font-semibold text-pp-blue hover:bg-white">
               Replace
@@ -108,10 +152,19 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
           className={`mt-3 flex flex-1 flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-8 text-center transition-colors ${dragging ? 'border-pp-blue bg-pp-highlight' : 'border-pp-border bg-white'}`}
         >
           <Icon name="upload" className="size-6 text-pp-muted" />
-          <p className="mt-3 text-[15px] font-semibold">Drop a text file here</p>
-          <p className="mt-1 text-[13px] text-pp-muted">.txt, up to 200 KB</p>
+          {reading ? (
+            <>
+              <p className="mt-3 text-[15px] font-semibold" role="status">The AI is reading {reading}…</p>
+              <p className="mt-1 text-[13px] text-pp-muted">Usually takes a few seconds.</p>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-[15px] font-semibold">Drop a PDF, photo or text file here</p>
+              <p className="mt-1 text-[13px] text-pp-muted">PDFs and photos are read by AI, then checked by rules</p>
+            </>
+          )}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button variant="quiet" className="h-10 px-4 text-[14px]" onClick={() => input.current?.click()}>Choose file</Button>
+            <Button variant="quiet" className="h-10 px-4 text-[14px]" onClick={() => input.current?.click()} disabled={Boolean(reading)}>Choose file</Button>
             <Button variant="quiet" className="h-10 px-4 text-[14px]" onClick={() => props.onChange({ text: props.demoText, name: 'demo', demo: true })}>
               Use demo document
             </Button>
@@ -119,7 +172,7 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
           <input
             ref={input}
             type="file"
-            accept=".txt,.md,text/plain"
+            accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,application/pdf,image/png,image/jpeg,image/webp,text/plain"
             className="sr-only"
             aria-label={`Upload ${props.title}`}
             onChange={(e) => {

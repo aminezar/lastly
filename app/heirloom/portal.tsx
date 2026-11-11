@@ -22,7 +22,8 @@ import {
   type PayoutState,
   type Stage,
 } from './sections';
-import { merchantName, money, type MandateInfo, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money, type RowProgress } from './types';
+import { draftNotice } from './letter';
+import { fictional, merchantName, money, type NoticeLetter, type MandateInfo, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money, type RowProgress } from './types';
 
 async function call<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -130,8 +131,31 @@ export function Portal({ mandate, demo }: { mandate: MandateInfo; demo: { certif
     try {
       if (item.triage === 'formal_notice_only') {
         // No PayPal call: the contract means the payment must keep running until the merchant answers.
-        setRow(item.key, { step: 'done', paypalStatus: item.status, message: 'Notice drafted', at: now() });
-        log({ item: name, action: 'Formal notice drafted; payment left running because the membership is contract-bound', status: 'DRAFTED', tone: 'ok' });
+        // The AI writes the letter from the verified facts; if it is unavailable the fixed template is used and labelled.
+        const c = analysis!.case;
+        let letter: NoticeLetter;
+        try {
+          const r = await call<{ letter: string; model: string }>('/api/estate/letter', {
+            merchant: name,
+            merchantNote: item.note,
+            subscriptionId: item.subscriptionId,
+            amount: item.amount ? `${item.amount.value} ${item.amount.currency_code}` : undefined,
+            nextBillingAt: item.nextBillingAt,
+            deceasedName: (c.deceased_name ?? '').replace(fictional, ''),
+            dateOfDeath: c.date_of_death,
+            executorName: c.executor_name,
+          });
+          letter = { text: r.letter, source: 'ai', model: r.model };
+        } catch (e) {
+          letter = { text: draftNotice(item, analysis!), source: 'template', fallbackReason: e instanceof Error ? e.message : String(e) };
+        }
+        setRow(item.key, { step: 'done', paypalStatus: item.status, message: letter.source === 'ai' ? 'Notice written by AI' : 'Notice drafted', at: now(), letter });
+        log({
+          item: name,
+          action: `Formal notice ${letter.source === 'ai' ? `written by AI (${letter.model})` : 'drafted from the template (AI unavailable)'}; payment left running because the membership is contract-bound`,
+          status: 'DRAFTED',
+          tone: 'ok',
+        });
         return;
       }
       if (item.triage === 'keep_for_family') {

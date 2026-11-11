@@ -12,6 +12,16 @@ export type PayoutState = { step: 'idle' | 'confirm' | 'sending' | 'polling' | '
 export type Stage = 'verify' | 'review' | 'act' | 'settle' | 'resolved';
 
 // --- Icons (one stroke family) ---------------------------------------------------------
+// Marks anything a model produced, so the executor always knows what to double-check.
+export function AiBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-pp-blue/30 bg-pp-highlight px-2.5 py-0.5 text-[12px] font-semibold text-pp-navy">
+      <span className="rounded-sm bg-pp-blue px-1 text-[10px] font-bold leading-[1.4] tracking-wide text-white">AI</span>
+      {label}
+    </span>
+  );
+}
+
 export function Icon({ name, className = 'size-4' }: { name: 'check' | 'x' | 'arrow' | 'lock' | 'download' | 'upload' | 'print' | 'copy'; className?: string }) {
   const paths: Record<typeof name, string> = {
     check: 'M4 10.5l4 4 8-9',
@@ -419,17 +429,28 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
         {tab === 'letters' &&
           notices.map((item) => {
             const ready = item.progress.step === 'done';
+            const letter = item.progress.letter;
+            const text = letter?.text ?? draftNotice(item, analysis);
             return (
               <article key={item.key} className="rounded-xl border border-pp-border bg-white">
                 <header className="flex flex-wrap items-center gap-3 border-b border-pp-border px-6 py-4">
                   <h3 className="text-[17px] font-semibold">Formal notice to {merchantName(item.merchant)}</h3>
-                  <span className="text-[14px] text-pp-muted">{ready ? 'Drafted. Review it, then send it yourself.' : 'Drafted when you approve the plan.'}</span>
+                  {letter?.source === 'ai' && <AiBadge label={`Written by AI · ${letter.model}`} />}
+                  <span className="text-[14px] text-pp-muted">
+                    {!ready
+                      ? item.progress.step === 'running'
+                        ? 'The AI is writing this letter from the verified facts…'
+                        : 'Preview of the template. When you approve the plan, the AI writes the letter for this merchant from the verified facts.'
+                      : letter?.source === 'ai'
+                        ? 'Review every line, then send it yourself. Nothing is sent by Heirloom.'
+                        : 'AI was unavailable, so this is the fixed template. Review it, then send it yourself.'}
+                  </span>
                   {ready && (
                     <Button
                       variant="quiet"
                       className="ml-auto h-9 px-4 text-[14px]"
                       onClick={async () => {
-                        await navigator.clipboard.writeText(draftNotice(item, analysis));
+                        await navigator.clipboard.writeText(text);
                         setCopied(item.key);
                       }}
                     >
@@ -437,7 +458,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
                     </Button>
                   )}
                 </header>
-                <pre className={`whitespace-pre-wrap px-6 py-5 font-[inherit] text-[15px] leading-relaxed ${ready ? 'text-pp-ink' : 'text-pp-muted'}`}>{draftNotice(item, analysis)}</pre>
+                <pre className={`whitespace-pre-wrap px-6 py-5 font-[inherit] text-[15px] leading-relaxed ${ready ? 'text-pp-ink' : 'text-pp-muted'}`}>{text}</pre>
               </article>
             );
           })}
