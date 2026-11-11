@@ -57,7 +57,7 @@ function initialProgress(item: EstateItem): RowProgress {
   return { step: 'ready' };
 }
 
-export function Portal({ mandate, demo }: { mandate: MandateInfo; demo: { certificateText: string; notaryText: string } }) {
+export function Portal({ mandate, demo, publicDemo = false }: { mandate: MandateInfo; demo: { certificateText: string; notaryText: string }; publicDemo?: boolean }) {
   const [signedIn, setSignedIn] = useState(false);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [opening, setOpening] = useState(false);
@@ -381,6 +381,7 @@ export function Portal({ mandate, demo }: { mandate: MandateInfo; demo: { certif
                   }}
                   finalAck={finalAck}
                   onFinalAck={setFinalAck}
+                  finalLocked={publicDemo}
                   onCancel={() => setApproving(false)}
                   onRun={runApproved}
                 />

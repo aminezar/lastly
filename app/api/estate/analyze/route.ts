@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getBalances, getCapture, getSubscription } from '@/lib/paypal';
+import { demoIds, prepareDemo } from '@/lib/demo-mode';
 import { classifyWithRules, crossCheck, demoDocuments, extractDocuments, parseDocument, type Mandate, type MerchantFacts } from '@/lib/estate';
 
 type SeedItem = { key: string; merchant: string; note: string; type?: string };
@@ -48,7 +49,9 @@ export async function POST(request: Request) {
     const extraction = usingDemo ? { source: 'demo-documents' as const } : await extractDocuments(docs);
     const dateOfDeath = certificate.dateOfDeath;
 
-    const ids = seed.sandbox_ids.pending_demo ?? {};
+    // Hosted demo only: put the Sandbox back in its starting state first (lib/demo-mode.ts).
+    await prepareDemo(seed.sandbox_ids.pending_demo ?? {}, seed.items.filter((i) => i.type === 'capture').map((i) => i.key));
+    const ids = demoIds(seed.sandbox_ids.pending_demo ?? {});
     const [balances, ...looked] = await Promise.all([
       getBalances(),
       ...seed.items.map(async (item) => {

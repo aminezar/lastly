@@ -197,6 +197,8 @@ export function ApprovePanel(props: {
   onMode: (m: Mode) => void;
   finalAck: boolean;
   onFinalAck: (v: boolean) => void;
+  // Public hosted demo: permanent cancel is refused by the server, so offer only the pause.
+  finalLocked?: boolean;
   onCancel: () => void;
   onRun: () => void;
 }) {
@@ -230,10 +232,10 @@ export function ApprovePanel(props: {
         <legend className="text-[14px] font-semibold">How should subscriptions be stopped?</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {(['rehearsal', 'final'] as const).map((m) => (
-            <label key={m} className={`hl-focus-within cursor-pointer rounded-lg border px-4 py-2.5 text-[14px] ${props.mode === m ? 'border-white bg-white text-pp-navy' : 'border-[var(--hl-board-line-strong)] text-[var(--hl-board-text)] hover:text-white'}`}>
-              <input type="radio" name="mode" value={m} checked={props.mode === m} onChange={() => props.onMode(m)} className="sr-only" />
+            <label key={m} className={`hl-focus-within rounded-lg border px-4 py-2.5 text-[14px] ${m === 'final' && props.finalLocked ? 'cursor-not-allowed border-[var(--hl-board-line)] text-[var(--hl-board-muted)] opacity-70' : props.mode === m ? 'cursor-pointer border-white bg-white text-pp-navy' : 'cursor-pointer border-[var(--hl-board-line-strong)] text-[var(--hl-board-text)] hover:text-white'}`}>
+              <input type="radio" name="mode" value={m} checked={props.mode === m} disabled={m === 'final' && props.finalLocked} onChange={() => props.onMode(m)} className="sr-only" />
               <span className="font-semibold">{m === 'rehearsal' ? 'Pause (rehearsal)' : 'Cancel permanently'}</span>
-              <span className="ml-2 opacity-80">{m === 'rehearsal' ? 'can be resumed later' : 'cannot be undone'}</span>
+              <span className="ml-2 opacity-80">{m === 'rehearsal' ? 'can be resumed later' : props.finalLocked ? 'off on the public demo' : 'cannot be undone'}</span>
             </label>
           ))}
         </div>

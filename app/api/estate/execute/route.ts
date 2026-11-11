@@ -9,6 +9,7 @@
 //   pollBatchId?
 // }
 // Server-only: the PayPal secret never leaves the server.
+import { publicDemo } from '@/lib/demo-mode';
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
     if (body.subscriptionId) {
       const rehearsal = body.rehearsal !== false;
       if (!rehearsal && body.confirmFinal !== true) return fail(400, 'Final mode cancels permanently and needs confirmFinal: true.');
+      if (!rehearsal && publicDemo()) return fail(403, 'Final mode is turned off on the public demo, so the next visitor gets the same case. Rehearsal pauses the subscription instead.');
       const reason = body.reason ?? 'Subscriber deceased — Heirloom estate wind-down';
       if (rehearsal) await suspendSubscription(body.subscriptionId, reason, key('suspend', body.subscriptionId));
       else await cancelSubscription(body.subscriptionId, reason, key('cancel', body.subscriptionId));

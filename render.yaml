@@ -1,0 +1,27 @@
+# Render Blueprint for the hosted Heirloom demo (PayPal Sandbox only).
+# New > Blueprint in the Render dashboard, pick this repo, then paste the secret values when asked.
+services:
+  - type: web
+    name: heirloom
+    runtime: node
+    # Starter stays awake; the free plan sleeps and the first judge waits ~1 minute.
+    plan: starter
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Every visitor gets a fresh case; permanent cancel is off (lib/demo-mode.ts).
+      - key: HEIRLOOM_PUBLIC_DEMO
+        value: "1"
+      # Secrets: entered in the Render dashboard, never committed.
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AG_STUDIO
+        sync: false

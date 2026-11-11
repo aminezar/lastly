@@ -349,6 +349,26 @@ export function createOrder(input: { customId: string; amount: Money; descriptio
   });
 }
 
+// Sandbox-only demo seed: an order paid with PayPal's published Sandbox test card completes
+// at once, with no buyer login. Used by the hosted demo to put back a refundable charge
+// (same as scripts/seed-capture.mjs). BASE_URL is always the Sandbox.
+// PayPal requires a PayPal-Request-Id whenever an order carries a payment_source.
+export function createTestCardCapture(input: { customId: string; amount: Money; description: string; requestId: string }): Promise<Order> {
+  return post<Order>('/v2/checkout/orders', {
+    intent: 'CAPTURE',
+    purchase_units: [{ reference_id: input.customId, custom_id: input.customId, amount: input.amount, description: input.description }],
+    payment_source: {
+      card: {
+        name: 'Jean Dupont',
+        number: '4032039932256235',
+        expiry: '2029-12',
+        security_code: '123',
+        billing_address: { address_line_1: 'Rue de la Loi 16', admin_area_2: 'Brussels', postal_code: '1000', country_code: 'BE' },
+      },
+    },
+  }, input.requestId);
+}
+
 export function getOrder(id: string): Promise<Order> {
   return get<Order>(`/v2/checkout/orders/${encodeURIComponent(id)}`);
 }
