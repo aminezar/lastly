@@ -4,6 +4,7 @@
 // subscription. Rehearsal only; never cancels. Run scripts/seed-capture.mjs afterwards
 // to get a fresh refundable capture.
 //   node scripts/test-estate-flow.mjs [spareSubscriptionId] [baseUrl]
+// The spare must be one of the estate's seeded subscriptions: execute refuses any other ID.
 import { loadEnvLocal, call, token } from './_paypal-env.mjs';
 
 const SPARE = process.argv[2];

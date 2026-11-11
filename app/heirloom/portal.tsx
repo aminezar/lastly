@@ -73,6 +73,8 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [payout, setPayout] = useState<PayoutState>({ step: 'idle' });
   const runId = useRef('');
+  // The documents this case was opened with; every action sends them so the server re-checks them.
+  const caseDocs = useRef<{ certificateText: string; notaryText: string }>({ certificateText: '', notaryText: '' });
   const progressRef = useRef<Record<string, RowProgress>>({});
 
   const log = useCallback((entry: Omit<AuditEntry, 'at'> & { at?: string }) => {
@@ -94,6 +96,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       const body = { certificateText: cert.text, notaryText: act.text };
       const data = await call<Analysis>('/api/estate/analyze', body);
       runId.current = newRunId();
+      caseDocs.current = body;
       const initial = Object.fromEntries(data.items.map((i) => [i.key, initialProgress(i)]));
       progressRef.current = initial;
       setProgress(initial);
@@ -163,6 +166,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       if (item.triage === 'keep_for_family') {
         const r = await call<{ at: string; handover: { subscriptionId: string; status: string; approveUrl?: string } }>('/api/estate/execute', {
           runId: runId.current,
+          documents: caseDocs.current,
           handover: { key: item.key, merchant: name },
         });
         setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Family link ready', at: r.at });
@@ -170,7 +174,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         return;
       }
       if (item.captureId) {
-        const r = await call<{ at: string; refund: { id: string; status: string; amount?: Money } }>('/api/estate/execute', { runId: runId.current, captureId: item.captureId });
+        const r = await call<{ at: string; refund: { id: string; status: string; amount?: Money } }>('/api/estate/execute', { runId: runId.current, documents: caseDocs.current, captureId: item.captureId });
         const ok = r.refund.status === 'COMPLETED';
         setRow(item.key, { step: 'done', paypalStatus: ok ? 'REFUNDED' : r.refund.status, resultId: r.refund.id, resultKind: 'Refund', refundId: r.refund.id, refunded: ok ? r.refund.amount : undefined, message: ok ? `${money(r.refund.amount)} returned` : `Refund ${r.refund.status.toLowerCase()}`, at: r.at });
         log({ at: r.at, item: `${name} charge`, action: `Post-death charge refunded to its original payment source (charge ${item.captureId})`, paypalId: r.refund.id, status: r.refund.status, tone: ok ? 'ok' : 'pending', amount: r.refund.amount ? `${r.refund.amount.value} ${r.refund.amount.currency_code}` : undefined });
@@ -179,6 +183,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       if (item.subscriptionId) {
         const r = await call<{ at: string; subscription: { id: string; status: string } }>('/api/estate/execute', {
           runId: runId.current,
+          documents: caseDocs.current,
           subscriptionId: item.subscriptionId,
           rehearsal,
           confirmFinal: !rehearsal && finalAck,
@@ -235,6 +240,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     try {
       const r = await call<{ at: string; payout: { batchId: string; status: string; amount: string } }>('/api/estate/execute', {
         runId: runId.current,
+        documents: caseDocs.current,
         payout: { receiver: analysis.payoutReceiver.email, amount: recovered.value, currency: recovered.currency_code, refundIds },
       });
       log({ at: r.at, item: 'Heirs', action: `Payout to ${analysis.payoutReceiver.email}`, paypalId: r.payout.batchId, status: r.payout.status, tone: 'pending', amount: `${r.payout.amount} ${recovered.currency_code}` });

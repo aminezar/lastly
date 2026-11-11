@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { aiEnabled, aiModels } from "@/lib/ai";
+import { publicDemo } from "@/lib/demo-mode";
 import { getDashboardData } from "@/lib/dashboard-data";
 import { Dashboard } from "./dashboard";
 
@@ -14,11 +15,12 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   // Only the model ids reach the client; the OpenAI key stays on the server (lib/ai.ts).
+  // The public demo has no free-form assistant: its proxy is closed there (app/api/ai/responses).
   return (
     <Dashboard
       data={data}
       licenseKey={process.env.AG_STUDIO}
-      aiModels={aiEnabled() ? aiModels() : undefined}
+      aiModels={aiEnabled() && !publicDemo() ? aiModels() : undefined}
     />
   );
 }

@@ -215,6 +215,16 @@ export function parseDocument(text: string): ParsedDocument {
 const same = (a?: string, b?: string) =>
   Boolean(a && b && a.replace(/\s+/g, ' ').trim().toLowerCase() === b.replace(/\s+/g, ' ').trim().toLowerCase());
 
+/**
+ * The same document gate /api/estate/analyze applies, for re-checking on the server before any
+ * PayPal action. No text at all means the fictional demo documents, exactly as analyze reads it.
+ */
+export function documentsVerified(docs: { certificateText?: string; notaryText?: string } | undefined, mandate: Mandate): boolean {
+  const empty = !docs?.certificateText?.trim() && !docs?.notaryText?.trim();
+  const { certificateText, notaryText } = empty ? demoDocuments() : { certificateText: docs?.certificateText ?? '', notaryText: docs?.notaryText ?? '' };
+  return crossCheck(parseDocument(certificateText), parseDocument(notaryText), mandate).every((c) => c.pass);
+}
+
 export function crossCheck(certificate: ParsedDocument, notary: ParsedDocument, mandate: Mandate): TrustCheck[] {
   const show = (v?: string) => v ?? 'not found';
   return [

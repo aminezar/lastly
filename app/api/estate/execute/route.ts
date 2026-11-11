@@ -6,10 +6,15 @@
 //   captureId?,                              // refund a post-death charge to its source
 //   handover?: { key, merchant },            // new subscription on the same plan for the family
 //   payout?: { receiver, amount, currency?, refundIds[] },  // gated: heir + recovered cap
-//   pollBatchId?
+//   pollBatchId?,
+//   documents?: { certificateText, notaryText }  // the case's documents, re-checked here
 // }
+// Nothing from the browser is trusted: before any action the documents are cross-checked
+// against the Legacy Mandate again (same rule as /analyze), and only this estate's own
+// subscriptions, captures and refunds are accepted.
 // Server-only: the PayPal secret never leaves the server.
-import { publicDemo } from '@/lib/demo-mode';
+import { estateIds, publicDemo } from '@/lib/demo-mode';
+import { documentsVerified, type Mandate } from '@/lib/estate';
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -37,12 +42,17 @@ type Body = {
   handover?: { key: string; merchant: string };
   payout?: { receiver: string; amount: string; currency?: string; refundIds?: string[] };
   pollBatchId?: string;
+  documents?: { certificateText?: string; notaryText?: string };
 };
 
 type Seed = {
-  estate: { sandbox_payout_receiver: { email: string } };
-  sandbox_ids: { pending_demo?: { plan_ids?: Record<string, string> } };
+  estate: { sandbox_payout_receiver: { email: string }; legacy_mandate: Mandate };
+  sandbox_ids: { pending_demo?: { plan_ids?: Record<string, string>; subscription_ids?: Record<string, string>; capture_ids?: Record<string, string> } };
 };
+
+// A refund's "up" link names the capture it refunded.
+const refundedCapture = (r?: { links?: { rel: string; href: string }[] }) =>
+  r?.links?.find((l) => l.rel === 'up')?.href.match(/\/captures\/([A-Z0-9]+)/)?.[1];
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
@@ -62,7 +72,14 @@ export async function POST(request: Request) {
     // the first result instead of acting again.
     const key = (action: string, target: string) => `heirloom-${runId}-${action}-${target}`.slice(0, 108);
 
+    const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as Seed;
+    // Gate 0, for every action: the documents must still pass the cross-check that unlocked the plan.
+    if (!documentsVerified(body.documents, seed.estate.legacy_mandate))
+      return fail(403, 'The documents do not match the Legacy Mandate, so no action can run for this case.');
+    const own = estateIds(seed.sandbox_ids.pending_demo ?? {});
+
     if (body.subscriptionId) {
+      if (!own.subscriptions.has(body.subscriptionId)) return fail(403, 'That subscription is not part of this estate.');
       const rehearsal = body.rehearsal !== false;
       if (!rehearsal && body.confirmFinal !== true) return fail(400, 'Final mode cancels permanently and needs confirmFinal: true.');
       if (!rehearsal && publicDemo()) return fail(403, 'Final mode is turned off on the public demo, so the next visitor gets the same case. Rehearsal pauses the subscription instead.');
@@ -74,6 +91,7 @@ export async function POST(request: Request) {
     }
 
     if (body.captureId) {
+      if (!own.captures.has(body.captureId)) return fail(403, 'That charge is not part of this estate.');
       const refund = await refundCapturedPayment(
         body.captureId,
         { note_to_payer: 'Post-death charge refunded to the original payment source (Lastly estate resolution)' },
@@ -83,8 +101,6 @@ export async function POST(request: Request) {
       const detail = await getRefund(refund.id).catch(() => undefined);
       return NextResponse.json({ ok: true, at, refund: { id: refund.id, status: detail?.status ?? refund.status, captureId: body.captureId, amount: detail?.amount } });
     }
-
-    const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as Seed;
 
     if (body.handover?.key) {
       // Keep for Family: the family member approves a NEW subscription on the same plan.
@@ -107,7 +123,10 @@ export async function POST(request: Request) {
       if (receiver?.toLowerCase() !== seed.estate.sandbox_payout_receiver.email.toLowerCase())
         return fail(403, 'Payouts go only to the heir account recorded for this estate.');
       // Gate 2: never more than what refunds actually recovered, re-read from PayPal.
-      const refunds = await Promise.all(refundIds.slice(0, 10).map((id) => getRefund(id).catch(() => undefined)));
+      // Gate 3: only refunds of this estate's own charges count.
+      const refunds = (await Promise.all(refundIds.slice(0, 10).map((id) => getRefund(id).catch(() => undefined)))).filter((r) =>
+        own.captures.has(refundedCapture(r) ?? ''),
+      );
       const recovered = refunds
         .filter((r) => r?.status === 'COMPLETED' && r.amount?.currency_code === currency)
         .reduce((sum, r) => sum + Number(r!.amount!.value), 0);

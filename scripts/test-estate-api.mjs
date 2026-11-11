@@ -78,7 +78,7 @@ const NOTARY = 'Notary act for the estate of Jean Dupont, deceased 20 October 20
   check('execute empty → 400', r1.status === 400);
   const r2 = await post('/api/estate/execute', { captureId: 'X' });
   check('execute without runId → 400', r2.status === 400 && /runId/.test(r2.data.error));
-  const r3 = await post('/api/estate/execute', { runId: 'test', subscriptionId: 'I-97071AR8T6TS', rehearsal: false });
+  const r3 = await post('/api/estate/execute', { runId: 'test', subscriptionId: 'I-MN83BBV5ENFM', rehearsal: false });
   check('final cancel without confirmFinal → 400', r3.status === 400 && /confirmFinal/.test(r3.data.error));
   const r4 = await post('/api/estate/execute', { runId: 'test', payout: { receiver: 'attacker@example.com', amount: '1.00', refundIds: [] } });
   check('payout to non-heir → 403', r4.status === 403);
@@ -88,6 +88,12 @@ const NOTARY = 'Notary act for the estate of Jean Dupont, deceased 20 October 20
   check('negative payout → 400', r6.status === 400);
   const r7 = await post('/api/estate/execute', { runId: 'test', handover: { key: 'unknown', merchant: 'X' } });
   check('handover for unknown plan → 400', r7.status === 400);
+  const r8 = await post('/api/estate/execute', { runId: 'test', subscriptionId: 'I-97071AR8T6TS', rehearsal: true });
+  check('subscription outside the estate → 403', r8.status === 403, r8.data.error);
+  const r9 = await post('/api/estate/execute', { runId: 'test', captureId: '3GH37097HC473840V' });
+  check('capture outside the estate → 403', r9.status === 403, r9.data.error);
+  const r10 = await post('/api/estate/execute', { runId: 'test', captureId: 'X', documents: { certificateText: 'Deceased: Someone Else\nDate of death: 1 January 2026', notaryText: 'Executor: Nobody' } });
+  check('mismatched documents → 403', r10.status === 403 && /Legacy Mandate/.test(r10.data.error), r10.data.error);
 }
 
 // 8. Polling a known payout batch reads PayPal.

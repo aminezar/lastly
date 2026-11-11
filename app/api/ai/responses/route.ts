@@ -1,4 +1,5 @@
 import { aiModels, openAiKey } from '@/lib/ai';
+import { publicDemo } from '@/lib/demo-mode';
 
 // Proxy for AG Studio's OpenAI adapter (app/dashboard/studio/openai-adapter.ts). The adapter
 // runs in the browser and POSTs to `${endpoint}/responses`; with its endpoint set to /api/ai it lands
@@ -14,6 +15,10 @@ const MAX_OUTPUT_TOKENS = 32_000;
 const error = (status: number, message: string) => Response.json({ error: { message } }, { status });
 
 export async function POST(request: Request) {
+  // On the public demo this would be an open, keyed OpenAI proxy for anyone on the internet, so it
+  // is closed there (and the dashboard hides its assistant). Lastly's own AI steps (document reading,
+  // letters, plan review) call OpenAI server-side with fixed prompts and are not affected.
+  if (publicDemo()) return error(403, 'The free-form AI assistant is turned off on the public demo.');
   const apiKey = openAiKey();
   if (!apiKey) return error(503, 'The AI assistant is not configured: set AG_STUDIO_OPENAI_API_KEY in .env.local.');
 

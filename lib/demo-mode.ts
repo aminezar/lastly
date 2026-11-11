@@ -17,6 +17,9 @@ const firstToken = (v?: string) => v?.split(' ')[0];
 
 // The capture this server created, which replaces the seed file's (the file is not rewritten).
 let freshCaptures: Record<string, string> = {};
+// Every capture this server has made for the demo, so a refund from a run that started before
+// the latest reset still counts as the estate's own when its payout is sent.
+const madeCaptures = new Set<string>();
 let running: Promise<void> | null = null;
 let lastRun = 0;
 
@@ -24,6 +27,20 @@ let lastRun = 0;
 export function demoIds(ids: Ids): Ids {
   if (!publicDemo()) return ids;
   return { ...ids, capture_ids: { ...(ids.capture_ids ?? {}), ...freshCaptures } };
+}
+
+/**
+ * The PayPal IDs that belong to this estate: its seeded subscriptions and its captures (the
+ * seeded one plus any this server created). /api/estate/execute refuses every other ID, so a
+ * direct POST cannot touch other subscriptions or charges on the Sandbox merchant.
+ */
+export function estateIds(ids: Ids): { subscriptions: Set<string>; captures: Set<string> } {
+  const current = demoIds(ids);
+  const tokens = (m?: Record<string, string>) => Object.values(m ?? {}).map(firstToken).filter((id): id is string => Boolean(id));
+  return {
+    subscriptions: new Set(tokens(current.subscription_ids)),
+    captures: new Set([...tokens(ids.capture_ids), ...tokens(current.capture_ids), ...madeCaptures]),
+  };
 }
 
 /** Put the Sandbox back in its starting state. Runs at most once at a time, and not more than every 20 s. */
@@ -61,6 +78,7 @@ async function reset(ids: Ids, captureKeys: string[]) {
         const fresh = order.purchase_units?.[0]?.payments?.captures?.[0];
         if (fresh?.id && fresh.status === 'COMPLETED') {
           freshCaptures = { ...freshCaptures, [key]: fresh.id };
+          madeCaptures.add(fresh.id);
           console.log(`[demo] fresh post-death charge ${fresh.id} for ${key}`);
         }
       } catch (e) {

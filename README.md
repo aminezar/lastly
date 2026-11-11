@@ -44,7 +44,7 @@ Credentials live only in `.env.local` (gitignored) and never leave the server.
 
 PayPal Sandbox REST API · AG Grid (the Estate Ledger in the executor portal, `app/heirloom/ledger.tsx`) · Next.js / React / TypeScript · AI document extraction + triage · Render (hosting)
 
-Built on the official `paypaldev/hackathon-paypal-ag-grid-boilerplate`. Its AG Studio dashboard at `/dashboard` is kept as it came from the boilerplate; the Lastly portal itself uses AG Grid.
+Built on the official `paypaldev/hackathon-paypal-ag-grid-boilerplate`. Its AG Studio dashboard at `/dashboard` is kept as it came from the boilerplate, except that on the hosted public demo its free-form AI assistant is off and its OpenAI proxy (`/api/ai/responses`) refuses requests; the Lastly portal itself uses AG Grid.
 
 ## Licence
 
