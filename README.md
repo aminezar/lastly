@@ -6,6 +6,12 @@ After a death, recurring PayPal payments keep charging a person who is gone, ref
 
 Full product spec: [`PRODUCT.md`](PRODUCT.md) · Hackathon facts: [`docs/hackathon/HACKATHON.md`](docs/hackathon/HACKATHON.md)
 
+## Try it
+
+Live demo: **https://heirloom-vxgl.onrender.com/heirloom** (PayPal Sandbox only, fictional people).
+
+The hosted demo runs in public demo mode: each visitor gets a fresh copy of the case, and permanent subscription cancel is turned off so the demo estate stays intact for the next judge. It is on Render's free plan, so the first load after a quiet period can take up to a minute while the server wakes.
+
 ## Run locally
 
 Requires Node 20.9+ and a PayPal Sandbox REST app ([developer.paypal.com](https://developer.paypal.com/dashboard/applications/sandbox)) with Transaction Search enabled.
