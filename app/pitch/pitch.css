@@ -450,5 +450,5 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 }
 .pd-redteam b { flex-shrink: 0; white-space: nowrap; font-family: var(--serif); font-size: 34px; font-weight: 500; color: var(--green); }
 .pd-one .pd-principle { flex-wrap: wrap; gap: 26px 60px; max-width: 1300px; font-size: 42px; }
-.pd-intro { padding-left: 16px; border-left: 3px solid var(--accent); }
+.pd-intro { color: var(--accent); font-weight: 600; }
 .pd-filming { margin: 4px 0 0; padding: 12px 16px 12px 32px; border-radius: 12px; background: var(--paper-deep); font-size: 15px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px; }
