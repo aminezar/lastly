@@ -73,7 +73,7 @@ export type AuditEntry = {
 
 export const TRIAGE_LABEL: Record<Triage, string> = {
   stop_and_refund: 'Stop & Refund',
-  keep_for_family: 'Keep for Family',
+  keep_for_family: 'Hand Over',
   formal_notice_only: 'Formal Notice',
 };
 

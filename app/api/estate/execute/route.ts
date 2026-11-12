@@ -4,7 +4,7 @@
 //   runId,                                   // one per opened case; makes retries idempotent
 //   subscriptionId?, rehearsal?, confirmFinal?,  // stop: suspend (rehearsal) or cancel (final)
 //   captureId?,                              // refund a post-death charge to its source
-//   handover?: { key, merchant },            // new subscription on the same plan for the family
+//   handover?: { key, merchant },            // new subscription on the same plan for whoever keeps it
 //   payout?: { receiver, amount, currency?, refundIds[] },  // gated: heir + recovered cap
 //   pollBatchId?,
 //   documents?: { certificateText, notaryText }  // the case's documents, re-checked here
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     }
 
     if (body.handover?.key) {
-      // Keep for Family: the family member approves a NEW subscription on the same plan.
+      // Hand over: whoever keeps it approves a NEW subscription on the same plan.
       // The deceased's subscription is left running until that approval; nothing is moved.
       const planId = seed.sandbox_ids.pending_demo?.plan_ids?.[body.handover.key];
       if (!planId) return fail(400, `No Sandbox plan recorded for "${body.handover.key}".`);

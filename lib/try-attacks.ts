@@ -299,7 +299,7 @@ async function readDoc(kind: DocKind, doc: Doc): Promise<Read> {
   return r;
 }
 
-const ACTIONS: Record<string, string> = { stop_and_refund: 'Stop, and return what was charged after the death', keep_for_family: 'Keep for the family', formal_notice_only: 'Write to the company' };
+const ACTIONS: Record<string, string> = { stop_and_refund: 'Stop, and return what was charged after the death', keep_for_family: 'Hand over to whoever keeps it', formal_notice_only: 'Write to the company' };
 
 async function runDocuments(certificate: Doc, notary: Doc, labels = { certificate: 'Death certificate', notary: 'Notary act' }): Promise<Omit<RunResult, 'id' | 'ranAt' | 'ms'>> {
   const { estate, items } = await seed();

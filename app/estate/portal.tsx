@@ -248,7 +248,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
           documents: caseDocs.current,
           handover: { key: item.key, merchant: name },
         });
-        setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Waiting for the family to approve', at: r.at });
+        setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Waiting for whoever keeps it to approve', at: r.at });
         log({ at: r.at, item: name, action: 'New subscription on the same plan created for whoever keeps it to approve; original keeps running until then', paypalId: r.handover.subscriptionId, status: r.handover.status, tone: 'pending' });
         return;
       }

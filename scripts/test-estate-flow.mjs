@@ -52,7 +52,7 @@ for (let i = 0; i < 12 && p1.data.payout?.batchId; i++) {
 }
 check('payout batch settles SUCCESS', final === 'SUCCESS', final);
 
-// Handover: a new subscription on the family plan, waiting for the family member.
+// Handover: a new subscription on the family plan, waiting for whoever keeps it.
 const h = await post('/api/estate/execute', { runId: RUN, handover: { key: 'family-cloud', merchant: 'FamilyCloud' } });
 check('handover subscription APPROVAL_PENDING with approve link', h.data.handover?.status === 'APPROVAL_PENDING' && /^https:\/\/www\.sandbox\.paypal\.com/.test(h.data.handover?.approveUrl ?? ''), `${h.data.handover?.subscriptionId} ${h.data.handover?.status}`);
 

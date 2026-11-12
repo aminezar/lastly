@@ -401,7 +401,7 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
   const noticeRows = done.filter((r) => r.triage === 'formal_notice_only');
   const handed = handedRows.length;
   const notices = noticeRows.length;
-  // Handovers wait for the family to approve, notices for the merchant to answer.
+  // Handovers wait for whoever keeps it to approve, notices for the merchant to answer.
   const waiting = handed + notices;
   // Only what actually happened: a zero or an empty figure is noise on the closing screen.
   const stats = [
