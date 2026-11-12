@@ -474,3 +474,4 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 .pd-receipt-ok { color: #00875a; }
 .pd-receipt-line { font-family: var(--serif); font-size: 52px; color: var(--ink); }
 .pd-slide.is-active .pd-receipt-line, .pd-slide.is-active .pd-receipt { animation-duration: var(--dur, 1000ms); }
+.pd-redteam em { font-style: normal; font-weight: 600; color: #fff; white-space: nowrap; }

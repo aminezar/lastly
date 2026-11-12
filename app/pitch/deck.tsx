@@ -203,7 +203,7 @@ const SLIDES: Slide[] = [
     shots: [
       {
         at: '0:39',
-        show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents agree”.',
+        show: 'Record the browser at 1280px wide or more. “Continue as Marie”, and hold one quiet beat on the welcome: “We’re sorry about your father. Here is what we can take off your hands.” Then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents agree”.',
         say: 'Marie adds the papers she already has: the death certificate and the notary act. AI reads them, the rules check they agree with each other and with what Jean signed, and the AI reads them once more on its own. Nothing else is asked of her.',
       },
       {
@@ -382,7 +382,7 @@ const SLIDES: Slide[] = [
             Re-checked on the server before every PayPal call, against the estate’s own IDs.
           </p>
           <p className="pd-in pd-redteam" style={d(2600)}>
-            <b>21 attacks, 21 held</b> forged facts, injected prompts, doctored scans, direct calls to the money routes. Both genuine cases still opened.
+            <b>21 attacks, 21 held</b> <span>Both genuine cases still opened. Run the attacks yourself at <em>{BRAND.demoUrl}/try-to-cheat-it</em></span>
           </p>
         </div>
       </div>
