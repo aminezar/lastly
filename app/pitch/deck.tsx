@@ -382,7 +382,7 @@ const SLIDES: Slide[] = [
             Re-checked on the server before every PayPal call, against the estate’s own IDs.
           </p>
           <p className="pd-in pd-redteam" style={d(2600)}>
-            <b>21 attacks, 21 held</b> <span>Both genuine cases still opened. Run the attacks yourself at <em>{BRAND.demoUrl}/try-to-cheat-it</em></span>
+            <b>21 attacks, 21 held</b> <span>Run them yourself, including a perfect forgery: even then, money only goes back to where it came from, or to the heir on file. <em>{BRAND.demoUrl}/try-to-cheat-it</em></span>
           </p>
         </div>
       </div>
