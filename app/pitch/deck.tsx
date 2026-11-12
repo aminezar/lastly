@@ -173,7 +173,7 @@ const SLIDES: Slide[] = [
     shots: [
       {
         at: '0:37',
-        show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents verified”.',
+        show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents agree”.',
         say: 'Marie uploads the scanned death certificate and notary act. AI reads both. Rules check that they agree with each other and with Jean’s mandate, and the AI reads them a second time on its own: same person, October 20th, Marie as executor. Four checks, all green.',
       },
       {
@@ -215,7 +215,7 @@ const SLIDES: Slide[] = [
               <p className="pd-card-kicker">Estate of</p>
               <p className="pd-card-name">Jean Dupont</p>
             </div>
-            <span className="pd-in pd-fade pd-verified" style={d(1100)}><i />Documents verified</span>
+            <span className="pd-in pd-fade pd-verified" style={d(1100)}><i />Documents agree</span>
           </div>
           <ul className="pd-rows">
             {[

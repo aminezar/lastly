@@ -2,7 +2,7 @@
 
 **PayPal AI Hackathon — Build What's Next with PayPal and AI** (deadline Nov 12, 2026)
 
-After a death, recurring PayPal payments keep charging a person who is gone, refunds for post-death charges go unclaimed, and the balance sits locked while families contact every merchant by hand. Lastly is an Estate Resolution Portal for the pre-authorized family executor: upload the death certificate and notary act, and Lastly checks them against the Legacy Mandate the account holder signed while alive, reads the estate's subscriptions and post-death charge from PayPal by ID, and sorts each one into **Stop & Refund**, **Keep for Family**, or **Formal Notice Only**. Approved actions execute live in PayPal Sandbox (pause or cancel, refund to source, family handover), and the recovered money is paid out to the heir named in the notary act, with a notary-ready audit report.
+After a death, recurring PayPal payments keep charging a person who is gone, refunds for post-death charges go unclaimed, and families contact every merchant by hand. Lastly is an Estate Resolution Portal for the pre-authorized family executor: upload the death certificate and notary act, and Lastly checks them against the Legacy Mandate the account holder signed while alive, reads the estate's subscriptions and post-death charge from PayPal by ID, and sorts each one into **Stop & Refund**, **Keep for Family**, or **Formal Notice Only**. Approved actions execute live in PayPal Sandbox (pause or cancel, refund to source, family handover), and the recovered money is paid out to the heir named in the notary act, with a notary-ready audit report.
 
 **AI reads and writes, rules decide.** AI (OpenAI `gpt-5.4-mini` through the Responses API) does four jobs: it reads uploaded PDFs and photos of the documents; it reads both documents a second time on its own, and any fact where its reading differs from the rules' reading holds the case for a person to check; it explains each payment's decision in plain words and flags anything a person should check; and it writes the formal bereavement letter for contract-bound merchants. Which payments are stopped, refunded or kept, and whether the documents match, is decided by explicit rules in `lib/estate.ts`, and the executor approves every PayPal action. No money moves on a model's say.
 
@@ -32,6 +32,24 @@ node scripts/reset-estate.mjs        # after a rehearsal: re-activate paused sub
 ```
 
 Credentials live only in `.env.local` (gitignored) and never leave the server.
+
+## We attacked it
+
+We tried to get a forged case through, and to trick the AI, with 21 attacks: changed dates, a different executor or deceased, a court correction hidden in the text, prompt injection in typed documents, faint and printed instructions to the AI inside scanned documents, garbage and oversized input, and direct requests to the money routes. The latest run against the hosted demo stopped **21 of 21**, and both genuine cases (typed and scanned) still opened. Full table: [`docs/red-team-results.md`](docs/red-team-results.md).
+
+What it showed:
+
+- **Fixed patterns alone miss things.** A court correction of the date, and an addendum replacing the executor, passed the rules. The AI second reader held both.
+- **Injection can fool one AI reading, not two.** A faint hidden line on a scanned certificate made the transcribing model write 20 October where the page says 2 October, so the rules passed it. The second reader, reading the original file with its own prompt, read 2 October and held the case.
+- **Money never depends on the AI.** Foreign charge or subscription IDs, a payout to another account, and a payout with no refund behind it were all refused by the server before any PayPal call.
+- One earlier hosted run got a transient 502 while reading one scan (no verdict, counted as a failure); the rerun passed. Model outputs can vary, which is why a difference or an unusable answer holds the case instead of opening it.
+
+Rerun it yourself (AI and rule checks only, nothing is read or changed in PayPal; needs an OpenAI key on the server):
+
+```bash
+python3 scripts/red-team/make-attack-documents.py   # optional: rebuild the attack scans
+BASE=https://heirloom-vxgl.onrender.com node scripts/red-team/run.mjs
+```
 
 ## Honest limits (read this, judges)
 

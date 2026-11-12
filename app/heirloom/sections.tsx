@@ -123,7 +123,7 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
           <Icon name={ok ? 'check' : 'x'} className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[16px] font-semibold">{ok ? 'Documents verified' : heldByAi ? 'Case held: the AI read the documents differently' : 'Case blocked: documents do not match'}</p>
+          <p className="text-[16px] font-semibold">{ok ? 'Documents agree' : heldByAi ? 'Case held: the AI read the documents differently' : 'Case blocked: documents do not match'}</p>
           <p className="text-[13px] text-[var(--hl-header-muted)]">{passed} of {counted.length} checks passed</p>
         </div>
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="hl-focus rounded-full px-3 py-1.5 text-[13px] font-semibold text-[var(--hl-header-text)] hover:bg-white/10">

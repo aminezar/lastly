@@ -106,7 +106,7 @@ export default function Home() {
               Nobody should keep paying after they&rsquo;re gone.
             </h1>
             <p className="mt-6 max-w-[34em] text-pretty text-[18px] leading-relaxed text-[var(--home-body)]">
-              When someone dies, their subscriptions keep charging, refunds go unclaimed and the balance sits locked. Lastly gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
+              When someone dies, their subscriptions keep charging, refunds go unclaimed and families chase every merchant by hand. Lastly gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/heirloom" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
@@ -127,7 +127,7 @@ export default function Home() {
                   <p className="font-[family-name:var(--font-serif)] text-[24px] font-medium leading-tight">Jean Dupont</p>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5fd3a1]/15 px-3 py-1 text-[12px] font-semibold text-[#5fd3a1]">
-                  <span className="size-1.5 rounded-full bg-[#5fd3a1]" /> Documents verified
+                  <span className="size-1.5 rounded-full bg-[#5fd3a1]" /> Documents agree
                 </span>
               </div>
               <ul className="mt-5 divide-y divide-white/10 border-y border-white/10">
@@ -165,7 +165,7 @@ export default function Home() {
               {[
                 ['The charges keep coming', 'Streaming, cloud storage, gyms. Recurring payments do not know that the person behind them has died.'],
                 ['Every merchant, by hand', 'Families find out months later and contact each company one by one, often with the same documents each time.'],
-                ['The money waits', 'Refunds for charges after death go unclaimed, and the balance stays locked until someone settles it.'],
+                ['The money waits', 'Refunds for charges taken after the death go unclaimed unless someone asks for them.'],
               ].map(([title, body]) => (
                 <div key={title}>
                   <p className="text-[16px] font-semibold text-[var(--home-ink)]">{title}</p>
