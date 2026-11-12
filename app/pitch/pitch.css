@@ -122,8 +122,8 @@ body:has(.pd-root) nextjs-portal { display: none; }
   font-family: var(--serif);
   font-weight: 500;
   font-size: 132px;
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  line-height: 1.04;
+  letter-spacing: -0.012em;
   color: var(--ink);
 }
 .pd-h2 {
@@ -132,8 +132,8 @@ body:has(.pd-root) nextjs-portal { display: none; }
   font-family: var(--serif);
   font-weight: 500;
   font-size: 84px;
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.008em;
 }
 .pd-h2-wide { max-width: 1600px; }
 .pd-on-navy { color: #fff; }
@@ -301,7 +301,7 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 
 /* ——— Slide 7: close ——— */
 .pd-close { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.pd-close-h { margin-top: 40px; max-width: 1500px; font-family: var(--serif); font-weight: 500; font-size: 104px; line-height: 1.04; letter-spacing: -0.02em; }
+.pd-close-h { margin-top: 40px; max-width: 1500px; font-family: var(--serif); font-weight: 500; font-size: 104px; line-height: 1.06; letter-spacing: -0.008em; }
 .pd-links { margin-top: 56px; display: flex; gap: 72px; }
 .pd-links p { display: flex; flex-direction: column; gap: 8px; }
 .pd-links span { font-size: 20px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
@@ -452,3 +452,25 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 .pd-one .pd-principle { flex-wrap: wrap; gap: 26px 60px; max-width: 1300px; font-size: 42px; }
 .pd-intro { color: var(--accent); font-weight: 600; }
 .pd-filming { margin: 4px 0 0; padding: 12px 16px 12px 32px; border-radius: 12px; background: var(--paper-deep); font-size: 15px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px; }
+
+/* Slide 0: the receipt that arrived after the death (a drawn depiction, no company branding). */
+.pd-receipt-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 64px; }
+.pd-receipt {
+  width: 620px;
+  padding: 52px 56px 44px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 40px 80px -48px rgba(0, 28, 100, 0.35);
+  text-align: center;
+}
+.pd-receipt-kicker { font-size: 20px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.pd-receipt-amount { margin-top: 26px; font-family: var(--serif); font-size: 104px; font-weight: 500; line-height: 1; letter-spacing: 0; }
+.pd-receipt-to { margin-top: 14px; font-size: 26px; color: var(--body); }
+.pd-receipt dl { margin-top: 40px; border-top: 1px solid var(--line); }
+.pd-receipt dl div { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 22px; }
+.pd-receipt dt { color: var(--muted); }
+.pd-receipt dd { font-weight: 600; }
+.pd-receipt-ok { color: #00875a; }
+.pd-receipt-line { font-family: var(--serif); font-size: 52px; color: var(--ink); }
+.pd-slide.is-active .pd-receipt-line, .pd-slide.is-active .pd-receipt { animation-duration: var(--dur, 1000ms); }
