@@ -390,3 +390,49 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 
 /* Even line lengths for the big serif lines (no one-word last line). */
 .pd-hero, .pd-h2, .pd-close-h { text-wrap: balance; }
+
+/* Slide 3, one line: who it's for. */
+.pd-one { justify-content: center; }
+.pd-one-h { margin-top: 28px; margin-bottom: 72px; font-size: 120px; max-width: 1500px; }
+
+/* Slide 6: three locks. */
+.pd-locks { display: flex; flex-direction: column; gap: 22px; }
+.pd-lock {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 28px;
+  align-items: start;
+  padding: 30px 34px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.pd-lock b { display: block; font-size: 30px; }
+.pd-lock span:not(.pd-lock-n) { display: block; margin-top: 8px; font-size: 22px; line-height: 1.45; color: var(--board-text); }
+.pd-lock-n {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: rgba(95, 211, 161, 0.14);
+  color: var(--green);
+}
+.pd-lock-icon { width: 40px; height: 40px; }
+.pd-lock-n em {
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--navy);
+  font-style: normal;
+  font-size: 17px;
+  font-weight: 700;
+}
+.pd-lock-foot { margin-top: 6px; padding-left: 4px; font-size: 21px; color: var(--sky); }

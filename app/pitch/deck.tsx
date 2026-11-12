@@ -53,7 +53,7 @@ const SLIDES: Slide[] = [
   {
     id: 'title',
     title: 'Title',
-    time: '0:00–0:10',
+    time: '0:00–0:08',
     tone: 'paper',
     say: [
       'When someone dies, their payments don’t.',
@@ -84,12 +84,12 @@ const SLIDES: Slide[] = [
   {
     id: 'problem',
     title: 'The problem',
-    time: '0:10–0:32',
+    time: '0:08–0:27',
     tone: 'paper',
     say: [
       'Meet Marie. Her father Jean died on October 20th.',
       'Three weeks later his PayPal was still charging StreamFlix. His family cloud renewed. His gym contract kept billing.',
-      'Marie has to find every payment and contact every merchant by hand, while the money charged after his death sits there, unclaimed.',
+      'Marie has to find every payment and write to every merchant by hand, while the money charged after his death sits unclaimed.',
     ],
     body: (
       <div className="pd-pad pd-col">
@@ -146,44 +146,20 @@ const SLIDES: Slide[] = [
   },
   {
     id: 'solution',
-    title: 'Who it’s for, what it does',
-    time: '0:32–0:48',
+    title: 'Who it’s for',
+    time: '0:27–0:34',
     tone: 'paper',
-    say: [
-      `${BRAND.name} is built for her: the executor Jean named while he was alive.`,
-      'She proves who she is, sees every payment with a reason, approves, and PayPal does the rest, right down to paying the heirs.',
-    ],
+    say: [`${BRAND.name} is for her: the one person Jean chose, while he was alive, to settle it.`],
     body: (
-      <div className="pd-pad pd-col">
+      <div className="pd-pad pd-col pd-one">
         <p className="pd-in pd-eyebrow" style={d(100)}>Who it’s for</p>
-        <h2 className="pd-h2 pd-h2-wide">
-          <Words text="For the one person they chose to settle it." start={200} step={65} />
+        <h2 className="pd-hero pd-one-h">
+          <Words text="For the one person they chose to settle it." start={200} step={75} />
         </h2>
-        <p className="pd-in pd-lead pd-lead-tight" style={d(900)}>
-          Marie is the Trusted Executor her father named in a Legacy Mandate while he was alive. {BRAND.name} gives her one guided flow.
-        </p>
-
-        <ol className="pd-steps">
-          <span className="pd-in pd-draw pd-steps-line" style={{ ...d(1200), ['--dur' as string]: '1500ms' }} />
-          {[
-            ['Prove who you are', 'AI reads the death certificate and notary act'],
-            ['See every payment', 'A plan for each, with a reason'],
-            ['Approve', 'Nothing moves before she does'],
-            ['PayPal acts', 'Pause, cancel, refund, hand over'],
-            ['Pay the heirs', 'Plus an audit report for the notary'],
-          ].map(([t, b], i) => (
-            <li key={t} className="pd-step">
-              <span className="pd-in pd-pop pd-step-n" style={d(1250 + i * 300)}>{i + 1}</span>
-              <b className="pd-in" style={d(1350 + i * 300)}>{t}</b>
-              <span className="pd-in" style={d(1420 + i * 300)}>{b}</span>
-            </li>
-          ))}
-        </ol>
-
         <p className="pd-principle">
-          <span className="pd-in" style={d(3000)}><i className="pd-dot-ai" />AI reads and explains.</span>
-          <span className="pd-in" style={d(3300)}><i className="pd-dot-keep" />PayPal acts.</span>
-          <span className="pd-in" style={d(3600)}><i className="pd-dot-accent" />A person approves every step.</span>
+          <span className="pd-in" style={d(1300)}><i className="pd-dot-ai" />AI reads and checks.</span>
+          <span className="pd-in" style={d(1550)}><i className="pd-dot-accent" />A person approves.</span>
+          <span className="pd-in" style={d(1800)}><i className="pd-dot-keep" />PayPal acts.</span>
         </p>
       </div>
     ),
@@ -191,34 +167,34 @@ const SLIDES: Slide[] = [
   {
     id: 'demo',
     title: 'Demo cue',
-    time: '0:48–0:52, then demo to 2:15',
+    time: '0:34–0:37, then demo to 2:05',
     tone: 'navy',
-    say: ['Here it is, live on the PayPal Sandbox. The family is fictional; every PayPal call is real.'],
+    say: ['Here it is, live on the PayPal Sandbox. Every PayPal call you’ll see is real.'],
     shots: [
       {
-        at: '0:52',
+        at: '0:37',
         show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents verified”.',
-        say: 'Marie uploads the death certificate and the notary act, scanned. AI reads both. Then rules check that they agree with each other and with Jean’s mandate: same person, same date of death, October 20th, and Marie as executor.',
+        say: 'Marie uploads the scanned death certificate and notary act. AI reads both. Rules check that they agree with each other and with Jean’s mandate, and the AI reads them a second time on its own: same person, October 20th, Marie as executor. Four checks, all green.',
       },
       {
-        at: '1:08',
-        show: '“What happens to each payment”: the AG Grid ledger. Point at one AI explanation.',
+        at: '0:56',
+        show: 'Hold on the four checks, including “Second reader”. Then “What happens to each payment”: the AG Grid ledger. Point at one AI explanation.',
         say: 'Every payment gets a plan and a reason. StreamFlix charged after his death: stop and refund. FamilyCloud is shared with the household: keep it for the family. FitGym is under contract, so stopping payment would create estate debt: send a formal notice. Rules decide; AI explains each row in plain words.',
       },
       {
-        at: '1:32',
+        at: '1:20',
         show: '“Review and approve”, then “Approve and run 4 actions”, and let the rows flip green one by one. Zoom on a PayPal ID.',
         say: 'Nothing moves until Marie approves. Now watch: each row flips as PayPal confirms it. Subscription paused, refund issued, each with its real Sandbox ID.',
       },
       {
-        at: '1:52',
-        show: 'Records: the FitGym letter and the FamilyCloud handover link.',
+        at: '1:38',
+        show: 'Scroll below the payout box and click the “Letters” tab: the FitGym letter. Then the FamilyCloud handover link.',
         say: 'For FitGym, AI drafts the bereavement letter. The family gets a link to take over FamilyCloud.',
       },
       {
-        at: '2:02',
-        show: '“Pay the heirs” → “Release €9.99 to the heir”, then “Estate resolved” and Download audit report.',
-        say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. And the notary gets an audit report with every PayPal ID and timestamp.',
+        at: '1:48',
+        show: '“Pay the heirs” → “Release €9.99 to the heir”. PayPal takes about 25 s to confirm: cut the wait in the edit. Then “Estate resolved”: hold on “Future charges stopped, per year”, and Download audit report.',
+        say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. €119.88 a year of charges, stopped. And the notary gets an audit report with every PayPal ID and timestamp.',
       },
     ],
     body: (
@@ -271,10 +247,10 @@ const SLIDES: Slide[] = [
   {
     id: 'how',
     title: 'Under the hood',
-    time: '2:15–2:30',
+    time: '2:05–2:22',
     tone: 'paper',
     say: [
-      'Under the hood: AI reads the documents, explains every decision and writes the letters.',
+      'Under the hood: AI reads the documents, then reads them again as a second check, explains every decision and writes the letters.',
       'Rules make the decisions, and a person approves them.',
       'And every action is a real PayPal call: subscriptions, refunds, payouts and reporting.',
     ],
@@ -282,7 +258,7 @@ const SLIDES: Slide[] = [
       <div className="pd-pad pd-col">
         <p className="pd-in pd-eyebrow" style={d(100)}>Under the hood</p>
         <h2 className="pd-h2 pd-h2-wide">
-          <Words text="AI reads and explains. Rules decide. PayPal acts." start={200} step={65} />
+          <Words text="AI reads and checks. Rules decide. PayPal acts." start={200} step={65} />
         </h2>
 
         <div className="pd-lanes">
@@ -291,9 +267,10 @@ const SLIDES: Slide[] = [
             kicker="AI · OpenAI gpt-5.4-mini"
             dot="ai"
             items={[
-              'Reads the death certificate and notary act, PDF or photo',
+              'Reads the scanned death certificate and notary act',
+              'Reads them again on its own: any difference holds the case',
               'Explains each row of the plan in plain words',
-              'Drafts a bereavement letter for each contract-bound merchant',
+              'Drafts the bereavement letter for each contract-bound merchant',
             ]}
           />
           <Arrow delay={1500} />
@@ -331,34 +308,40 @@ const SLIDES: Slide[] = [
   },
   {
     id: 'safe',
-    title: 'Why it’s safe',
-    time: '2:30–2:44',
+    title: 'Why it can’t be abused',
+    time: '2:22–2:42',
     tone: 'navy',
     say: [
-      'And it’s built so a forged document can’t move a cent.',
-      'Only the executor chosen in life can open a case, the documents must agree, and a PayPal refund only ever goes back to where the money came from.',
+      'So how do we know it can’t be abused? Three locks, before any money moves.',
+      'Only the executor Jean chose while he was alive can open the case. Two independent readers, the rules and the AI, must agree on both documents, or the case stops for a person.',
+      'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on the notary act. The server re-checks all of it on every single action.',
     ],
     body: (
       <div className="pd-pad pd-split pd-split-safe">
         <div className="pd-split-text">
-          <p className="pd-in pd-eyebrow pd-eyebrow-sky" style={d(100)}>Why it’s safe</p>
+          <p className="pd-in pd-eyebrow pd-eyebrow-sky" style={d(100)}>Can it be abused?</p>
           <h2 className="pd-h2 pd-on-navy">
-            <Words text="Built so a forged document can’t move a cent." start={200} step={70} />
+            <Words text="Three locks before any money moves." start={200} step={80} />
           </h2>
           <RefundDiagram />
         </div>
-        <div className="pd-guards">
+        <div className="pd-locks">
           {[
-            ['Chosen while alive', 'Only the Trusted Executor named in a Legacy Mandate can open a case.'],
-            ['Documents must agree', 'Same person, same date, same executor. Any mismatch stops the case for human review.'],
-            ['Refunds go home', 'PayPal refunds only to the original payment source: the estate, never the uploader.'],
-            ['Rehearse first', 'Subscriptions are paused by default. Cancelling for good takes a second confirmation.'],
+            ['Chosen while alive', 'Only the Trusted Executor Jean named in his Legacy Mandate can open the case.'],
+            ['Two readers must agree', 'Rules match both documents to the mandate. AI reads them again on its own. Any difference holds the case for a person.'],
+            ['Money only goes home', 'Refunds return to the original payment source. The payout goes only to the heir on the notary act, capped at what PayPal confirmed.'],
           ].map(([t, b], i) => (
-            <div key={t} className="pd-in pd-guard" style={d(1100 + i * 220)}>
-              <b>{t}</b>
-              <span>{b}</span>
+            <div key={t} className="pd-in pd-lock" style={d(1000 + i * 350)}>
+              <span className="pd-in pd-pop pd-lock-n" style={d(1100 + i * 350)}><LockIcon /><em>{i + 1}</em></span>
+              <div>
+                <b>{t}</b>
+                <span>{b}</span>
+              </div>
             </div>
           ))}
+          <p className="pd-in pd-fade pd-lock-foot" style={d(2300)}>
+            Re-checked on the server before every PayPal call, against the estate’s own IDs.
+          </p>
         </div>
       </div>
     ),
@@ -366,7 +349,7 @@ const SLIDES: Slide[] = [
   {
     id: 'close',
     title: 'Close',
-    time: '2:44–2:55',
+    time: '2:42–2:52',
     tone: 'paper',
     say: [`${BRAND.name}. Nobody should keep paying after they’re gone.`, 'Try it yourself at the link below.'],
     body: (
@@ -387,6 +370,15 @@ const SLIDES: Slide[] = [
     ),
   },
 ];
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="pd-lock-icon" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function Check() {
   return (
@@ -422,7 +414,7 @@ function RefundDiagram() {
     <svg viewBox="0 0 760 300" className="pd-refund" aria-hidden="true">
       <g className="pd-in pd-fade" style={d(900)}>
         <rect x="270" y="10" width="220" height="64" rx="14" className="pd-node" />
-        <text x="380" y="50" textAnchor="middle" className="pd-node-t">Merchant refund</text>
+        <text x="380" y="50" textAnchor="middle" className="pd-node-t">Refund</text>
       </g>
       <path className="pd-stroke pd-ok" style={d(1300)} pathLength={1} d="M330 74 C 300 150, 190 150, 160 214" fill="none" />
       <path className="pd-stroke pd-bad" style={d(1300)} pathLength={1} d="M430 74 C 460 150, 570 150, 600 214" fill="none" />
@@ -612,7 +604,7 @@ function Notes({ slide }: { slide: Slide }) {
               <span className="pd-say">“{s.say}”</span>
             </li>
           ))}
-          <li className="pd-shots-cut">2:15 · Cut back to the deck, next slide</li>
+          <li className="pd-shots-cut">2:05 · Cut back to the deck, next slide</li>
         </ol>
       )}
     </div>
