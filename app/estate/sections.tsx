@@ -356,7 +356,7 @@ export function Settlement(props: {
           )}
           {(busy || payout.step === 'done' || payout.step === 'stalled' || (payout.step === 'error' && payout.batchId)) && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px]">
-              <span className="font-semibold">{busy ? 'PayPal is sending it. This usually takes under a minute…' : payout.status === 'SUCCESS' ? `Received in ${heirAccount(analysis.case).to}` : 'Sent, waiting for PayPal to confirm'}</span>
+              <span className="font-semibold">{busy ? 'PayPal is sending it. This usually takes under a minute, and you don\u2019t need to watch: it finishes on its own.' : payout.status === 'SUCCESS' ? `Received in ${heirAccount(analysis.case).to}` : 'Sent, waiting for PayPal to confirm'}</span>
               {payout.batchId && <span className="text-pp-muted">Payout <span className="font-mono text-pp-ink">{payout.batchId}</span></span>}
               {payout.status && <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${payout.status === 'SUCCESS' ? 'bg-[var(--hl-success-bg)] text-[var(--hl-success-ink)]' : 'bg-[#fff4e5] text-[#8a4600]'}`}>{payout.status}</span>}
             </div>
@@ -377,7 +377,7 @@ function outcomeLine(done: LedgerRow[], heir?: string, paid?: boolean): string {
   for (const r of done) {
     const m = merchantName(r.merchant);
     if (r.triage === 'formal_notice_only') parts.push(`the letter to ${m} is written`);
-    else if (r.triage === 'keep_for_family') parts.push(`${m} is waiting for the family to take it over`);
+    else if (r.triage === 'keep_for_family') parts.push(`${m} is waiting for whoever keeps it to approve the handover`);
     else if (r.progress.refunded) parts.push(`the ${money(r.progress.refunded)} ${m} took after the death has gone back${paid && heir ? `, and on to ${heir}` : ''}`);
     else if (r.subscriptionId) parts.push(`${m} is ${r.progress.paypalStatus === 'CANCELLED' ? 'cancelled' : 'paused'}`);
   }
@@ -431,7 +431,7 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
                 <li key={r.key}>Send the letter to {merchantName(r.merchant)}. It is already written: you will find it below, under Letters. The payment keeps running until they answer.</li>
               ))}
               {handedRows.map((r) => (
-                <li key={r.key}>Send the {merchantName(r.merchant)} link to whoever in the family will keep it. It is below, under Family handover.</li>
+                <li key={r.key}>Send the {merchantName(r.merchant)} link to whoever will keep it. It is below, under Family handover.</li>
               ))}
             </ul>
           </div>
@@ -538,7 +538,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
               {row.progress.approveUrl ? (
                 <>
                   <p className="mt-2 max-w-[70ch] text-[15px] text-pp-muted">
-                    A new subscription on the same plan is waiting for whoever in the family will keep it to approve it in PayPal. Send them this link when it suits you. The original keeps running until then, so nothing is cut off. Subscription <span className="font-mono text-pp-ink">{row.progress.resultId}</span>.
+                    A new subscription on the same plan is waiting for whoever will keep it to approve it in PayPal. Send them this link when it suits you. The original keeps running until then, so nothing is cut off. Subscription <span className="font-mono text-pp-ink">{row.progress.resultId}</span>.
                   </p>
                   <a href={row.progress.approveUrl} target="_blank" rel="noreferrer" className="hl-focus mt-4 inline-flex items-center gap-2 font-semibold text-pp-blue underline decoration-pp-blue/40 underline-offset-4 hover:text-pp-blue-dark">
                     Open the family approval link in PayPal <Icon name="arrow" />
