@@ -33,7 +33,7 @@ const steps = [
   {
     n: '4',
     title: 'The heirs are paid',
-    body: 'What came back goes to the heir named in the notary act. Never more than PayPal confirms it returned, and never twice.',
+    body: 'What came back goes to the heir on file for this estate. Never more than PayPal confirms it returned, and never twice.',
     api: 'Payouts',
   },
   {
@@ -82,7 +82,7 @@ const RED_TEAM_URL = `${REPO_URL}/blob/main/docs/red-team-results.md`;
 const judgeSteps = [
   { lead: 'Choose “Continue as Marie”.', body: 'She is the daughter and Trusted Executor of the fictional Jean Dupont. No account or password.' },
   { lead: 'Choose “Open the demo case”.', body: 'Lastly checks the documents against the Legacy Mandate and lays out a plan for each payment, with its reason.' },
-  { lead: 'Approve the plan.', body: 'A real Sandbox refund and payout run, and the ledger shows the ID PayPal returned for each step.' },
+  { lead: 'Approve the plan.', body: 'Real Sandbox calls pause, refund and hand over, and the ledger shows the ID PayPal returned for each step. Then send what came back to the heir.' },
 ];
 
 const devPages = [

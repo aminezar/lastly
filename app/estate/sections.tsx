@@ -179,14 +179,14 @@ export function Journey({ stage, blocked }: { stage: Stage; blocked: boolean }) 
   const current = STAGES.findIndex((s) => s.id === stage);
   return (
     <nav aria-label="Case progress" className="sticky top-0 z-20 border-b border-pp-border bg-white/95 backdrop-blur print:hidden">
-      <ol className="mx-auto flex w-full max-w-[1320px] items-center gap-2 overflow-x-auto px-6 py-3 lg:px-10">
+      <ol className="mx-auto flex w-full max-w-[1320px] items-center gap-1 overflow-x-auto px-4 py-3 sm:gap-2 sm:px-6 lg:px-10">
         {STAGES.map((s, i) => {
           const done = i < current || (stage === 'resolved' && i === current);
           const active = i === current && !done;
           const failed = blocked && s.id === 'verify';
           return (
             <li key={s.id} className="flex shrink-0 items-center gap-2" aria-current={active ? 'step' : undefined}>
-              {i > 0 && <span className="mx-1 h-px w-6 bg-pp-border lg:w-10" aria-hidden="true" />}
+              {i > 0 && <span className="mx-1 h-px w-3 bg-pp-border sm:w-6 lg:w-10" aria-hidden="true" />}
               <span
                 className={`grid size-6 place-items-center rounded-full text-[12px] font-bold tabular-nums ${
                   failed ? 'bg-[#f6e3bf] text-[#6b4300]' : done ? 'bg-pp-success text-white' : active ? 'bg-pp-blue text-white' : 'bg-pp-canvas text-pp-muted ring-1 ring-pp-border'
@@ -194,7 +194,7 @@ export function Journey({ stage, blocked }: { stage: Stage; blocked: boolean }) 
               >
                 {failed ? <Icon name="pause" className="size-3.5" /> : done ? <Icon name="check" className="size-3.5" /> : i + 1}
               </span>
-              <span className={`text-[14px] ${active || failed ? 'font-semibold text-pp-ink' : done ? 'text-pp-ink' : 'text-pp-muted'}`}>{s.label}</span>
+              <span className={`text-[14px] ${active || failed ? 'font-semibold text-pp-ink' : `max-sm:sr-only ${done ? 'text-pp-ink' : 'text-pp-muted'}`}`}>{s.label}</span>
             </li>
           );
         })}
