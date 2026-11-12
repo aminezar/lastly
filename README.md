@@ -12,8 +12,9 @@ It runs on Render's free plan, so the first load after a quiet spell can take ab
 
 ## Try it
 
-1. Click **Open the demo case**. You're Marie Dupont, the executor her father Jean named before he died.
-2. In each upload box, click **Download a sample PDF**, then upload it. The samples are scans with no text layer, so the AI has to read the page itself.
+1. Click **Continue as Marie**. You're Marie Dupont, the executor her father Jean named before he died.
+2. Click **Open the demo case**. It fills in both documents and runs the same checks.
+   To watch the AI read a scan instead, use the upload boxes: click **Download a sample PDF** in each, then upload it. The samples have no text layer, so the AI has to read the page itself.
 3. Read the ledger. Each payment has a decision and a reason. Approve it, and the actions run against PayPal Sandbox. Each row shows the PayPal ID that comes back.
 4. Finish with **Print the report for the notary**.
 
@@ -80,12 +81,14 @@ node scripts/paypal-smoke.mjs  # checks the credentials
 npm run dev                    # http://localhost:3000/estate
 ```
 
+The AI parts need an OpenAI key: add `OPENAI_API_KEY` to `.env.local`. Without one, **Open the demo case** and **Use demo document** still work, and the rules run on their own. Uploading a PDF or photo needs the key, because only the AI can read it.
+
 `scripts/test-estate-api.mjs` runs the API contract tests. `scripts/test-estate-flow.mjs` runs the full money flow against Sandbox, and `scripts/reset-estate.mjs` puts the estate back afterwards. Credentials stay in `.env.local` and never reach the browser.
 
 ## Built with
 
 PayPal Sandbox REST APIs (Subscriptions, Orders, Refunds, Payouts) · AG Grid for the estate ledger · Next.js 16 / React 19 / TypeScript · OpenAI Responses API · Render
 
-The project started from the official PayPal × AG Grid hackathon boilerplate. Its dashboard at `/dashboard` is unchanged, except that its AI assistant is switched off on the public demo.
+The project started from the official PayPal × AG Grid hackathon boilerplate. Its dashboard at `/dashboard` is still there for local use. On the hosted demo it redirects to the portal.
 
 MIT licence, see [`LICENSE`](LICENSE).
