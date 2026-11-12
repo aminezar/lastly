@@ -90,6 +90,7 @@ const devPages = [
   { href: '/pitch', label: 'Pitch deck' },
   { href: REPO_URL, label: 'Source code' },
   { href: RED_TEAM_URL, label: 'Red-team results' },
+  { href: '/try-to-cheat-it', label: 'Try to cheat it' },
 ];
 
 function Arrow() {
@@ -281,6 +282,12 @@ export default function Home() {
                   </a>
                 </li>
               )}
+              <li>
+                <Link href="/try-to-cheat-it" className="home-focus block rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 hover:border-[var(--home-ink)]">
+                  <span className="flex items-center justify-between gap-3 font-semibold text-[var(--home-ink)]">Try to cheat it <Arrow /></span>
+                  <span className="mt-1 block text-[13px] leading-snug text-[var(--home-muted)]">Pick a forged document and watch the live checks read it. No PayPal call is made.</span>
+                </Link>
+              </li>
               <li>
                 <a href={RED_TEAM_URL} target="_blank" rel="noreferrer" className="home-focus block rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 hover:border-[var(--home-ink)]">
                   <span className="flex items-center justify-between gap-3 font-semibold text-[var(--home-ink)]">Attack results <Arrow /></span>
