@@ -7,17 +7,26 @@ import { demoDocuments } from '@/lib/estate';
 import { Portal } from './portal';
 import type { MandateInfo } from './types';
 
-export const metadata: Metadata = {
-  title: 'Executor portal',
-  description: 'Resolve a PayPal estate: stop, refund, hand over, notify, and pay the heirs, with an audit report.',
-};
+async function readMandate(): Promise<MandateInfo> {
+  // The seeded Legacy Mandate, read on the server.
+  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as {
+    estate: { legacy_mandate: MandateInfo };
+  };
+  return seed.estate.legacy_mandate;
+}
+
+// The tab names the person, not the tool.
+export async function generateMetadata(): Promise<Metadata> {
+  const mandate = await readMandate();
+  return {
+    title: `${mandate.deceased_name}\u2019s PayPal`,
+    description: 'Settle a PayPal account after a death: stop, refund, hand over, write the letters and pay the heirs, with a report for the notary.',
+  };
+}
 
 export default async function LastlyPage() {
   // Rendered per request so the public-demo flag is read from the running server's environment.
   await connection();
-  // The seeded Legacy Mandate and the fictional demo documents, read on the server.
-  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as {
-    estate: { legacy_mandate: MandateInfo };
-  };
+  const seed = { estate: { legacy_mandate: await readMandate() } };
   return <Portal mandate={seed.estate.legacy_mandate} demo={demoDocuments()} publicDemo={publicDemo()} />;
 }

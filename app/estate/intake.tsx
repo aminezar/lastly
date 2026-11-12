@@ -226,7 +226,7 @@ export function Intake(props: {
         {[
           `Stop ${mandate.deceased_name}\u2019s payments that should end`,
           'Return money taken after the death',
-          'Hand shared services to the family',
+          'Pass shared services to whoever keeps them',
           'Write the letters that need writing',
         ].map((line) => (
           <li key={line} className="flex items-start gap-2.5">

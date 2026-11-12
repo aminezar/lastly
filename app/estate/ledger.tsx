@@ -148,7 +148,7 @@ const STATUS: Record<string, { label: string; tone: 'neutral' | 'good' | 'warn' 
   CHARGED: { label: 'Charged', tone: 'warn' },
   REFUNDED: { label: 'Refunded', tone: 'good' },
   PARTIALLY_REFUNDED: { label: 'Partly refunded', tone: 'warn' },
-  APPROVAL_PENDING: { label: 'Waiting for family', tone: 'live' },
+  APPROVAL_PENDING: { label: 'Waiting for approval', tone: 'live' },
   SENDING: { label: 'Sending…', tone: 'live' },
   'NOT CHANGED': { label: 'Not changed', tone: 'warn' },
 };
