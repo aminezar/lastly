@@ -133,7 +133,7 @@ const SLIDES: Slide[] = [
           {[
             ['The charges keep coming', 'Recurring payments don’t know the person behind them has died.'],
             ['Every merchant, by hand', 'Families find out months later and write to each company, one by one.'],
-            ['The money waits', 'Refunds for charges after death go unclaimed. The balance stays locked.'],
+            ['The refunds go unclaimed', 'Nobody asks for the money charged after the date of death.'],
           ].map(([t, b], i) => (
             <div key={t} className="pd-in pd-pain" style={d(4000 + i * 220)}>
               <b>{t}</b>
@@ -194,7 +194,7 @@ const SLIDES: Slide[] = [
       {
         at: '1:48',
         show: '“Pay the heirs” → “Release €9.99 to the heir”. PayPal takes about 25 s to confirm: cut the wait in the edit. Then “Estate resolved”: hold on “Future charges stopped, per year”, then click “Print the report for the notary” and hold on the report.',
-        say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. €119.88 a year of charges, stopped. And the notary gets a printed report with every PayPal ID and timestamp.',
+        say: 'What was recovered goes to the heir on file, never more than PayPal confirmed as refunded. And €119.88 a year of future charges, halted. And the notary gets a printed report with every PayPal ID and timestamp.',
       },
     ],
     body: (
@@ -308,13 +308,13 @@ const SLIDES: Slide[] = [
   },
   {
     id: 'safe',
-    title: 'Why it can’t be abused',
+    title: 'Can it be abused?',
     time: '2:22–2:42',
     tone: 'navy',
     say: [
-      'So how do we know it can’t be abused? Three locks, before any money moves.',
+      'So, can it be abused? Here are the three locks before any money moves.',
       'Only the executor Jean chose while he was alive can open the case. Both documents must match his mandate, or the case stops for a person. And the AI reads them again on its own: it can hold a case, never open one.',
-      'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on the notary act. The server re-checks all of it on every single action.',
+      'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on file. The server re-checks all of it on every single action.',
     ],
     body: (
       <div className="pd-pad pd-split pd-split-safe">
@@ -329,7 +329,7 @@ const SLIDES: Slide[] = [
           {[
             ['Chosen while alive', 'Only the Trusted Executor Jean named in his Legacy Mandate can open the case.'],
             ['Documents must match', 'Both documents must match the mandate, or the case stops for a person. A second AI reading can hold a case, never open one.'],
-            ['Money only goes home', 'Refunds return to the original payment source. The payout goes only to the heir on the notary act, capped at what PayPal confirmed.'],
+            ['Money only goes home', 'Refunds return to the original payment source. The payout goes only to the heir on file, capped at what PayPal confirmed.'],
           ].map(([t, b], i) => (
             <div key={t} className="pd-in pd-lock" style={d(1000 + i * 350)}>
               <span className="pd-in pd-pop pd-lock-n" style={d(1100 + i * 350)}><LockIcon /><em>{i + 1}</em></span>
