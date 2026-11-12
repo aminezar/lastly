@@ -6,7 +6,7 @@
 
 The whole case in one minute, from the documents to the closing screen.
 
-When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to whoever keeps it and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
+When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It creates a handover link so whoever keeps a shared subscription can take it over, and it writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
 ![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to whoever keeps it, write to FitGym to end the contract, refund the €9.99 charged after his death](docs/portal-plan.png)
 
