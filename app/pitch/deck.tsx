@@ -85,7 +85,7 @@ const SLIDES: Slide[] = [
     time: '0:05–0:17',
     tone: 'paper',
     say: [
-      `After a death, ${BRAND.name} stops the person’s PayPal charges, refunds the ones taken after they died, and hands their subscriptions to the family.`,
+      `After a death, ${BRAND.name} stops the person’s PayPal charges, refunds the ones taken after they died, and hands on the ones someone still uses.`,
       'Because nobody should keep paying after they’re gone.',
     ],
     body: (
@@ -101,7 +101,7 @@ const SLIDES: Slide[] = [
           </h1>
           <span className="pd-in pd-draw pd-rule" style={d(1350)} />
           <p className="pd-in pd-lead" style={d(1550)}>
-            One calm place to settle a loved one’s PayPal life: stop what should stop, keep what the family needs, recover what was charged after death, and pay the heirs.
+            One calm place to settle a loved one’s PayPal life: stop what should stop, hand on what others still use, recover what was charged after death, and pay the heirs.
           </p>
         </div>
         <footer className="pd-in pd-fade pd-foot" style={d(2000)}>
@@ -187,7 +187,7 @@ const SLIDES: Slide[] = [
         <p className="pd-principle">
           <span className="pd-in" style={d(1300)}><i className="pd-dot-stop" />Stop the charges.</span>
           <span className="pd-in" style={d(1550)}><i className="pd-dot-accent" />Refund what was taken.</span>
-          <span className="pd-in" style={d(1800)}><i className="pd-dot-keep" />Hand over what the family keeps.</span>
+          <span className="pd-in" style={d(1800)}><i className="pd-dot-keep" />Hand over what someone keeps.</span>
           <span className="pd-in" style={d(2050)}><i className="pd-dot-notice" />Write to the rest.</span>
         </p>
       </div>
@@ -209,7 +209,7 @@ const SLIDES: Slide[] = [
       {
         at: '1:01',
         show: 'Hold on the four checks, including “Second reader”. Then “What happens to each payment”: the AG Grid ledger. Point at one AI explanation.',
-        say: 'Each payment gets a plan, and a reason in plain words. StreamFlix, charged after Jean died: stopped and refunded. FamilyCloud, which the family still uses: handed over. FitGym is under contract, so a letter goes first. Rules decide; AI explains. She doesn’t have to call anyone.',
+        say: 'Each payment gets a plan, and a reason in plain words. StreamFlix, charged after Jean died: stopped and refunded. FamilyCloud, still in use at home: handed over. FitGym is under contract, so a letter goes first. Rules decide; AI explains. She doesn’t have to call anyone.',
       },
       {
         at: '1:21',
@@ -218,8 +218,8 @@ const SLIDES: Slide[] = [
       },
       {
         at: '1:39',
-        show: 'Scroll below the payout box and click the “Letters” tab: the FitGym letter. Then the FamilyCloud handover link.',
-        say: 'For FitGym, AI writes the letter she would otherwise have to write herself. The family gets a link to take over FamilyCloud.',
+        show: 'Scroll below the payout box to the records. Click “Letters (1)”: the FitGym letter. Then “Handover (1)”: the FamilyCloud handover link.',
+        say: 'For FitGym, AI writes the letter she would otherwise have to write herself. Whoever keeps FamilyCloud gets a link to take it over.',
       },
       {
         at: '1:48',
@@ -250,7 +250,7 @@ const SLIDES: Slide[] = [
           <ul className="pd-rows">
             {[
               { m: 'StreamFlix', why: 'Charged after the date of death', plan: 'Stop & refund', dot: 'stop', done: '€9.99 back to the estate' },
-              { m: 'FamilyCloud', why: 'Shared with the household', plan: 'Keep for family', dot: 'keep', done: 'Handover link sent' },
+              { m: 'FamilyCloud', why: 'Shared with the household', plan: 'Hand over', dot: 'keep', done: 'Handover link sent' },
               { m: 'FitGym', why: 'Contract-bound membership', plan: 'Formal notice', dot: 'notice', done: 'Letter drafted' },
             ].map((r, i) => (
               <li key={r.m} className="pd-in pd-row" style={d(900 + i * 180)}>
@@ -319,7 +319,7 @@ const SLIDES: Slide[] = [
               {[
                 ['Pause or cancel', 'POST /v1/billing/subscriptions/{id}/suspend · /cancel'],
                 ['Refund post-death charges', 'POST /v2/payments/captures/{id}/refund'],
-                ['Hand over to the family', 'POST /v1/billing/subscriptions'],
+                ['Hand over to whoever keeps it', 'POST /v1/billing/subscriptions'],
                 ['Pay the heir', 'POST /v1/payments/payouts'],
                 ['Read the estate', 'GET /v1/billing/subscriptions · /v1/reporting/balances'],
               ].map(([what, route], i) => (
