@@ -20,12 +20,12 @@ const INSTRUCTIONS = (lang: Lang) =>
     'Say only what the facts say. Do not add any action, promise, feeling about a specific person, or detail that is not in the facts.',
     'Answer with JSON only: {"opening": string, "facts": [string, one per fact, in order], "waiting": string or null, "closing": string}.',
     '- opening: two or three sentences; it must contain {NAME} and {DIED}.',
-    '- facts: one short paragraph per fact (one to three sentences), using only that fact\'s own placeholders plus {NAME}, {PAID} and {PAYEE}.',
+    '- facts: one short paragraph per fact (one to three sentences), using only that fact\'s own placeholders plus {NAME} and {PAYEE}. Mention each amount once.',
     '- waiting: one or two sentences naming each fact still waiting on someone else by its merchant placeholder, or null when nothing waits.',
-    '- closing: one or two quiet sentences that say what the family does not have to do. Do not sign off; the signature is added separately.',
+    '- closing: one quiet sentence that says what the family does not have to do. Do not sign off; the signature is added separately.',
     'If a handover is waiting, the closing must say that, apart from approving it, nothing else is needed.',
     'Make no promise except, in "waiting", that the family will be told when it is settled. Do not say "I will" anywhere else.',
-    'Voice: a grown child writing to their family, not an administrator. Avoid office words such as "position", "note sets out", "regarding", "records", "dealt with".',
+    'Voice: a grown child writing to their family, not an administrator. Do not claim more than the facts (no "put right", "sorted out", "everything"). Avoid office words such as "position", "note sets out", "regarding", "records", "dealt with".',
   ].join('\n');
 
 function describe(f: LetterFact, n: number, c: LetterCase): string {
@@ -34,7 +34,7 @@ function describe(f: LetterFact, n: number, c: LetterCase): string {
     case 'stopped':
       return `Fact ${n}: ${has('M')} was a subscription still charging${f.monthly ? ` ${has('A')} a month` : ''}. It has been ${f.how === 'paused' ? 'PAUSED (not cancelled): nothing more will be taken, and it can be closed for good once the estate is settled' : 'CANCELLED: nothing more will be taken'}.`;
     case 'refund':
-      return `Fact ${n}: ${has('M')} took ${has('A')}${f.chargedOn ? ` on ${has('D')}` : ''}, after the death. It has been REFUNDED to the account it was taken from.${c.payout ? ` That money has since been paid out to {PAYEE} ({PAID}), an heir named in the notary act${c.payout.to === c.executor ? ' (the executor, so {PAYEE} reads "me")' : ''}.` : ' It belongs to the estate.'}`;
+      return `Fact ${n}: ${has('M')} took ${has('A')}${f.chargedOn ? ` on ${has('D')}` : ''}, after the death. It has been REFUNDED to the account it was taken from.${c.payout ? ` That money has since been paid out to {PAYEE}, an heir named in the notary act${c.payout.to === c.executor ? ' (the executor, so {PAYEE} reads "me")' : ''}.` : ' It belongs to the estate.'}`;
     case 'handover':
       return `Fact ${n}: ${has('M')} is shared by the household, so it was NOT stopped. A new subscription on the same plan WAITS for a family member to approve it in PayPal; the old one keeps running until then. (Still waiting.)`;
     case 'notice':
