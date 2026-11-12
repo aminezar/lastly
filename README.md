@@ -2,9 +2,11 @@
 
 When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
+![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, send FitGym a formal notice, refund the €9.99 charged after his death](docs/portal-plan.png)
+
 We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
 
-**Live demo: https://heirloom-vxgl.onrender.com/heirloom**
+**Live demo: https://heirloom-vxgl.onrender.com/estate**
 
 It runs on Render's free plan, so the first load after a quiet spell can take about a minute.
 
@@ -75,7 +77,7 @@ You need Node 20.9 or later and a PayPal Sandbox REST app with Transaction Searc
 npm install
 cp .env.example .env.local     # add your Sandbox PAYPAL_CLIENT_ID and PAYPAL_SECRET
 node scripts/paypal-smoke.mjs  # checks the credentials
-npm run dev                    # http://localhost:3000/heirloom
+npm run dev                    # http://localhost:3000/estate
 ```
 
 `scripts/test-estate-api.mjs` runs the API contract tests. `scripts/test-estate-flow.mjs` runs the full money flow against Sandbox, and `scripts/reset-estate.mjs` puts the estate back afterwards. Credentials stay in `.env.local` and never reach the browser.
