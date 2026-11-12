@@ -193,8 +193,8 @@ const SLIDES: Slide[] = [
       },
       {
         at: '1:48',
-        show: '“Pay the heirs” → “Release €9.99 to the heir”. PayPal takes about 25 s to confirm: cut the wait in the edit. Then “Estate resolved”: hold on “Future charges stopped, per year”, and Download audit report.',
-        say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. €119.88 a year of charges, stopped. And the notary gets an audit report with every PayPal ID and timestamp.',
+        show: '“Pay the heirs” → “Release €9.99 to the heir”. PayPal takes about 25 s to confirm: cut the wait in the edit. Then “Estate resolved”: hold on “Future charges stopped, per year”, then click “Print the report for the notary” and hold on the report.',
+        say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. €119.88 a year of charges, stopped. And the notary gets a printed report with every PayPal ID and timestamp.',
       },
     ],
     body: (
