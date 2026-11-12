@@ -73,7 +73,7 @@ const preview = [
 
 // The demo video. Paste the full link (YouTube, Vimeo…) between the quotes; while it is
 // empty, the landing page shows no video link at all.
-const VIDEO_URL = '';
+const VIDEO_URL = 'https://youtu.be/uP7PsSFzOC4';
 
 const REPO_URL = 'https://github.com/aminezar/lastly';
 const RED_TEAM_URL = `${REPO_URL}/blob/main/docs/red-team-results.md`;
