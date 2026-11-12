@@ -347,7 +347,10 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     setPayout((s) => ({ ...s, step: 'polling', message: undefined }));
     for (let i = 0; i < 45; i++) {
       await new Promise((ok) => setTimeout(ok, 2000));
-      const p = await call<{ at: string; payoutBatch: { status: string } }>('/api/estate/execute', { pollBatchId: batchId });
+      // The payout is already sent: a failed status check (a network blip) is not a failed
+      // payout, so it is retried on the next round instead of shown as an error.
+      const p = await call<{ at: string; payoutBatch: { status: string } }>('/api/estate/execute', { pollBatchId: batchId }).catch(() => undefined);
+      if (!p) continue;
       setPayout((s) => ({ ...s, step: 'polling', batchId, status: p.payoutBatch.status }));
       if (['SUCCESS', 'DENIED', 'CANCELED'].includes(p.payoutBatch.status)) {
         const ok = p.payoutBatch.status === 'SUCCESS';

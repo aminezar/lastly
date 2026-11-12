@@ -532,7 +532,8 @@ export function TryToCheat({ initial, demo, aiReady }: { initial: AttackCard[]; 
               {batch?.error ?? (tally.run ? `${tally.asExpected} of ${tally.run} behaved as they should.` : 'Or open any card below for the step-by-step.')}
             </span>
           </div>
-          <p className="mt-5 text-[13px] text-[var(--home-muted)]">
+          <p className="mt-4 text-[14px] text-[var(--home-body)]">21 attacks, plus Jean’s two genuine cases and one forgery that gets through.</p>
+          <p className="mt-2 text-[13px] text-[var(--home-muted)]">
             Each result is a real run on this server, kept until it restarts, with the time it ran. The full scripted run is in{' '}
             <a className="home-focus underline decoration-[var(--home-line)] underline-offset-4 hover:decoration-current" href={`${REPO_URL}/blob/main/docs/red-team-results.md`}>
               the red-team results
