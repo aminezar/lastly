@@ -67,7 +67,7 @@ const safeguards = [
 // always come from a real Sandbox response.
 const preview = [
   { merchant: 'StreamFlix', detail: 'Charged after he died', plan: 'Stop', dot: 'bg-[#e8615a]', result: '€9.99 goes back to his account' },
-  { merchant: 'FamilyCloud', detail: 'Shared with the household', plan: 'Hand over', dot: 'bg-[#0070e0]', result: 'Handover link sent' },
+  { merchant: 'FamilyCloud', detail: 'Shared with the household', plan: 'Hand over', dot: 'bg-[#0070e0]', result: 'Handover link ready' },
   { merchant: 'FitGym', detail: 'Contract-bound membership', plan: 'Write to them', dot: 'bg-[#f5a623]', result: 'Letter written' },
 ];
 
