@@ -177,7 +177,7 @@ const SLIDES: Slide[] = [
     title: 'Who it’s for',
     time: '0:31–0:41',
     tone: 'paper',
-    say: [`${BRAND.name} is for her, the one person Jean chose to look after this. We built it in Belgium, where we live; it works anywhere PayPal does.`],
+    say: [`${BRAND.name} is for her, the one person Jean chose to look after this. I built it in Belgium, where I live; it works anywhere PayPal does.`],
     body: (
       <div className="pd-pad pd-col pd-one">
         <p className="pd-in pd-eyebrow" style={d(100)}>Who it’s for</p>
@@ -347,7 +347,7 @@ const SLIDES: Slide[] = [
       {
         at: '2:25',
         show: 'Fresh private window, “Continue as Marie”. Upload scripts/red-team/docs/scan-hidden-injection-date.png as the death certificate and the sample notary act PDF, click “Check documents and open the case”, hold on the amber “On hold” panel and its line “Nothing in PayPal has been touched”. It reads either “On hold: the AI read the documents differently” or “On hold: the documents do not agree”; either is fine. If it ever opens, redo it with scan-different-person.png, which the rules block.',
-        say: 'We tested it against 21 attacks, and all 21 were held. Here, a doctored scan: the case simply stops, and nothing in PayPal moves.',
+        say: 'I tested it against 21 attacks, and all 21 were held. Here, a doctored scan: the case simply stops, and nothing in PayPal moves.',
       },
       {
         at: '2:35',

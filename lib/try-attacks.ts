@@ -369,7 +369,7 @@ async function runMoney(body: Record<string, unknown>): Promise<Omit<RunResult, 
     stoppedBy: held ? 'the server' : '',
     summary: held
       ? `Refused with HTTP ${res.status}: “${data.error ?? 'no reason given'}” The request never reached PayPal.`
-      : 'The server accepted this request. This should not happen; please tell us.',
+      : 'The server accepted this request. This should not happen; please report it.',
     request: shorten(request),
     response: { status: res.status, error: data.error },
   };

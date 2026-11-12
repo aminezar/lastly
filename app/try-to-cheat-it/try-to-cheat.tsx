@@ -511,7 +511,7 @@ export function TryToCheat({ initial, demo, aiReady }: { initial: AttackCard[]; 
           </h1>
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr]">
             <p className="max-w-[38em] text-pretty text-[18px] leading-relaxed text-[var(--home-body)]">
-              Before Marie can act for her father, Jean Dupont, Lastly checks two documents: his death certificate and the notary act naming her executor. These are the ways we tried to fool that check. Run any of them on the live site and see what the AI read, which rule caught it, and what happened.
+              Before Marie can act for her father, Jean Dupont, Lastly checks two documents: his death certificate and the notary act naming her executor. These are the ways I tried to fool that check. Run any of them on the live site and see what the AI read, which rule caught it, and what happened.
             </p>
             <ul className="space-y-2.5 self-end text-[14px] leading-relaxed text-[var(--home-body)]">
               <li className="flex gap-2.5"><Mark ok /> Same checks as the portal, AI reading included.</li>
@@ -586,7 +586,7 @@ export function TryToCheat({ initial, demo, aiReady }: { initial: AttackCard[]; 
             <h2 className="font-[family-name:var(--font-serif)] text-[28px] font-medium leading-tight text-[var(--home-ink)]">What this page does not show</h2>
             <ul className="space-y-3 text-[15px] leading-relaxed text-[var(--home-body)]">
               <li>The AI reads, it does not decide. A model can misread a document; when its reading differs from the rules, the case waits for a person. If the AI cannot be reached at all, the rules decide alone and the check says so.</li>
-              <li>These are attacks we thought of. Others may get further through the documents, which is why the money limits above do not depend on them.</li>
+              <li>These are attacks I thought of. Others may get further through the documents, which is why the money limits above do not depend on them.</li>
               <li>Results are kept in this server’s memory and reset when it restarts. Every one of them is a real run, timed when it happened.</li>
               <li>
                 More detail: every rule and the attack it stops in{' '}

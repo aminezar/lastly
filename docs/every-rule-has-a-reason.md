@@ -7,7 +7,7 @@ None of this proves a document is genuine. Someone who knows the names on the ma
 ## The documents
 
 **1. Both documents must give the same date of death, name the person on the mandate, and name the executor from the mandate.**
-- Stops: our first portal said "Documents agree" without comparing anything.
+- Stops: the first portal said "Documents agree" without comparing anything.
 - Enforced: [`lib/estate.ts:247`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/lib/estate.ts#L247) · Tested by: "Date of death changed in one document", "Different deceased", "Different executor".
 
 **2. A missing name or date fails the check. Nothing is filled in.**
@@ -34,7 +34,7 @@ None of this proves a document is genuine. Someone who knows the names on the ma
 - Enforced: [`route.ts:82`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L82) and [`route.ts:97`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L97) · Tested by: "Pause a subscription that is not the estate's", "Refund a charge that is not the estate's".
 
 **7. Every action needs a case run ID, and every PayPal write carries an idempotency key built from it.**
-- Stops: a retried click running twice. Our first IDs came from `Date.now()`, so a retry looked like a new request.
+- Stops: a retried click running twice. The first IDs came from `Date.now()`, so a retry looked like a new request.
 - Enforced: [`route.ts:70`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L70) and [`route.ts:73`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L73).
 
 **8. Cancelling for good needs a second confirmation, and it's off on the public demo, where subscriptions are only paused.**
@@ -47,12 +47,12 @@ None of this proves a document is genuine. Someone who knows the names on the ma
 
 ## Where money can go
 
-**10. A refund has no destination we can set. It goes back to the original payment source.**
+**10. A refund has no destination Lastly can set. It goes back to the original payment source.**
 - Stops: a forged case redirecting money to the person who uploaded it.
 - Enforced: the refund call sends only a note ([`route.ts:98`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L98)), and PayPal returns the money to the source.
 
 **11. The payout goes only to the heir account on file.**
-- Stops: our first payout route, which paid any receiver any amount.
+- Stops: the first payout route, which paid any receiver any amount.
 - Enforced: [`route.ts:126`](https://github.com/aminezar/lastly/blob/577b74fea6d658190026eb94b9407bd2564995fa/app/api/estate/execute/route.ts#L126) · Tested by: "Pay out to the attacker".
 
 **12. The payout is never more than this estate's refunds that PayPal confirms as completed.**
