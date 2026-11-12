@@ -8,38 +8,38 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: { absolute: "Lastly · Nobody should keep paying after they're gone" },
   description:
-    'Lastly helps the person chosen to settle a PayPal life: stop post-death charges, recover refunds, hand over what the family keeps, and pay the heirs, one approved step at a time.',
+    "One calm place to settle a loved one's PayPal payments after they die: stop the charges, return what was taken after the death, hand over what the family keeps, and pay the heirs, one step you approve at a time.",
 };
 
 const steps = [
   {
     n: '1',
-    title: 'Prove who you are',
-    body: 'The executor uploads the death certificate and the notary act. AI reads both, and Lastly checks that they agree with each other and with the Legacy Mandate the account holder signed while alive.',
+    title: 'Show who you are',
+    body: 'Marie, Jean’s daughter, adds his death certificate and the notary act. Lastly reads both and checks that they agree with each other and with the Legacy Mandate Jean signed while he was alive.',
     api: 'AI document reading',
   },
   {
     n: '2',
-    title: 'See every payment, with a reason',
-    body: 'Lastly reads the recurring payments and sorts each one: stop and refund, keep for the family, or send a formal notice. Every decision says why.',
+    title: 'See every payment, and why',
+    body: 'Each of Jean’s regular payments gets a plain plan: stop it and return what it took after he died, keep it for the family, or write to the company. Every plan says why.',
     api: 'Subscriptions · Captures · Balances',
   },
   {
     n: '3',
-    title: 'Approve, then PayPal acts',
-    body: 'Nothing moves until the executor approves. Then subscriptions are paused or cancelled, post-death charges refunded, and the family gets a link to take over what they keep.',
+    title: 'Nothing happens until she agrees',
+    body: 'Then PayPal pauses or stops the subscriptions, returns the charges taken after his death, and the family gets a link to take over what they keep.',
     api: 'Cancel · Suspend · Refund · New subscription',
   },
   {
     n: '4',
-    title: 'Pay the heirs',
-    body: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirms as refunded, and never twice.',
+    title: 'The heirs are paid',
+    body: 'What came back goes to the heir named in the notary act. Never more than PayPal confirms it returned, and never twice.',
     api: 'Payouts',
   },
   {
     n: '5',
-    title: 'Hand the notary a record',
-    body: 'Every step, with its PayPal ID and timestamp, in an audit report ready to print. Contract-bound services get a bereavement letter drafted for them.',
+    title: 'A record for the notary',
+    body: 'Every step, with its PayPal ID and time, in a report ready to print. Companies bound by a contract get a letter already written; she only sends it.',
     api: 'Audit report · AI letters',
   },
 ];
@@ -51,24 +51,24 @@ const safeguards = [
   },
   {
     title: 'Documents must agree',
-    body: 'Same person, same date of death, same executor, across both documents and the mandate. Any mismatch blocks the case for human review.',
+    body: 'Same person, same date of death, same executor, across both documents and the mandate. Any difference holds the case, untouched, for a person to look at.',
   },
   {
     title: 'Refunds go home',
     body: 'PayPal returns a refund only to the original payment source, the estate. A forged document cannot redirect money to the uploader.',
   },
   {
-    title: 'Rehearse first',
-    body: 'By default subscriptions are paused, which can be undone. Cancelling for good takes an explicit second confirmation.',
+    title: 'Pause before stopping',
+    body: 'By default subscriptions are paused, which can be undone. Cancelling for good asks for a second confirmation.',
   },
 ];
 
 // Illustration of the plan screen. Plain text only: no PayPal IDs, which in the portal
 // always come from a real Sandbox response.
 const preview = [
-  { merchant: 'StreamFlix', detail: 'Charged after the date of death', plan: 'Stop & refund', dot: 'bg-[#e8615a]', result: '€9.99 back to the estate' },
+  { merchant: 'StreamFlix', detail: 'Charged after he died', plan: 'Stop', dot: 'bg-[#e8615a]', result: '€9.99 goes back to his account' },
   { merchant: 'FamilyCloud', detail: 'Shared with the household', plan: 'Keep for family', dot: 'bg-[#0070e0]', result: 'Handover link sent' },
-  { merchant: 'FitGym', detail: 'Contract-bound membership', plan: 'Formal notice', dot: 'bg-[#f5a623]', result: 'Letter drafted' },
+  { merchant: 'FitGym', detail: 'Contract-bound membership', plan: 'Write to them', dot: 'bg-[#f5a623]', result: 'Letter written' },
 ];
 
 // The demo video. Paste the full link (YouTube, Vimeo…) between the quotes; while it is
@@ -82,7 +82,7 @@ const RED_TEAM_URL = `${REPO_URL}/blob/main/docs/red-team-results.md`;
 const judgeSteps = [
   { lead: 'Choose “Continue as Marie”.', body: 'She is the daughter and Trusted Executor of the fictional Jean Dupont. No account or password.' },
   { lead: 'Choose “Open the demo case”.', body: 'Lastly checks the documents against the Legacy Mandate and lays out a plan for each payment, with its reason.' },
-  { lead: 'Approve the plan, then pay the heirs.', body: 'A real Sandbox refund and payout run, and the ledger shows the ID PayPal returned for each step.' },
+  { lead: 'Approve the plan.', body: 'A real Sandbox refund and payout run, and the ledger shows the ID PayPal returned for each step.' },
 ];
 
 const devPages = [
@@ -120,7 +120,7 @@ export default function Home() {
               Nobody should keep paying after they&rsquo;re gone.
             </h1>
             <p className="mt-6 max-w-[34em] text-pretty text-[18px] leading-relaxed text-[var(--home-body)]">
-              When someone dies, their subscriptions keep charging, refunds go unclaimed and families chase every merchant by hand. Lastly gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
+              When someone dies, their subscriptions keep charging, and families end up chasing every company by hand. Lastly gives the person they chose one quiet place to settle their PayPal payments: stop what should stop, keep what the family needs, return what was taken after the death, and pay the heirs. Nobody has to phone each company; the letters are written for you.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/estate" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
@@ -137,7 +137,7 @@ export default function Home() {
             <div className="rounded-[16px] border border-white/10 px-5 pb-5 pt-5">
               <div className="flex items-baseline justify-between gap-4">
                 <div>
-                  <p className="text-[12px] text-[#9fb3d9]">Estate of</p>
+                  <p className="text-[12px] text-[#9fb3d9]">Settling the payments of</p>
                   <p className="font-[family-name:var(--font-serif)] text-[24px] font-medium leading-tight">Jean Dupont</p>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5fd3a1]/15 px-3 py-1 text-[12px] font-semibold text-[#5fd3a1]">
@@ -160,70 +160,12 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-white/[0.06] px-4 py-3">
-                <p className="text-[13px] text-[#c9d5ec]">Paid to the heir</p>
-                <p className="text-[20px] font-semibold tabular-nums">€9.99</p>
-              </div>
+              <p className="mt-4 rounded-xl bg-white/[0.06] px-4 py-3 text-[13px] leading-relaxed text-[#c9d5ec]">
+                Once it is back, the €9.99 goes to his heir.
+              </p>
             </div>
             <figcaption className="sr-only">Illustration of the Lastly plan for a fictional estate.</figcaption>
           </figure>
-        </section>
-
-        {/* For judges */}
-        <section id="judges" aria-labelledby="judges-title" className="mx-auto w-full max-w-[1200px] scroll-mt-8 px-6 pb-20 lg:px-10">
-          <div className="grid gap-10 rounded-2xl border border-[var(--home-line)] bg-white/60 p-6 sm:p-8 lg:grid-cols-[1.5fr_1fr] lg:gap-14">
-            <div>
-              <h2 id="judges-title" className="font-[family-name:var(--font-serif)] text-[26px] font-medium leading-tight text-[var(--home-ink)]">
-                Judging? Start here.
-              </h2>
-              <p className="mt-2 text-[15px] leading-relaxed text-[var(--home-body)]">
-                No login needed, and the demo case resets itself for the next visitor.{' '}
-                <Link href="/estate" className="home-focus font-semibold text-[#0070e0] underline-offset-2 hover:underline">Open the portal</Link>, then:
-              </p>
-              <ol className="mt-6 space-y-4">
-                {judgeSteps.map((s, i) => (
-                  <li key={s.lead} className="grid grid-cols-[auto_1fr] gap-x-4">
-                    <span className="w-4 font-[family-name:var(--font-serif)] text-[22px] font-medium leading-none text-[var(--home-accent)]">{i + 1}</span>
-                    <p className="text-[15px] leading-relaxed text-[var(--home-body)]">
-                      <span className="font-semibold text-[var(--home-ink)]">{s.lead}</span> {s.body}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-              <p className="mt-6 text-[14px] leading-relaxed text-[var(--home-muted)]">
-                Optional: to watch AI read a scan, download the{' '}
-                <a href="/samples/death-certificate-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">death certificate</a>{' '}
-                and the{' '}
-                <a href="/samples/notary-act-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">notary act</a>{' '}
-                and upload them in place of the demo documents.
-              </p>
-            </div>
-            <ul className="flex flex-col gap-3 self-start text-[15px]">
-              {VIDEO_URL && (
-                <li>
-                  <a href={VIDEO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
-                    Watch the demo video <Arrow />
-                  </a>
-                </li>
-              )}
-              <li>
-                <a href={RED_TEAM_URL} target="_blank" rel="noreferrer" className="home-focus block rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 hover:border-[var(--home-ink)]">
-                  <span className="flex items-center justify-between gap-3 font-semibold text-[var(--home-ink)]">Attack results <Arrow /></span>
-                  <span className="mt-1 block text-[13px] leading-snug text-[var(--home-muted)]">21 attacks tried, 21 held. Both genuine cases opened.</span>
-                </a>
-              </li>
-              <li>
-                <a href={REPO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
-                  Source code <Arrow />
-                </a>
-              </li>
-              <li>
-                <Link href="/pitch" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
-                  Pitch deck <Arrow />
-                </Link>
-              </li>
-            </ul>
-          </div>
         </section>
 
         {/* Problem */}
@@ -236,7 +178,7 @@ export default function Home() {
               {[
                 ['The charges keep coming', 'Streaming, cloud storage, gyms. Recurring payments do not know that the person behind them has died.'],
                 ['Every merchant, by hand', 'Families find out months later and contact each company one by one, often with the same documents each time.'],
-                ['The money waits', 'Refunds for charges taken after the death go unclaimed unless someone asks for them.'],
+                ['The money waits', 'What was charged after the death stays with the company unless someone asks for it back.'],
               ].map(([title, body]) => (
                 <div key={title}>
                   <p className="text-[16px] font-semibold text-[var(--home-ink)]">{title}</p>
@@ -293,15 +235,72 @@ export default function Home() {
         {/* Closing CTA */}
         <section className="mx-auto w-full max-w-[1200px] px-6 py-24 text-center lg:px-10">
           <h2 className="mx-auto max-w-[16em] text-balance font-[family-name:var(--font-serif)] text-[34px] font-medium leading-tight tracking-[-0.01em] text-[var(--home-ink)] sm:text-[42px]">
-            Walk through the estate of Jean Dupont.
+            Settle Jean Dupont&rsquo;s payments, as Marie would.
           </h2>
           <p className="mx-auto mt-4 max-w-[36em] text-[16px] leading-relaxed text-[var(--home-body)]">
-            Sign in as Marie, his daughter and Trusted Executor. Use the demo documents, review the plan, and watch PayPal answer each step.
+            Sign in as Marie, the daughter he chose to look after this. Use the demo documents, read the plan, and see PayPal carry out each step.
           </p>
           <Link href="/estate" className="home-focus mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white transition-colors hover:bg-[#003087]">
             Open the demo case <Arrow />
           </Link>
         </section>
+        {/* For judges */}
+        <section id="judges" aria-labelledby="judges-title" className="mx-auto w-full max-w-[1200px] scroll-mt-8 px-6 pb-16 lg:px-10">
+          <div className="grid gap-10 rounded-2xl border border-[var(--home-line)] p-6 sm:p-8 lg:grid-cols-[1.5fr_1fr] lg:gap-14">
+            <div>
+              <h2 id="judges-title" className="font-[family-name:var(--font-serif)] text-[22px] font-medium leading-tight text-[var(--home-ink)]">
+                Judging? Start here.
+              </h2>
+              <p className="mt-2 text-[15px] leading-relaxed text-[var(--home-body)]">
+                No login needed, and the demo case resets itself for the next visitor.{' '}
+                <Link href="/estate" className="home-focus font-semibold text-[#0070e0] underline-offset-2 hover:underline">Open the portal</Link>, then:
+              </p>
+              <ol className="mt-6 space-y-4">
+                {judgeSteps.map((s, i) => (
+                  <li key={s.lead} className="grid grid-cols-[auto_1fr] gap-x-4">
+                    <span className="w-4 font-[family-name:var(--font-serif)] text-[22px] font-medium leading-none text-[var(--home-accent)]">{i + 1}</span>
+                    <p className="text-[15px] leading-relaxed text-[var(--home-body)]">
+                      <span className="font-semibold text-[var(--home-ink)]">{s.lead}</span> {s.body}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-6 text-[14px] leading-relaxed text-[var(--home-muted)]">
+                Optional: to watch AI read a scan, download the{' '}
+                <a href="/samples/death-certificate-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">death certificate</a>{' '}
+                and the{' '}
+                <a href="/samples/notary-act-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">notary act</a>{' '}
+                and upload them in place of the demo documents.
+              </p>
+            </div>
+            <ul className="flex flex-col gap-3 self-start text-[15px]">
+              {VIDEO_URL && (
+                <li>
+                  <a href={VIDEO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                    Watch the demo video <Arrow />
+                  </a>
+                </li>
+              )}
+              <li>
+                <a href={RED_TEAM_URL} target="_blank" rel="noreferrer" className="home-focus block rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 hover:border-[var(--home-ink)]">
+                  <span className="flex items-center justify-between gap-3 font-semibold text-[var(--home-ink)]">Attack results <Arrow /></span>
+                  <span className="mt-1 block text-[13px] leading-snug text-[var(--home-muted)]">21 attacks tried, 21 held. Both genuine cases opened.</span>
+                </a>
+              </li>
+              <li>
+                <a href={REPO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                  Source code <Arrow />
+                </a>
+              </li>
+              <li>
+                <Link href="/pitch" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                  Pitch deck <Arrow />
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </section>
+
       </main>
 
       <footer className="border-t border-[var(--home-line)]">
