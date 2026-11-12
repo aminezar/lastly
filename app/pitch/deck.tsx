@@ -324,8 +324,8 @@ const SLIDES: Slide[] = [
     shots: [
       {
         at: '2:35',
-        show: 'Fresh private window, “Continue as Marie”. Upload scripts/red-team/docs/scan-hidden-injection-date.png as the death certificate and the sample notary act PDF, click “Check documents and open the case”, hold on the red “Case held: the AI read the documents differently”. If it opens instead, redo it with scan-different-person.png, which the rules block.',
-        say: 'We attacked it ourselves: 21 attacks, 21 held. This scan hides an instruction that fooled the AI reading it. The second AI reader caught it, and the case is held.',
+        show: 'Fresh private window, “Continue as Marie”. Upload scripts/red-team/docs/scan-hidden-injection-date.png as the death certificate and the sample notary act PDF, click “Check documents and open the case”, hold on the red panel. On the hosted demo it shows either “Case held: the AI read the documents differently” or “Case blocked: documents do not match” (both seen on Nov 12); either is fine. If it ever opens, redo it with scan-different-person.png, which the rules block.',
+        say: 'We attacked it ourselves: 21 attacks, 21 held. This scan hides an instruction meant to fool the AI. The case is held, and nothing in PayPal can move.',
       },
     ],
     body: (
