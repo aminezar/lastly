@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: 'Invoices' };
 export default async function InvoicesPage() {
   await connection();
   // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
-  if (publicDemo()) redirect('/heirloom');
+  if (publicDemo()) redirect('/estate');
   const invoices = await listInvoices();
 
   return (

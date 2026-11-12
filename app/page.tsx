@@ -72,7 +72,7 @@ const preview = [
 ];
 
 const devPages = [
-  { href: '/heirloom', label: 'Executor portal' },
+  { href: '/estate', label: 'Executor portal' },
   { href: '/pitch', label: 'Pitch deck' },
   { href: 'https://github.com/aminezar/lastly', label: 'Source code' },
   { href: 'https://github.com/aminezar/lastly/blob/main/docs/red-team-results.md', label: 'Red-team results' },
@@ -92,7 +92,7 @@ export default function Home() {
       <header className="mx-auto flex w-full max-w-[1200px] items-center gap-4 px-6 py-6 lg:px-10">
         <span className="font-[family-name:var(--font-serif)] text-[24px] font-semibold tracking-tight text-[var(--home-ink)]">Lastly</span>
         <span className="ml-auto hidden text-[13px] text-[var(--home-muted)] sm:block">PayPal Sandbox demo · fictional estate</span>
-        <Link href="/heirloom" className="home-focus ml-auto inline-flex h-10 items-center gap-2 rounded-full bg-[var(--home-ink)] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0a2a6e] sm:ml-4">
+        <Link href="/estate" className="home-focus ml-auto inline-flex h-10 items-center gap-2 rounded-full bg-[var(--home-ink)] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0a2a6e] sm:ml-4">
           Open the portal <Arrow />
         </Link>
       </header>
@@ -109,7 +109,7 @@ export default function Home() {
               When someone dies, their subscriptions keep charging, refunds go unclaimed and families chase every merchant by hand. Lastly gives the person they chose one calm place to settle their PayPal life: stop what should stop, keep what the family needs, recover what was taken after death, and pay the heirs.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link href="/heirloom" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
+              <Link href="/estate" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
                 Open the demo case <Arrow />
               </Link>
               <a href="#how" className="home-focus inline-flex h-12 items-center rounded-full px-5 text-[16px] font-semibold text-[var(--home-ink)] hover:bg-black/[0.04]">
@@ -227,7 +227,7 @@ export default function Home() {
           <p className="mx-auto mt-4 max-w-[36em] text-[16px] leading-relaxed text-[var(--home-body)]">
             Sign in as Marie, his daughter and Trusted Executor. Use the demo documents, review the plan, and watch PayPal answer each step.
           </p>
-          <Link href="/heirloom" className="home-focus mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white transition-colors hover:bg-[#003087]">
+          <Link href="/estate" className="home-focus mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white transition-colors hover:bg-[#003087]">
             Open the demo case <Arrow />
           </Link>
         </section>

@@ -24,8 +24,8 @@ const order = await call(tok, 'POST', '/v2/checkout/orders', {
   intent: 'CAPTURE',
   purchase_units: [
     {
-      reference_id: 'heirloom-post-death-charge',
-      custom_id: 'heirloom-post-death-charge',
+      reference_id: 'lastly-post-death-charge',
+      custom_id: 'lastly-post-death-charge',
       amount: { currency_code: 'EUR', value: '9.99' },
       description: 'StreamFlix charge after date of death (fictional)',
     },

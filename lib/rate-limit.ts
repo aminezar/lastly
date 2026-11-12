@@ -1,5 +1,5 @@
 // Simple in-memory rate limit for the routes that call OpenAI (server-only).
-// Only on the hosted public demo (HEIRLOOM_PUBLIC_DEMO=1): a visitor can run the whole case
+// Only on the hosted public demo (LASTLY_PUBLIC_DEMO=1): a visitor can run the whole case
 // several times, but nobody can drain the AI budget. One demo run makes about 6 such requests.
 import { NextResponse } from 'next/server';
 import { publicDemo } from '@/lib/demo-mode';

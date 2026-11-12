@@ -37,7 +37,7 @@ export async function call(accessToken, method, path, body) {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
-      'PayPal-Request-Id': `heirloom-seed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      'PayPal-Request-Id': `lastly-seed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });

@@ -1,4 +1,4 @@
-// Hosted public demo (server-only). Set HEIRLOOM_PUBLIC_DEMO=1 on the host (render.yaml does).
+// Hosted public demo (server-only). Set LASTLY_PUBLIC_DEMO=1 on the host (render.yaml does).
 // Every judge who opens the case should see the whole story, so before the case is read:
 //   - seeded subscriptions a previous visitor paused (rehearsal) are re-activated, and
 //   - when the post-death charge is already refunded, a fresh one is created with PayPal's
@@ -9,8 +9,9 @@
 
 import { randomUUID } from 'node:crypto';
 import { activateSubscription, createTestCardCapture, getCapture, getSubscription } from '@/lib/paypal';
+import { setting } from '@/lib/env';
 
-export const publicDemo = () => process.env.HEIRLOOM_PUBLIC_DEMO === '1';
+export const publicDemo = () => setting('PUBLIC_DEMO') === '1';
 
 type Ids = { subscription_ids?: Record<string, string>; capture_ids?: Record<string, string> };
 const firstToken = (v?: string) => v?.split(' ')[0];
@@ -70,10 +71,10 @@ async function reset(ids: Ids, captureKeys: string[]) {
       if (cap?.status === 'COMPLETED') return;
       try {
         const order = await createTestCardCapture({
-          customId: 'heirloom-post-death-charge',
+          customId: 'lastly-post-death-charge',
           amount: { currency_code: 'EUR', value: '9.99' },
           description: 'StreamFlix charge after date of death (fictional)',
-          requestId: `heirloom-demo-${randomUUID()}`,
+          requestId: `lastly-demo-${randomUUID()}`,
         });
         const fresh = order.purchase_units?.[0]?.payments?.captures?.[0];
         if (fresh?.id && fresh.status === 'COMPLETED') {

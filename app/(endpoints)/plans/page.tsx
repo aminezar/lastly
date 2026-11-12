@@ -14,7 +14,7 @@ const interval = (cycle?: BillingCycle) =>
 export default async function PlansPage() {
   await connection();
   // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
-  if (publicDemo()) redirect('/heirloom');
+  if (publicDemo()) redirect('/estate');
   const plans = await listPlans();
 
   return (

@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     if (!runId) return fail(400, 'runId is required so a retried action cannot run twice.');
     // Same run + same action + same target = same PayPal-Request-Id, so PayPal replays
     // the first result instead of acting again.
-    const key = (action: string, target: string) => `heirloom-${runId}-${action}-${target}`.slice(0, 108);
+    const key = (action: string, target: string) => `lastly-${runId}-${action}-${target}`.slice(0, 108);
 
     const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as Seed;
     // Gate 0, for every action: the documents must still pass the cross-check that unlocked the plan.
@@ -110,9 +110,9 @@ export async function POST(request: Request) {
       const origin = new URL(request.url).origin;
       const sub = await createSubscription({
         planId,
-        customId: `heirloom-handover-${body.handover.key}-${runId}`.slice(0, 127),
-        returnUrl: `${origin}/heirloom?handover=approved`,
-        cancelUrl: `${origin}/heirloom?handover=cancelled`,
+        customId: `lastly-handover-${body.handover.key}-${runId}`.slice(0, 127),
+        returnUrl: `${origin}/estate?handover=approved`,
+        cancelUrl: `${origin}/estate?handover=cancelled`,
       });
       return NextResponse.json({ ok: true, at, handover: { subscriptionId: sub.id, status: sub.status, approveUrl: approveLink(sub.links), planId } });
     }
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
         const refundAmount = Number(r.amount!.value);
         const batch = await createPayout(
           {
-            senderBatchId: `heirloom-${createHash('sha256').update(r.id).digest('hex').slice(0, 32)}`,
+            senderBatchId: `lastly-${createHash('sha256').update(r.id).digest('hex').slice(0, 32)}`,
             subject: 'Lastly estate payout',
             message: 'Recovered estate balance share (Lastly demo)',
             items: [{ receiver, amount: { value: refundAmount.toFixed(2), currency_code: currency }, note: `Lastly estate payout of refund ${r.id}`, sender_item_id: `heir-${r.id}`.slice(0, 63) }],

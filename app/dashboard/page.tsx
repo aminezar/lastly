@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   // Live PayPal data: render per request, not at build time.
   await connection();
   // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
-  if (publicDemo()) redirect('/heirloom');
+  if (publicDemo()) redirect('/estate');
   const data = await getDashboardData();
 
   // Only the model ids reach the client; the OpenAI key stays on the server (lib/ai.ts).

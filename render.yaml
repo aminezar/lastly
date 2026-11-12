@@ -2,7 +2,7 @@
 # New > Blueprint in the Render dashboard, pick this repo, then paste the secret values when asked.
 services:
   - type: web
-    name: heirloom
+    name: lastly
     runtime: node
     # Free plan: sleeps after 15 idle minutes, then the first visitor waits about a minute.
     # A free uptime pinger hitting / every 10 minutes keeps it awake (750 free hours a month covers it).
@@ -15,7 +15,7 @@ services:
       - key: NODE_VERSION
         value: "22"
       # Every visitor gets a fresh case; permanent cancel is off (lib/demo-mode.ts).
-      - key: HEIRLOOM_PUBLIC_DEMO
+      - key: LASTLY_PUBLIC_DEMO
         value: "1"
       # Secrets: entered in the Render dashboard, never committed.
       - key: PAYPAL_CLIENT_ID

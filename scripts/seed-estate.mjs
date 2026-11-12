@@ -22,8 +22,8 @@ const seedPath = 'data/seed-estate.json';
 const seed = JSON.parse(readFileSync(seedPath, 'utf8'));
 const mode = process.argv[2] ?? 'create';
 const stamp = new Date().toISOString().slice(0, 10).replaceAll('-', '');
-const returnUrl = 'https://example.com/heirloom/approved';
-const cancelUrl = 'https://example.com/heirloom/cancelled';
+const returnUrl = 'https://example.com/lastly/approved';
+const cancelUrl = 'https://example.com/lastly/cancelled';
 
 function approveLink(links = []) {
   return links.find((l) => l.rel === 'approve')?.href;
@@ -90,7 +90,7 @@ for (const item of items) {
   });
   const sub = await call(tok, 'POST', '/v1/billing/subscriptions', {
     plan_id: plan.id,
-    custom_id: `heirloom-${item.key}-${stamp}`,
+    custom_id: `lastly-${item.key}-${stamp}`,
     application_context: { return_url: returnUrl, cancel_url: cancelUrl, user_action: 'SUBSCRIBE_NOW' },
   });
   products[item.key] = product.id;
@@ -111,7 +111,7 @@ if (only) {
 }
 const order = await call(tok, 'POST', '/v2/checkout/orders', {
   intent: 'CAPTURE',
-  purchase_units: [{ reference_id: 'heirloom-post-death-charge', custom_id: `heirloom-post-death-charge-${stamp}`, amount: { currency_code: 'EUR', value: '9.99' }, description: 'StreamFlix charge after date of death (fictional)' }],
+  purchase_units: [{ reference_id: 'lastly-post-death-charge', custom_id: `lastly-post-death-charge-${stamp}`, amount: { currency_code: 'EUR', value: '9.99' }, description: 'StreamFlix charge after date of death (fictional)' }],
   application_context: { return_url: returnUrl, cancel_url: cancelUrl, user_action: 'PAY_NOW' },
 });
 await writePending({

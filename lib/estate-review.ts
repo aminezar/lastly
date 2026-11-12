@@ -7,8 +7,9 @@
 
 import { createHash } from 'node:crypto';
 import { openAiKey } from '@/lib/ai';
+import { setting } from '@/lib/env';
 
-const MODEL = () => process.env.HEIRLOOM_AI_MODEL || 'gpt-5.4-mini';
+const MODEL = () => setting('AI_MODEL') || 'gpt-5.4-mini';
 
 export type ReviewItem = {
   key: string;
