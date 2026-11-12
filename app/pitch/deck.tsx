@@ -351,8 +351,8 @@ const SLIDES: Slide[] = [
       },
       {
         at: '2:34',
-        show: 'The close, quiet and slow. Back in the finished case from the main take: open the family letter on the last screen, or hold the printed letter in hand on camera, and let it sit for two or three seconds before the line. Depends on the closing-letter screen landing in the app; if it hasn’t, hold the printed notary report (“Print the report for the notary”) instead and use the second line.',
-        say: 'And when it’s done, the case closes with a letter for the family: what was stopped, what came back, and what was handed on. [Fallback: “And the notary gets a printed record of every step, with every PayPal ID.”]',
+        show: 'The close, quiet and slow. Back in the finished case from the main take, under the report buttons on “Everything is done”: click the card “A letter for the family”. Let the letter sit on screen for two or three seconds before the line. If you like, print it (or save as PDF) and hold the printed letter in hand on camera instead.',
+        say: 'And when it’s done, the case closes with a letter for the family: what was stopped, what came back, and what was handed on.',
       },
     ],
     body: (
