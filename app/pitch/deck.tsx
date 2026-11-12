@@ -175,9 +175,9 @@ const SLIDES: Slide[] = [
   {
     id: 'solution',
     title: 'Who it’s for',
-    time: '0:31–0:37',
+    time: '0:31–0:41',
     tone: 'paper',
-    say: [`${BRAND.name} is for her: the one person Jean chose, while he was alive, to look after this.`],
+    say: [`${BRAND.name} is for her, the one person Jean chose to look after this. We built it in Belgium, where we live; it works anywhere PayPal does.`],
     body: (
       <div className="pd-pad pd-col pd-one">
         <p className="pd-in pd-eyebrow" style={d(100)}>Who it’s for</p>
@@ -196,34 +196,34 @@ const SLIDES: Slide[] = [
   {
     id: 'demo',
     title: 'Demo cue',
-    time: '0:37–0:39, then demo to 2:00',
-    cutBack: '2:00 · Cut back to the deck, next slide',
+    time: '0:41–0:43, then demo to 2:04',
+    cutBack: '2:04 · Cut back to the deck, next slide',
     tone: 'navy',
     say: ['Here it is, live on the PayPal Sandbox. Every PayPal call you’ll see is real.'],
     shots: [
       {
-        at: '0:39',
+        at: '0:43',
         show: 'Record the browser at 1280px wide or more. “Continue as Marie”, and hold one quiet beat on the welcome: “We’re sorry about your father. Here is what we can take off your hands.” Then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents agree”.',
-        say: 'Marie adds the papers she already has: the death certificate and the notary act. AI reads them, the rules check they agree with each other and with what Jean signed, and the AI reads them once more on its own. Nothing else is asked of her.',
+        say: 'Marie adds the papers she already has: the death certificate, and the notary act naming her executor, much like letters testamentary in the US. AI reads them, the rules check them against what Jean signed, and the AI reads them once more on its own. Nothing else is asked of her.',
       },
       {
-        at: '0:55',
+        at: '1:01',
         show: 'Hold on the four checks, including “Second reader”. Then “What happens to each payment”: the AG Grid ledger. Point at one AI explanation.',
         say: 'Each payment gets a plan, and a reason in plain words. StreamFlix, charged after Jean died: stopped and refunded. FamilyCloud, which the family still uses: handed over. FitGym is under contract, so a letter goes first. Rules decide; AI explains. She doesn’t have to call anyone.',
       },
       {
-        at: '1:17',
+        at: '1:21',
         show: '“Review and approve”, then “Approve these 4 steps”, and let the rows settle one by one. Each row’s PayPal column shows its real ID in small type under the status: zoom in on the StreamFlix refund ID in the edit, or pause and zoom while recording.',
         say: 'Nothing moves until Marie approves. Then each row settles as PayPal confirms it, each with its own PayPal ID.',
       },
       {
-        at: '1:35',
+        at: '1:39',
         show: 'Scroll below the payout box and click the “Letters” tab: the FitGym letter. Then the FamilyCloud handover link.',
         say: 'For FitGym, AI writes the letter she would otherwise have to write herself. The family gets a link to take over FamilyCloud.',
       },
       {
-        at: '1:44',
-        show: '“Passing the money on” → “Send €9.99 to your PayPal account” → “Yes, send it”. PayPal takes a while to confirm: cut the wait in the edit and label it. Then hold on “Everything is done” and the sentence under it, and stop there: the letter comes at the end.',
+        at: '1:48',
+        show: '“Passing the money on” → “Send €9.99 to your PayPal account” → “Yes, send it”. PayPal takes a while to confirm: cut the wait in the edit and label it. Then hold on “PayPal has done what you approved” and the sentence under it, and stop there: the letter comes at the end.',
         say: 'The money taken after his death goes back, and on to the heir on file. No more charges will come in Jean’s name.',
       },
     ],
@@ -277,7 +277,7 @@ const SLIDES: Slide[] = [
   {
     id: 'how',
     title: 'Under the hood',
-    time: '2:00–2:10',
+    time: '2:04–2:12',
     tone: 'paper',
     say: [
       'Under the hood: AI reads the documents and writes the letters, rules decide, and every action is a real PayPal call.',
@@ -337,21 +337,21 @@ const SLIDES: Slide[] = [
   {
     id: 'safe',
     title: 'Can it be abused?',
-    time: '2:10–2:24, then recordings to 2:46',
-    cutBack: '2:46 · Cut back to the deck, closing slide',
+    time: '2:12–2:25, then recordings to 2:47',
+    cutBack: '2:47 · Cut back to the deck, closing slide',
     tone: 'navy',
     say: [
       'So, can it be abused? Three locks before any money moves: only the executor Jean chose can open the case, both documents must match his mandate, and money only goes home.',
     ],
     shots: [
       {
-        at: '2:24',
+        at: '2:25',
         show: 'Fresh private window, “Continue as Marie”. Upload scripts/red-team/docs/scan-hidden-injection-date.png as the death certificate and the sample notary act PDF, click “Check documents and open the case”, hold on the amber “On hold” panel and its line “Nothing in PayPal has been touched”. It reads either “On hold: the AI read the documents differently” or “On hold: the documents do not agree”; either is fine. If it ever opens, redo it with scan-different-person.png, which the rules block.',
         say: 'We tested it against 21 attacks, and all 21 were held. Here, a doctored scan: the case simply stops, and nothing in PayPal moves.',
       },
       {
-        at: '2:34',
-        show: 'The close, quiet and slow. Back in the finished case from the main take: hold on “Everything is done” and the one sentence under it. Then click “Print the report for the notary” and hold on the report; if you like, hold the printed report in hand on camera.',
+        at: '2:35',
+        show: 'The close, quiet and slow. Back in the finished case from the main take: hold on “PayPal has done what you approved” and the one sentence under it. Then click “Print the report for the notary” and hold on the report; if you like, hold the printed report in hand on camera.',
         say: 'When it’s done, Lastly says plainly what happened, and Marie has one record, with every PayPal ID, for the notary and the other heirs.',
       },
     ],
@@ -391,7 +391,7 @@ const SLIDES: Slide[] = [
   {
     id: 'close',
     title: 'Close',
-    time: '2:46–2:55',
+    time: '2:47–2:55',
     tone: 'paper',
     say: [`${BRAND.name}. Nobody should keep paying after they’re gone.`],
     body: (
@@ -633,7 +633,7 @@ function DeckView() {
 
 const FILMING = [
   'Film the portal at real speed. Where you cut out waiting (the payout takes about 25 s), put a small on-screen label such as “wait cut” over the join.',
-  'Also record one clean spare take of the whole flow, about 60 seconds, start to “Everything is done”, in case a section needs replacing.',
+  'Also record one clean spare take of the whole flow, about 60 seconds, start to “PayPal has done what you approved”, in case a section needs replacing.',
 ];
 
 function Notes({ slide }: { slide: Slide }) {
