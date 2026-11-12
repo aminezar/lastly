@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/estate": ["./data/**/*"],
     "/api/estate/*": ["./data/**/*"],
+    "/api/try/*": ["./data/**/*", "./public/samples/**/*", "./public/try-to-cheat-it/**/*"],
+    "/try-to-cheat-it": ["./data/**/*"],
   },
   async redirects() {
     if (movedTo) {

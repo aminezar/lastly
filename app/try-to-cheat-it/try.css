@@ -1,0 +1,15 @@
+/* "Try to cheat it" (app/try-to-cheat-it): the drawer slides in, then each step of a run appears in turn. */
+@keyframes try-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.try-drawer { animation: try-drawer-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes try-step-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.try-step { animation: try-step-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.home-focus-within:focus-within { outline: 2px solid #0070e0; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .try-drawer, .try-step { animation: none; }
+}
