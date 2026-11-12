@@ -2,13 +2,13 @@
 
 *6 minute read, about 2 for the top through the judges' table. The longer pages are linked where they come up.*
 
-![Lastly in one minute: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan once, and PayPal Sandbox pauses StreamFlix, refunds the €9.99 taken after he died, and sets FamilyCloud up for the family to take over](docs/stages/lastly-stages.gif)
+![Lastly in one minute: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan once, and PayPal Sandbox pauses StreamFlix, refunds the €9.99 taken after he died, and sets FamilyCloud up for whoever keeps it](docs/stages/lastly-stages.gif)
 
 The whole case in one minute, from the documents to the closing screen.
 
-When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
+When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to whoever keeps it and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
-![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, write to FitGym to end the contract, refund the €9.99 charged after his death](docs/portal-plan.png)
+![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to whoever keeps it, write to FitGym to end the contract, refund the €9.99 charged after his death](docs/portal-plan.png)
 
 We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
 
@@ -27,7 +27,7 @@ It runs on Render's free plan, so the first load after a quiet spell can take ab
 |---|---|---|
 | Technological Implementation | The running app calls 10 PayPal Sandbox endpoints ([listed with code links](docs/paypal-apis.md)), and each write has its own idempotency key. The AI reads the documents, reads them again on its own, explains each decision and writes the merchant letter. | Open the demo case and approve. Each ledger row shows the ID PayPal returns. Code: [`lib/paypal.ts`](lib/paypal.ts) and [`app/api/estate/execute/route.ts`](app/api/estate/execute/route.ts). Run any attack against the live checks on [Try to cheat it](https://lastly-rdeo.onrender.com/try-to-cheat-it). |
 | Design | One flow from sign-in to the report for the notary, written for someone a few weeks after a death. | [Try it](#try-it) (four steps) and [Writing for someone grieving](docs/writing-for-someone-grieving.md). |
-| Potential Impact | Charges that keep running after a death, refunded to source, and a family subscription handed over instead of lost. We also say what only PayPal could do for real. | [What happens to each payment](#what-happens-to-each-payment) and [What it doesn't do](#what-it-doesnt-do). |
+| Potential Impact | Charges that keep running after a death, refunded to source, and a shared subscription handed over instead of lost. We also say what only PayPal could do for real. | [What happens to each payment](#what-happens-to-each-payment) and [What it doesn't do](#what-it-doesnt-do). |
 | Innovation/Idea | A mandate signed while alive decides who can act, and money has only two exits fixed in code: the original card and the heir on file. The AI can hold a case but never open one. | [The diagram](#where-the-ai-is-used), [Every rule has a reason](docs/every-rule-has-a-reason.md) and the [red-team results](docs/red-team-results.md) (21 of 21 attacks stopped). Try them yourself on [Try to cheat it](https://lastly-rdeo.onrender.com/try-to-cheat-it). |
 | Presentation | A video under 3 minutes and a short deck. | The video is linked on our Devpost page. The deck is at https://lastly-rdeo.onrender.com/pitch. |
 
@@ -48,7 +48,7 @@ The hosted demo resets the estate for each visitor. It pauses subscriptions inst
 | Demo estate | Lastly's decision | In PayPal |
 |---|---|---|
 | StreamFlix, charged €9.99 after the date of death | Stop and refund | Subscription paused or cancelled; capture refunded to the original card |
-| FamilyCloud, shared with the household | Keep for the family | New subscription on the same plan, for the partner to approve |
+| FamilyCloud, shared with the household | Hand over to whoever keeps it | New subscription on the same plan, for whoever keeps it to approve |
 | FitGym, under contract | Write to end the contract | No payment is stopped; AI writes the bereavement letter to the merchant |
 | Money recovered | Paid to the heir | One payout per refund, only to the heir account on file |
 
@@ -64,7 +64,7 @@ flowchart LR
   AI --> R[Rules: documents agree<br/>with each other and the mandate]
   AI -. second reading: any difference holds the case .-> R
   R -->|plan for each payment| OK([Executor approves])
-  OK --> S[Subscriptions API<br/>pause, cancel, or a new one for the partner]
+  OK --> S[Subscriptions API<br/>pause, cancel, or a new one to hand over]
   OK --> RF[Payments API<br/>refund to the original card only]
   RF --> PO[Payouts API<br/>to the heir on file only, once per refund]
   OK -. any other receiver or amount .-x X[Refused by the server]
