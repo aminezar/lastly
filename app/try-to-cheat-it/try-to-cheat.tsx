@@ -474,6 +474,23 @@ export function TryToCheat({ initial, demo, aiReady }: { initial: AttackCard[]; 
 
   const close = () => setShown(null);
 
+  // Every attack in turn, without opening the details: results already on the server come back at once.
+  const [batch, setBatch] = useState<{ done: number; error?: string } | null>(null);
+  async function runAll() {
+    setBatch({ done: 0 });
+    for (const [i, a] of cards.entries()) {
+      const res = await fetch('/api/try', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: a.id, live: false }) }).catch(() => null);
+      const data = (await res?.json().catch(() => ({}))) as { ok?: boolean; result?: RunResult; error?: string } | undefined;
+      if (!data?.ok || !data.result) {
+        setBatch({ done: i, error: data?.error ?? 'The server could not be reached. Please try again.' });
+        return;
+      }
+      const result = data.result;
+      setCards((cs) => cs.map((c) => (c.id === a.id ? { ...c, last: result } : c)));
+      setBatch({ done: i + 1 });
+    }
+  }
+
   return (
     <div className="hl-home flex min-h-full flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-[1200px] items-center gap-4 px-6 py-6 lg:px-10">
@@ -502,11 +519,21 @@ export function TryToCheat({ initial, demo, aiReady }: { initial: AttackCard[]; 
               <li className="flex gap-2.5"><Mark ok /> One attack gets through. It is at the end, with what still protects the money.</li>
             </ul>
           </div>
-          <p className="mt-8 text-[13px] text-[var(--home-muted)]">
-            {tally.run
-              ? `${tally.asExpected} of ${tally.run} attacks run on this server so far behaved as they should.`
-              : 'No attack has run on this server since it last started.'}{' '}
-            The full scripted run is in{' '}
+          <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <button
+              type="button"
+              onClick={runAll}
+              disabled={Boolean(batch && !batch.error && batch.done < cards.length)}
+              className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087] disabled:opacity-60"
+            >
+              {batch && !batch.error && batch.done < cards.length ? `Running ${batch.done + 1} of ${cards.length}…` : `Run all ${cards.length}, one after another`} <Arrow />
+            </button>
+            <span className="text-[14px] text-[var(--home-body)]" aria-live="polite">
+              {batch?.error ?? (tally.run ? `${tally.asExpected} of ${tally.run} behaved as they should.` : 'Or open any card below for the step-by-step.')}
+            </span>
+          </div>
+          <p className="mt-5 text-[13px] text-[var(--home-muted)]">
+            Each result is a real run on this server, kept until it restarts, with the time it ran. The full scripted run is in{' '}
             <a className="home-focus underline decoration-[var(--home-line)] underline-offset-4 hover:decoration-current" href={`${REPO_URL}/blob/main/docs/red-team-results.md`}>
               the red-team results
             </a>
