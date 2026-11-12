@@ -8,7 +8,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: { absolute: "Lastly · Nobody should keep paying after they're gone" },
   description:
-    "One calm place to settle someone's PayPal payments after they die: stop the charges, return what was taken after the death, hand over what the family keeps, and pay the heirs, one step you approve at a time.",
+    "One calm place to settle someone's PayPal payments after they die: stop the charges, return what was taken after the death, hand over the services someone keeps, and pay the heirs, one step you approve at a time.",
 };
 
 const steps = [
@@ -21,13 +21,13 @@ const steps = [
   {
     n: '2',
     title: 'See every payment, and why',
-    body: 'Each of Jean’s regular payments gets a plain plan: stop it and return what it took after he died, keep it for the family, or write to the company. Every plan says why.',
+    body: 'Each of Jean’s regular payments gets a plain plan: stop it and return what it took after he died, hand it over to whoever keeps it, or write to the company. Every plan says why.',
     api: 'Subscriptions · Captures · Balances',
   },
   {
     n: '3',
     title: 'Nothing happens until she agrees',
-    body: 'Then PayPal pauses or stops the subscriptions, returns the charges taken after his death, and the family gets a link to take over what they keep.',
+    body: 'Then PayPal pauses or stops the subscriptions, returns the charges taken after his death, and whoever keeps a shared service gets a link to take it over.',
     api: 'Cancel · Suspend · Refund · New subscription',
   },
   {
@@ -67,7 +67,7 @@ const safeguards = [
 // always come from a real Sandbox response.
 const preview = [
   { merchant: 'StreamFlix', detail: 'Charged after he died', plan: 'Stop', dot: 'bg-[#e8615a]', result: '€9.99 goes back to his account' },
-  { merchant: 'FamilyCloud', detail: 'Shared with the household', plan: 'Keep for family', dot: 'bg-[#0070e0]', result: 'Handover link sent' },
+  { merchant: 'FamilyCloud', detail: 'Shared with the household', plan: 'Hand over', dot: 'bg-[#0070e0]', result: 'Handover link sent' },
   { merchant: 'FitGym', detail: 'Contract-bound membership', plan: 'Write to them', dot: 'bg-[#f5a623]', result: 'Letter written' },
 ];
 
@@ -116,12 +116,12 @@ export default function Home() {
         {/* Hero */}
         <section className="mx-auto grid w-full max-w-[1200px] items-center gap-14 px-6 pb-20 pt-10 lg:grid-cols-[1.1fr_1fr] lg:px-10 lg:pt-16">
           <div>
-            <p className="text-[14px] font-semibold uppercase tracking-[0.14em] text-[var(--home-accent)]">For the family after a death</p>
+            <p className="text-[14px] font-semibold uppercase tracking-[0.14em] text-[var(--home-accent)]">After a death</p>
             <h1 className="mt-5 text-balance font-[family-name:var(--font-serif)] text-[46px] font-medium leading-[1.02] tracking-[-0.02em] text-[var(--home-ink)] sm:text-[64px]">
               Nobody should keep paying after they&rsquo;re gone.
             </h1>
             <p className="mt-6 max-w-[34em] text-pretty text-[18px] leading-relaxed text-[var(--home-body)]">
-              When someone dies, their subscriptions keep charging, and families end up chasing every company by hand. Lastly gives the person they chose one quiet place to settle their PayPal payments: stop what should stop, keep what the family needs, return what was taken after the death, and pay the heirs. Nobody has to phone each company; the letters are written for you.
+              When someone dies, their subscriptions keep charging, and families end up chasing every company by hand. Lastly gives the person they chose one quiet place to settle their PayPal payments: stop what should stop, hand over what someone keeps using, return what was taken after the death, and pay the heirs. Nobody has to phone each company; the letters are written for you.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/estate" className="home-focus inline-flex h-12 items-center gap-2 rounded-full bg-[#0070e0] px-6 text-[16px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,112,224,0.7)] transition-colors hover:bg-[#003087]">
