@@ -25,7 +25,7 @@ PayPal Subscriptions/Transaction Search are merchant-scoped: demo estate is seed
 PayPal Sandbox · AG Grid · Render · OpenAI gpt-5.4-mini (Responses API) · Next.js/React/TypeScript
 
 ## Try it
-Repo: [URL] · Demo: https://heirloom-vxgl.onrender.com/heirloom (public demo mode: the case resets per visitor, permanent cancel is off; free Render plan, first load may take up to a minute) · Video: [YouTube URL]
+Repo: https://github.com/aminezar/lastly · Demo: https://heirloom-vxgl.onrender.com/heirloom (public demo mode: the case resets per visitor, permanent cancel is off; free Render plan, first load may take up to a minute) · Video: [YouTube URL]
 Test: [Sandbox instructions; never publish live credentials]
 
 ## Video script (<3:00)
