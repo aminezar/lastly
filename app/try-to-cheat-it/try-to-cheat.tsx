@@ -57,7 +57,7 @@ function Outcome({ result, expect }: { result: RunResult; expect?: 'held' | 'ope
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${tone}`}>
       <span className="size-1.5 rounded-full bg-current" />
       {result.outcome === 'held' ? 'Held' : 'Opened'}
-      {result.stoppedBy ? <span className="font-normal opacity-80">· {result.stoppedBy}</span> : null}
+      {result.stoppedBy ? <span className="font-normal">· {result.stoppedBy}</span> : null}
     </span>
   );
 }

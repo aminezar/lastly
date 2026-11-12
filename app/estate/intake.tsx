@@ -5,7 +5,7 @@
 //   2. The case intake: who you are (the Legacy Mandate), the two documents (upload or
 //      use the demo ones), then one check. Opening the case only reads PayPal.
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import { AiBadge, Button, Icon } from './sections';
 import { longDate, type MandateInfo } from './types';
 
@@ -19,9 +19,29 @@ const AI_TYPES = /\.(pdf|png|jpe?g|webp)$/i;
 const MAX_AI_BYTES = 8 * 1024 * 1024;
 
 // --- 1. Sign in --------------------------------------------------------------------
+// PayPal sends whoever answered the handover link back to /estate?handover=approved or
+// =cancelled. The parameter alone proves nothing about the subscription, so the note only
+// says what is certain.
+const BACK_FROM_PAYPAL: Record<string, string> = {
+  approved: 'You\u2019re back from PayPal. If you approved FamilyCloud there, it is now billed to your account, and nothing more is needed here.',
+  cancelled: 'You\u2019re back from PayPal. Nothing was changed.',
+};
+
+const noSubscribe = () => () => {};
+function backFromPayPal(): string | undefined {
+  const answer = new URLSearchParams(window.location.search).get('handover');
+  return answer && Object.hasOwn(BACK_FROM_PAYPAL, answer) ? BACK_FROM_PAYPAL[answer] : undefined;
+}
+
 export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: () => void }) {
+  const back = useSyncExternalStore(noSubscribe, backFromPayPal, () => undefined);
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-[440px] flex-col justify-center py-16">
+      {back && (
+        <p role="status" className="mb-8 rounded-2xl border border-pp-border bg-white p-5 text-[15px] leading-relaxed text-pp-ink">
+          {back}
+        </p>
+      )}
       <h1 className="hl-serif text-[36px] leading-tight text-pp-navy">Sign in to Lastly</h1>
       <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person someone chose, while they were alive, to look after their PayPal account when they die.</p>
 
