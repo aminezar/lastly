@@ -56,7 +56,7 @@ Two results we didn't expect:
 - A court correction of the date, and an addendum replacing the executor, both got past the rules. The AI's second reading held both.
 - A faint hidden line on a scan made the AI write 20 October where the page says 2 October, and the rules passed it. The second reading, done on the original file, read 2 October and held the case.
 
-The full table is in [`docs/red-team-results.md`](docs/red-team-results.md). You can rerun it yourself. It only calls the AI and the rule checks, and touches nothing in PayPal:
+The full table is in [`docs/red-team-results.md`](docs/red-team-results.md). Each safety rule, the attack it stops, and the line of code that enforces it are in [Every rule has a reason](docs/every-rule-has-a-reason.md). You can rerun the attacks yourself. It only calls the AI and the rule checks, and touches nothing in PayPal:
 
 ```bash
 BASE=https://lastly-rdeo.onrender.com node scripts/red-team/run.mjs
