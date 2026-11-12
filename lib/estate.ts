@@ -11,6 +11,9 @@ import { readDocumentFacts, UnusableAnswer, type FactReading, type SecondReading
 const spoken = (iso: string) =>
   new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
+// The same for a value read from a document, which may not be a clean date: shown as read if it is not.
+const asDate = (v: string) => (/^\d{4}-\d{2}-\d{2}/.test(v) ? spoken(v) : v);
+
 export type Triage = 'stop_and_refund' | 'keep_for_family' | 'formal_notice_only';
 
 export type TriageDecision = {
@@ -222,9 +225,10 @@ export function compareReadings(rules: { certificate: ParsedDocument; notary: Pa
       const a = ai[f.doc][f.field];
       const agree = f.name ? normName(r) === normName(a) && Boolean(normName(r)) : Boolean(r) && r === a;
       if (agree) return null;
-      if (!r) return `${f.label} could not be read automatically; the AI read ${a ?? 'nothing either'}`;
-      if (!a) return `${f.label} was read as ${r}; the AI could not find it`;
-      return `${f.label} was read as ${r}, but the AI read ${a}`;
+      const say = (v: string) => (f.name ? v : asDate(v));
+      if (!r) return `${f.label} could not be read automatically; the AI read ${a ? say(a) : 'nothing either'}`;
+      if (!a) return `${f.label} was read as ${say(r)}; the AI could not find it`;
+      return `${f.label} was read as ${say(r)}, but the AI read ${say(a)}`;
     })
     .filter((d): d is string => Boolean(d));
   return {
@@ -255,7 +259,7 @@ export function crossCheck(certificate: ParsedDocument, notary: ParsedDocument, 
       id: 'death-date',
       label: 'Certificate and notary act give the same date of death',
       pass: Boolean(certificate.dateOfDeath && certificate.dateOfDeath === notary.dateOfDeath),
-      detail: `Certificate: ${show(certificate.dateOfDeath)} · Notary act: ${show(notary.dateOfDeath)}`,
+      detail: `Certificate: ${show(certificate.dateOfDeath && asDate(certificate.dateOfDeath))} · Notary act: ${show(notary.dateOfDeath && asDate(notary.dateOfDeath))}`,
     },
     {
       id: 'deceased',

@@ -48,6 +48,12 @@ export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: 
 // --- 2. Case intake ------------------------------------------------------------------
 
 // What the reader will look for, so the executor knows what a document must contain.
+// What the document is, in a few words, for anyone who has never seen one.
+const GLOSS: Record<Kind, string> = {
+  certificate: 'The official record of the death.',
+  notary: 'The document from the notary that names the heirs and the executor.',
+};
+
 const NEEDS: Record<Kind, string> = {
   certificate: 'Name of the person who died and the date of death',
   notary: 'The same name and date, and you as executor',
@@ -121,7 +127,7 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
   return (
     <div className="flex flex-col">
       <h3 className="text-[16px] font-semibold">{props.title}</h3>
-      <p className="mt-1 text-[14px] text-pp-muted md:min-h-[2lh]">Must show: {NEEDS[props.kind].toLowerCase()}.</p>
+      <p className="mt-1 text-[14px] text-pp-muted md:min-h-[2lh]">{GLOSS[props.kind]} It must show: {NEEDS[props.kind].toLowerCase()}.</p>
 
       {slot ? (
         <div className="mt-3 flex flex-1 flex-col rounded-xl border border-pp-success/40 bg-[var(--hl-success-bg)]/40">
