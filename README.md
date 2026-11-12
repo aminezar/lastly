@@ -35,6 +35,18 @@ The AI (OpenAI `gpt-5.4-mini`) reads the uploaded documents. It then reads them 
 
 The AI doesn't decide anything. The rules in `lib/estate.ts` check that the death certificate, the notary act and the mandate Jean signed all agree on five facts, and they decide what happens to each payment. The executor approves every PayPal action. If the AI's second reading differs from the rules on any of the five facts, the case is held for a person to check. If OpenAI can't be reached, the screen says the check did not run, and the rules decide on their own.
 
+```mermaid
+flowchart LR
+  E([Executor]) -->|death certificate + notary act| AI[AI reads the documents]
+  AI --> R[Rules: documents agree<br/>with each other and the mandate]
+  AI -. second reading: any difference holds the case .-> R
+  R -->|plan for each payment| OK([Executor approves])
+  OK --> S[Subscriptions API<br/>pause, cancel, or a new one for the partner]
+  OK --> RF[Payments API<br/>refund to the original card only]
+  RF --> PO[Payouts API<br/>to the heir on file only, once per refund]
+  OK -. any other receiver or amount .-x X[Refused by the server]
+```
+
 ## We attacked it
 
 We ran 21 attacks against the hosted demo, and all 21 were stopped. They included changed dates, a different executor, a court correction buried in the text, and hidden instructions to the AI inside scanned documents. We also sent requests straight to the money routes, and the server refused them before any PayPal call. Both genuine cases, typed and scanned, still opened. The first hosted run had one transient 502 while reading a scan, which we counted as a failure. The rerun was clean.
