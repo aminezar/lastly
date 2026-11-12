@@ -124,4 +124,6 @@ PayPal Sandbox REST APIs (Subscriptions, Orders, Refunds, Payouts) · AG Grid fo
 
 The project started from the official PayPal × AG Grid hackathon boilerplate. Its dashboard at `/dashboard` is still there for local use. On the hosted demo it redirects to the portal.
 
+Thanks to Ebubekir Kahriman for early work on the executor portal.
+
 MIT licence, see [`LICENSE`](LICENSE).
