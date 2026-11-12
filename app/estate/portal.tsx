@@ -249,7 +249,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
           handover: { key: item.key, merchant: name },
         });
         setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Waiting for the family to approve', at: r.at });
-        log({ at: r.at, item: name, action: 'New subscription on the same plan created for the family to approve; original keeps running until then', paypalId: r.handover.subscriptionId, status: r.handover.status, tone: 'pending' });
+        log({ at: r.at, item: name, action: 'New subscription on the same plan created for whoever keeps it to approve; original keeps running until then', paypalId: r.handover.subscriptionId, status: r.handover.status, tone: 'pending' });
         return;
       }
       if (item.captureId) {

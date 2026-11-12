@@ -408,7 +408,7 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
     { label: 'Subscriptions stopped', value: String(stopped), show: stopped > 0 },
     { label: 'Future charges stopped, per year', value: money({ value: yearly.toFixed(2), currency_code: yearlyCurrency }), show: yearly > 0 },
     { label: 'Returned by refunds', value: money(recovered), show: Number(recovered.value) > 0 },
-    { label: 'Handed to the family', value: String(handed), show: handed > 0 },
+    { label: 'Handed over', value: String(handed), show: handed > 0 },
     { label: 'Letters written', value: String(notices), show: notices > 0 },
     { label: 'Passed on to the heir', value: paid ? money({ value: paid, currency_code: recovered.currency_code }) : '', show: Boolean(paid) },
   ].filter((s) => s.show);
@@ -435,7 +435,7 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
                 <li key={r.key}>Send the letter to {merchantName(r.merchant)}. It is already written: you will find it below, under Letters. The payment keeps running until they answer.</li>
               ))}
               {handedRows.map((r) => (
-                <li key={r.key}>Send the {merchantName(r.merchant)} link to whoever will keep it. It is below, under Family handover.</li>
+                <li key={r.key}>Send the {merchantName(r.merchant)} link to whoever will keep it. It is below, under Handover.</li>
               ))}
             </ul>
           </div>
@@ -464,7 +464,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
   const tabs = [
     { id: 'audit', label: `Audit trail (${audit.length})` },
     { id: 'letters', label: `Letters (${notices.length})` },
-    { id: 'family', label: `Family handover (${handovers.length})` },
+    { id: 'family', label: `Handover (${handovers.length})` },
   ] as const;
   const [tab, setTab] = useState<(typeof tabs)[number]['id']>('audit');
   const [copied, setCopied] = useState<string | null>(null);
@@ -538,18 +538,18 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
         {tab === 'family' &&
           handovers.map((row) => (
             <article key={row.key} className="rounded-xl border border-pp-border bg-white px-6 py-5">
-              <h3 className="text-[17px] font-semibold">{merchantName(row.merchant)} for the family</h3>
+              <h3 className="text-[17px] font-semibold">Handing over {merchantName(row.merchant)}</h3>
               {row.progress.approveUrl ? (
                 <>
                   <p className="mt-2 max-w-[70ch] text-[15px] text-pp-muted">
                     A new subscription on the same plan is waiting for whoever will keep it to approve it in PayPal. Send them this link when it suits you. The original keeps running until then, so nothing is cut off. Subscription <span className="font-mono text-pp-ink">{row.progress.resultId}</span>.
                   </p>
                   <a href={row.progress.approveUrl} target="_blank" rel="noreferrer" className="hl-focus mt-4 inline-flex items-center gap-2 font-semibold text-pp-blue underline decoration-pp-blue/40 underline-offset-4 hover:text-pp-blue-dark">
-                    Open the family approval link in PayPal <Icon name="arrow" />
+                    Open the approval link in PayPal <Icon name="arrow" />
                   </a>
                 </>
               ) : (
-                <p className="mt-2 text-[15px] text-pp-muted">A family approval link is created in PayPal when you approve the plan.</p>
+                <p className="mt-2 text-[15px] text-pp-muted">An approval link is created in PayPal when you approve the plan.</p>
               )}
             </article>
           ))}

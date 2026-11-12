@@ -81,7 +81,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'keep_for_family',
       confidence: 'high',
       source: 'rules',
-      reason: 'Shared by the household: it keeps running, and the billing passes to the family member who keeps it.',
+      reason: 'Shared by the household: it keeps running, and the billing passes to whoever keeps it.',
     };
   }
   if (item.captureId && item.chargedAt && dateOfDeath && item.chargedAt.slice(0, 10) < dateOfDeath) {

@@ -91,7 +91,7 @@ export const longDate = (iso: string) =>
 export function planFor(item: EstateItem, rehearsal: boolean): string {
   if (item.noAction) return 'Nothing to do';
   if (item.triage === 'formal_notice_only') return 'Write to end the contract';
-  if (item.triage === 'keep_for_family') return 'Hand over to the family';
+  if (item.triage === 'keep_for_family') return 'Hand over to whoever keeps it';
   if (item.captureId) return `Refund ${money(item.amount)}`;
   return rehearsal ? 'Pause the subscription' : 'Cancel the subscription';
 }
