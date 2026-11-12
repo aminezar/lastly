@@ -26,7 +26,7 @@ It runs on Render's free plan, so the first load after a quiet spell can take ab
 | Criterion | What we did | Check it in under a minute |
 |---|---|---|
 | Technological Implementation | The running app calls 10 PayPal Sandbox endpoints ([listed with code links](docs/paypal-apis.md)), and each write has its own idempotency key. The AI reads the documents, reads them again on its own, explains each decision and writes the merchant letter. | Open the demo case and approve. Each ledger row shows the ID PayPal returns. Code: [`lib/paypal.ts`](lib/paypal.ts) and [`app/api/estate/execute/route.ts`](app/api/estate/execute/route.ts). Run any attack against the live checks on [Try to cheat it](https://lastly-rdeo.onrender.com/try-to-cheat-it). |
-| Design | One flow from sign-in to the report for the notary, written for someone a few weeks after a death. | [Try it](#try-it) (four steps) and [Writing for someone grieving](docs/writing-for-someone-grieving.md). |
+| Design | One flow from sign-in to the report for the notary, written for someone a few weeks after a death. | [Try it](#try-it) (five steps) and [Writing for someone grieving](docs/writing-for-someone-grieving.md). |
 | Potential Impact | Charges that keep running after a death, refunded to source, and a shared subscription handed over instead of lost. We also say what only PayPal could do for real. | [What happens to each payment](#what-happens-to-each-payment) and [What it doesn't do](#what-it-doesnt-do). |
 | Innovation/Idea | A mandate signed while alive decides who can act, and money has only two exits fixed in code: the original card and the heir on file. The AI can hold a case but never open one. | [The diagram](#where-the-ai-is-used), [Every rule has a reason](docs/every-rule-has-a-reason.md) and the [red-team results](docs/red-team-results.md) (21 of 21 attacks stopped). Try them yourself on [Try to cheat it](https://lastly-rdeo.onrender.com/try-to-cheat-it). |
 | Presentation | A video under 3 minutes and a short deck. | The video is linked on our Devpost page. The deck is at https://lastly-rdeo.onrender.com/pitch. |
@@ -39,7 +39,8 @@ It runs on Render's free plan, so the first load after a quiet spell can take ab
 2. Click **Open the demo case**. It fills in both documents and runs the same checks.
    To watch the AI read a scan instead, use the upload boxes: click **Download a sample PDF** in each, then upload it. The samples have no text layer, so the AI has to read the page itself.
 3. Read the ledger. Each payment has a decision and a reason. Approve it, and the actions run against PayPal Sandbox. Each row shows the PayPal ID that comes back.
-4. Finish with **Print the report for the notary**.
+4. Under **Passing the money on**, click **Send €9.99 to your PayPal account**, then **Yes, send it**. The payout goes only to the heir on file and shows **Accepted by PayPal**, **On its way**, then **Received**, usually within about half a minute.
+5. Finish with **Print the report for the notary**.
 
 The hosted demo resets the estate for each visitor. It pauses subscriptions instead of cancelling them, so the next judge finds the same case.
 
