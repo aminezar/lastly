@@ -53,7 +53,7 @@ async function openPage(n) {
   await send('Page.enable');
   await send('Page.navigate', { url: pathToFileURL(join(here, 'stages.html')).href });
   for (let i = 0; i < 100 && (await evaluate('document.readyState')) !== 'complete'; i++) await sleep(100);
-  await evaluate('window.__recording = true; document.getElementById("stage").style.transform = "none"; document.fonts.ready.then(() => document.fonts.size)');
+  await evaluate(`window.__recording = true; document.getElementById('stage').style.transform = 'none'; document.fonts.ready.then(() => document.fonts.size)`);
   const shoot = async (t) => {
     await evaluate(`window.seek(${t.toFixed(4)}); new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))`);
     const { data } = await send('Page.captureScreenshot', { format: 'png', clip: { x: 0, y: 0, width: 1920, height: 1080, scale: 1 } });
@@ -83,8 +83,8 @@ await page.close();
 const ff = (args) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
 const input = ['-framerate', String(FPS), '-i', join(frames, 'f%04d.png')];
 ff([...input, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', join(outDir, 'lastly-stages.mp4')]);
-// README loop: 960 wide, 12 fps, one shared palette.
-const gifFilter = 'fps=12,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle';
+// README loop: 960 wide, 10 fps, one shared palette.
+const gifFilter = 'fps=10,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle';
 ff([...input, '-vf', gifFilter, '-loop', '0', join(here, 'lastly-stages.gif')]);
 rmSync(work, { recursive: true, force: true });
 console.log(`done: ${join(here, 'lastly-stages.gif')} and ${join(outDir, 'lastly-stages.mp4')}`);

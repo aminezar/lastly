@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  The README animation: Lastly's stages in 30 seconds, drawn from the real portal screens and the
+  The README animation: Lastly's stages in about a minute, drawn from the real portal screens and the
   demo estate's real figures, written for someone grieving (docs/writing-for-someone-grieving.md).
   Every motion is a CSS animation with an absolute delay, so record.mjs can seek to any frame.
   Open it in a browser to watch it play.
@@ -8,7 +8,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Lastly in 30 seconds</title>
+<title>Lastly in one minute</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Geist+Mono:wght@500&display=block" rel="stylesheet">
 <style>
@@ -129,13 +129,16 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
 .res .ok .c { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; }
 .res .ok .c svg { width: 16px; height: 16px; }
 
-/* ——— The letter ——— */
-.letter { position: absolute; left: 50%; top: 330px; width: 1240px; margin-left: -620px; background: #fffefb; border: 2px solid var(--line); border-radius: 6px;
-  box-shadow: 0 40px 80px -44px rgba(0, 28, 100, 0.3); padding: 54px 80px 50px; font-family: var(--serif); color: #1f2a44; }
-.letter p { font-size: 29px; line-height: 1.5; margin-top: 18px; }
-.letter .greet { margin-top: 0; font-size: 32px; }
-.letter .sign { margin-top: 26px; font-style: italic; }
-.letter .m { color: var(--muted); }
+/* ——— Done ——— */
+.closing { position: absolute; left: 110px; right: 110px; top: 340px; border-radius: 24px; padding: 52px 64px 56px; color: #fff;
+  background: radial-gradient(1000px 600px at 90% 0%, rgba(0, 112, 224, 0.2), transparent 60%), var(--navy); box-shadow: 0 40px 80px -44px rgba(0, 28, 100, 0.5); }
+.closing .ct { display: flex; align-items: center; gap: 24px; font-family: var(--serif); font-weight: 500; font-size: 56px; }
+.closing .ct .c { flex: none; width: 64px; height: 64px; border-radius: 50%; background: var(--green); display: grid; place-items: center; }
+.closing .ct .c svg { width: 34px; height: 34px; }
+.closing .co { margin-top: 30px; max-width: 1450px; font-family: var(--serif); font-size: 38px; line-height: 1.35; }
+.closing .cs { margin-top: 22px; font-size: 28px; color: var(--board-text); }
+.closing .cl { margin-top: 34px; padding-top: 28px; border-top: 2px solid rgba(255, 255, 255, 0.14); display: grid; gap: 10px; font-size: 27px; color: var(--board-text); }
+.closing .clh { font-weight: 600; color: #fff; margin-bottom: 4px; }
 
 /* ——— End card ——— */
 .end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
@@ -154,73 +157,73 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
 <div class="stage" id="stage">
 
   <!-- Title -->
-  <div class="sc" style="--a:0s;--b:3.6s"><div class="sc-i"><div class="title">
-    <div class="word in" style="--d:0.2s">Lastly</div>
-    <div class="line in" style="--d:0.8s">When someone dies, their PayPal account keeps paying.</div>
-    <div class="sub in" style="--d:1.5s">Lastly settles it for the family, one approved step at a time.</div>
+  <div class="sc" style="--a:0s;--b:6s"><div class="sc-i"><div class="title">
+    <div class="word in" style="--d:0.3s">Lastly</div>
+    <div class="line in" style="--d:1.1s">When someone dies, their PayPal account keeps paying.</div>
+    <div class="sub in" style="--d:2.2s">Lastly settles it for the family, one approved step at a time.</div>
   </div></div></div>
 
   <!-- Stepper, shared by every stage -->
-  <div class="sc" style="--a:3.2s;--b:27.4s"><div class="sc-i">
+  <div class="sc" style="--a:5.6s;--b:57.6s"><div class="sc-i">
     <div class="stepper">
       <div class="brand">Lastly</div>
-      <div class="st" style="--a:3.5s;--b:13.4s"><span class="dot">1<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Documents</span></div><i class="bar"></i>
-      <div class="st" style="--a:13.4s;--b:17.2s"><span class="dot">2<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The plan</span></div><i class="bar"></i>
-      <div class="st" style="--a:17.2s;--b:21.8s"><span class="dot">3<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">In PayPal</span></div><i class="bar"></i>
-      <div class="st" style="--a:21.8s;--b:27s"><span class="dot">4<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The letter for the family</span></div>
+      <div class="st" style="--a:6.3s;--b:27.6s"><span class="dot">1<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Documents</span></div><i class="bar"></i>
+      <div class="st" style="--a:28.3s;--b:36.8s"><span class="dot">2<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The plan</span></div><i class="bar"></i>
+      <div class="st" style="--a:37.3s;--b:45.2s"><span class="dot">3<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">In PayPal</span></div><i class="bar"></i>
+      <div class="st" style="--a:45.8s;--b:57.2s"><span class="dot">4<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Done</span></div>
     </div>
   </div></div>
 
   <!-- 1–2 · Documents, then read by AI (the documents stay on screen) -->
-  <div class="sc" style="--a:3.5s;--b:6.9s"><div class="sc-i"><div class="head">
-    <div class="h in" style="--d:3.6s">Jean Dupont died on 20 October.</div>
-    <div class="h2 in" style="--d:4.1s">His daughter Marie, the executor he chose, adds two documents.</div>
+  <div class="sc" style="--a:6s;--b:12.6s"><div class="sc-i"><div class="head">
+    <div class="h in" style="--d:6.2s">Jean Dupont died on 20 October.</div>
+    <div class="h2 in" style="--d:7s">His daughter Marie, the executor he chose, adds two documents.</div>
   </div></div></div>
-  <div class="sc" style="--a:6.9s;--b:10.2s"><div class="sc-i"><div class="head">
+  <div class="sc" style="--a:12.6s;--b:19.2s"><div class="sc-i"><div class="head">
     <div class="h">AI reads them, so Marie types nothing.</div>
     <div class="h2">The names and the date are taken from the documents themselves.</div>
   </div></div></div>
-  <div class="sc" style="--a:3.5s;--b:10.2s"><div class="sc-i"><div class="docs">
-    <div class="doc in" style="--d:4.2s">
+  <div class="sc" style="--a:6s;--b:19.2s"><div class="sc-i"><div class="docs">
+    <div class="doc in" style="--d:7.6s">
       <div class="kind">Death certificate</div>
       <div class="t">Certificate of death</div>
       <div class="rows">
-        <div class="r">Name of the deceased: <b class="hl" style="--d:7.6s">Jean Dupont</b></div>
-        <div class="r">Date of death: <b class="hl" style="--d:8s">20 October 2026</b></div>
+        <div class="r">Name of the deceased: <b class="hl" style="--d:14.2s">Jean Dupont</b></div>
+        <div class="r">Date of death: <b class="hl" style="--d:14.8s">20 October 2026</b></div>
       </div>
       <div class="lines"><i style="width:92%"></i><i style="width:78%"></i><i style="width:86%"></i></div>
-      <div class="file fade" style="--d:4.9s">death-certificate-jean-dupont.pdf</div>
-      <div class="scan" style="--d:7.1s"></div>
-      <div class="ai soft" style="--d:8.8s"><span class="tag">AI</span>Read by AI</div>
+      <div class="file fade" style="--d:8.6s">death-certificate-jean-dupont.pdf</div>
+      <div class="scan" style="--d:13.2s"></div>
+      <div class="ai soft" style="--d:16.6s"><span class="tag">AI</span>Read by AI</div>
     </div>
-    <div class="doc in" style="--d:4.6s">
+    <div class="doc in" style="--d:8.2s">
       <div class="kind">Notary act of heredity</div>
       <div class="t">Act of heredity</div>
       <div class="rows">
-        <div class="r">Deceased: <b class="hl" style="--d:8.2s">Jean Dupont</b>, died <b class="hl" style="--d:8.4s">20 Oct 2026</b></div>
-        <div class="r">Executor: <b class="hl" style="--d:8.7s">Marie Dupont</b></div>
+        <div class="r">Deceased: <b class="hl" style="--d:15.4s">Jean Dupont</b>, died <b class="hl" style="--d:15.8s">20 Oct 2026</b></div>
+        <div class="r">Executor: <b class="hl" style="--d:16.2s">Marie Dupont</b></div>
         <div class="r">Heirs: Marie Dupont, Luc Dupont</div>
       </div>
       <div class="lines"><i style="width:88%"></i><i style="width:70%"></i></div>
-      <div class="file fade" style="--d:5.3s">notary-act-jean-dupont.pdf</div>
-      <div class="scan" style="--d:7.5s"></div>
-      <div class="ai soft" style="--d:9.2s"><span class="tag">AI</span>Read by AI</div>
+      <div class="file fade" style="--d:9.2s">notary-act-jean-dupont.pdf</div>
+      <div class="scan" style="--d:13.8s"></div>
+      <div class="ai soft" style="--d:17.2s"><span class="tag">AI</span>Read by AI</div>
     </div>
   </div></div></div>
 
   <!-- 3 · Checked -->
-  <div class="sc" style="--a:10.2s;--b:13.4s"><div class="sc-i">
+  <div class="sc" style="--a:19.2s;--b:28.2s"><div class="sc-i">
     <div class="head">
       <div class="h">Rules check that everything agrees.</div>
       <div class="h2">Nothing is touched before that.</div>
     </div>
     <div class="checks">
-      <div class="chk in" style="--d:10.5s"><span class="c"><svg><use href="#tick"/></svg></span>Same date of death on both documents</div>
-      <div class="chk in" style="--d:10.85s"><span class="c"><svg><use href="#tick"/></svg></span>Both name Jean, who signed the mandate</div>
-      <div class="chk in" style="--d:11.2s"><span class="c"><svg><use href="#tick"/></svg></span>The notary act names Marie as executor</div>
-      <div class="chk in" style="--d:11.55s"><span class="c"><svg><use href="#tick"/></svg></span>A second AI reading agrees with the rules</div>
+      <div class="chk in" style="--d:19.8s"><span class="c"><svg><use href="#tick"/></svg></span>Same date of death on both documents</div>
+      <div class="chk in" style="--d:20.9s"><span class="c"><svg><use href="#tick"/></svg></span>Both name Jean, who signed the mandate</div>
+      <div class="chk in" style="--d:22s"><span class="c"><svg><use href="#tick"/></svg></span>The notary act names Marie as executor</div>
+      <div class="chk in" style="--d:23.1s"><span class="c"><svg><use href="#tick"/></svg></span>A second AI reading agrees with the rules</div>
     </div>
-    <div class="agree in" style="--d:12s">
+    <div class="agree in" style="--d:24.4s">
       <div class="big"><span class="c"><svg><use href="#tick-n"/></svg></span>Documents agree</div>
       <div class="s">4 of 4 checks passed</div>
       <div class="note">The AI reads. The rules decide. Marie approves.</div>
@@ -228,62 +231,65 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
   </div></div>
 
   <!-- 4–5 · The plan, then Marie approves and PayPal acts (the table stays on screen) -->
-  <div class="sc" style="--a:13.4s;--b:17.2s"><div class="sc-i"><div class="head">
+  <div class="sc" style="--a:28.2s;--b:37.2s"><div class="sc-i"><div class="head">
     <div class="h">For each payment, what happens and why.</div>
   </div></div></div>
-  <div class="sc" style="--a:17.2s;--b:21.8s"><div class="sc-i"><div class="head">
+  <div class="sc" style="--a:37.2s;--b:45.6s"><div class="sc-i"><div class="head">
     <div class="h">Marie approves once. Lastly does the rest.</div>
   </div></div></div>
-  <div class="sc" style="--a:13.4s;--b:21.8s"><div class="sc-i"><div class="board in" style="--d:13.5s">
+  <div class="sc" style="--a:28.2s;--b:45.6s"><div class="sc-i"><div class="board in" style="--d:28.3s">
     <div class="top">
       <div><div class="bt">What happens to each payment</div><div class="bs">Jean Dupont · PayPal Sandbox</div></div>
-      <div class="btn">Approve these 4 steps<span class="done" style="--d:17.6s"><svg><use href="#tick"/></svg>Approved</span></div>
+      <div class="btn">Approve these 4 steps<span class="done" style="--d:38.4s"><svg><use href="#tick"/></svg>Approved</span></div>
     </div>
     <div class="grid">
       <div class="hd">Payment</div><div class="hd">Plan and why</div><div class="hd">PayPal</div><div class="hd">What happened</div>
 
-      <div class="in" style="--d:14.1s"><div class="m1">StreamFlix</div><div class="m2">€9.99 / month</div></div>
-      <div class="in" style="--d:14.1s"><div class="pl"><i class="d" style="background:var(--calm)"></i><div><div class="p1">Pause the subscription</div><div class="p2"><span class="ex">AI explains</span>His alone. No more charges.</div></div></div></div>
-      <div class="in" style="--d:14.1s"><span class="pill">Active</span><div class="id">I-MN83BBV5ENFM</div></div>
-      <div class="res"><i class="dash" style="--d:18.2s"></i><div class="in" style="--d:18.2s"><div class="ok"><span class="c" style="background:var(--calm)"><svg><use href="#tick-n"/></svg></span>Paused</div></div></div>
+      <div class="in" style="--d:29.4s"><div class="m1">StreamFlix</div><div class="m2">€9.99 / month</div></div>
+      <div class="in" style="--d:29.4s"><div class="pl"><i class="d" style="background:var(--calm)"></i><div><div class="p1">Pause the subscription</div><div class="p2"><span class="ex">AI explains</span>His alone. No more charges.</div></div></div></div>
+      <div class="in" style="--d:29.4s"><span class="pill">Active</span><div class="id">I-MN83BBV5ENFM</div></div>
+      <div class="res"><i class="dash" style="--d:39.6s"></i><div class="in" style="--d:39.6s"><div class="ok"><span class="c" style="background:var(--calm)"><svg><use href="#tick-n"/></svg></span>Paused</div></div></div>
 
-      <div class="in" style="--d:14.6s"><div class="m1">FamilyCloud</div><div class="m2">€12.00 / month</div></div>
-      <div class="in" style="--d:14.6s"><div class="pl"><i class="d" style="background:var(--sky)"></i><div><div class="p1">Hand over to the family</div><div class="p2"><span class="ex">AI explains</span>Shared at home. It keeps running.</div></div></div></div>
-      <div class="in" style="--d:14.6s"><span class="pill">Active</span><div class="id">I-AKDGPFEWRSNA</div></div>
-      <div class="res"><i class="dash" style="--d:19s"></i><div class="in" style="--d:19s"><div class="ok"><span class="c" style="background:var(--sky)"><svg><use href="#tick-n"/></svg></span>Waiting for family</div><div class="id">I-YSS51GUS9UJF</div></div></div>
+      <div class="in" style="--d:31s"><div class="m1">FamilyCloud</div><div class="m2">€12.00 / month</div></div>
+      <div class="in" style="--d:31s"><div class="pl"><i class="d" style="background:var(--sky)"></i><div><div class="p1">Hand over to the family</div><div class="p2"><span class="ex">AI explains</span>Shared at home. It keeps running.</div></div></div></div>
+      <div class="in" style="--d:31s"><span class="pill">Active</span><div class="id">I-AKDGPFEWRSNA</div></div>
+      <div class="res"><i class="dash" style="--d:41.1s"></i><div class="in" style="--d:41.1s"><div class="ok"><span class="c" style="background:var(--sky)"><svg><use href="#tick-n"/></svg></span>Waiting for approval</div><div class="id">I-YSS51GUS9UJF</div></div></div>
 
-      <div class="in" style="--d:15.1s"><div class="m1">FitGym</div><div class="m2">€39.00 / month</div></div>
-      <div class="in" style="--d:15.1s"><div class="pl"><i class="d" style="background:var(--notice)"></i><div><div class="p1">Write to end the contract</div><div class="p2"><span class="ex">AI explains</span>Under contract, so a letter comes first.</div></div></div></div>
-      <div class="in" style="--d:15.1s"><span class="pill">Active</span><div class="id">I-91KEVMRAV679</div></div>
-      <div class="res"><i class="dash" style="--d:19.8s"></i><div class="in" style="--d:19.8s"><div class="ok"><span class="c" style="background:var(--notice)"><svg><use href="#tick-n"/></svg></span>Letter written, for you to send</div></div></div>
+      <div class="in" style="--d:32.6s"><div class="m1">FitGym</div><div class="m2">€39.00 / month</div></div>
+      <div class="in" style="--d:32.6s"><div class="pl"><i class="d" style="background:var(--notice)"></i><div><div class="p1">Write to end the contract</div><div class="p2"><span class="ex">AI explains</span>Under contract, so a letter comes first.</div></div></div></div>
+      <div class="in" style="--d:32.6s"><span class="pill">Active</span><div class="id">I-91KEVMRAV679</div></div>
+      <div class="res"><i class="dash" style="--d:42.6s"></i><div class="in" style="--d:42.6s"><div class="ok"><span class="c" style="background:var(--notice)"><svg><use href="#tick-n"/></svg></span>Letter written, for you to send</div></div></div>
 
-      <div class="in" style="--d:15.6s"><div class="m1">StreamFlix</div><div class="m2">One charge · €9.99</div></div>
-      <div class="in" style="--d:15.6s"><div class="pl"><i class="d" style="background:var(--green)"></i><div><div class="p1">Refund €9.99</div><div class="p2"><span class="ex">AI explains</span>Taken after he died. It goes back.</div></div></div></div>
-      <div class="in" style="--d:15.6s"><span class="pill">Charged</span><div class="id">7CS27202KU453884G</div></div>
-      <div class="res"><i class="dash" style="--d:20.6s"></i><div class="in" style="--d:20.6s"><div class="ok"><span class="c" style="background:var(--green)"><svg><use href="#tick-n"/></svg></span>Refunded</div><div class="id">3A784550RV3218429</div></div></div>
+      <div class="in" style="--d:34.2s"><div class="m1">StreamFlix</div><div class="m2">One charge · €9.99</div></div>
+      <div class="in" style="--d:34.2s"><div class="pl"><i class="d" style="background:var(--green)"></i><div><div class="p1">Refund €9.99</div><div class="p2"><span class="ex">AI explains</span>Taken after he died. It goes back.</div></div></div></div>
+      <div class="in" style="--d:34.2s"><span class="pill">Charged</span><div class="id">7CS27202KU453884G</div></div>
+      <div class="res"><i class="dash" style="--d:44.1s"></i><div class="in" style="--d:44.1s"><div class="ok"><span class="c" style="background:var(--green)"><svg><use href="#tick-n"/></svg></span>Refunded</div><div class="id">3A784550RV3218429</div></div></div>
     </div>
   </div></div></div>
 
-  <!-- 6 · The family letter -->
-  <div class="sc" style="--a:21.8s;--b:27.4s"><div class="sc-i">
+  <!-- 6 · Done: the portal's closing screen, as it reads for this case (one handover still waits) -->
+  <div class="sc" style="--a:45.6s;--b:57.6s"><div class="sc-i">
     <div class="head">
-      <div class="h">Then a letter for the family, in plain words.</div>
+      <div class="h">When it’s done, Lastly says so plainly.</div>
     </div>
-    <div class="letter in" style="--d:22.1s">
-      <p class="greet fade" style="--d:22.6s">Dear Luc,</p>
-      <p class="fade" style="--d:23.1s">Jean died on 20 October 2026. Since then, the PayPal account went on paying for things as if nothing had changed. I have now been through each of them, and I wanted you to have a plain account of what was done.</p>
-      <p class="fade m" style="--d:24s">StreamFlix was still charging €9.99 every month. I have paused it, so nothing more will be taken, and it can be closed for good once the estate is settled. …</p>
-      <p class="fade" style="--d:24.8s">Apart from that one approval, nothing is needed from you. Take care of yourselves.</p>
-      <p class="sign fade" style="--d:25.5s">With love,<br>Marie</p>
+    <div class="closing in" style="--d:46.2s">
+      <div class="ct"><span class="c"><svg><use href="#tick-n"/></svg></span>PayPal has done what you approved</div>
+      <p class="co fade" style="--d:47.4s">StreamFlix is paused, FamilyCloud is waiting for the family to take it over, the letter to FitGym is written and the €9.99 StreamFlix took after the death has gone back.</p>
+      <p class="cs fade" style="--d:50.4s">PayPal has confirmed each step. The rest now waits on other people. What is left for you is small.</p>
+      <div class="cl fade" style="--d:52s">
+        <div class="clh">What is left, when you are ready</div>
+        <div>Send the letter to FitGym. It is already written.</div>
+        <div>Send the FamilyCloud link to whoever in the family will keep it.</div>
+      </div>
     </div>
   </div></div>
 
   <!-- End card -->
-  <div class="sc" style="--a:27.1s;--b:30s"><div class="sc-i"><div class="end">
-    <div class="word in" style="--d:27.3s">Lastly</div>
-    <div class="line in" style="--d:27.7s">Nobody should keep paying after they’re gone.</div>
-    <div class="url in" style="--d:28.1s">lastly-rdeo.onrender.com/estate</div>
-    <div class="fine in" style="--d:28.3s">PayPal Sandbox · every person in it is fictional</div>
+  <div class="sc" style="--a:57.3s;--b:62s"><div class="sc-i"><div class="end">
+    <div class="word in" style="--d:57.6s">Lastly</div>
+    <div class="line in" style="--d:58.2s">Nobody should keep paying after they’re gone.</div>
+    <div class="url in" style="--d:58.8s">lastly-rdeo.onrender.com/estate</div>
+    <div class="fine in" style="--d:59.1s">PayPal Sandbox · every person in it is fictional</div>
   </div></div></div>
 </div>
 <script>
@@ -292,10 +298,10 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
     if (!window.__recording) { el.style.transform = `scale(${s})`; el.style.transformOrigin = '0 0'; } };
   addEventListener('resize', fit); fit();
   // The recorder pauses every animation and seeks to an exact time.
-  window.DURATION = 30;
+  window.DURATION = 62;
   window.seek = (t) => { for (const a of document.getAnimations()) { a.pause(); a.currentTime = t * 1000; } };
   // Watching in a browser: loop.
-  setInterval(() => { if (!window.__recording) for (const a of document.getAnimations()) { a.currentTime = 0; a.play(); } }, 30000);
+  setInterval(() => { if (!window.__recording) for (const a of document.getAnimations()) { a.currentTime = 0; a.play(); } }, 62000);
 </script>
 </body>
 </html>

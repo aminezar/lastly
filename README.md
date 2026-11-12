@@ -2,9 +2,9 @@
 
 *8 minute read. The top, through the judges' table, takes about 2.*
 
-![Lastly in 30 seconds: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan, PayPal Sandbox pauses StreamFlix, returns the €9.99 taken after he died, hands FamilyCloud to the family, and a letter for the family is written](docs/stages/lastly-stages.gif)
+![Lastly in one minute: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan once, and PayPal Sandbox pauses StreamFlix, refunds the €9.99 taken after he died, and sets FamilyCloud up for the family to take over](docs/stages/lastly-stages.gif)
 
-The whole case in 30 seconds, from the documents to the letter for the family.
+The whole case in one minute, from the documents to the closing screen.
 
 When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
