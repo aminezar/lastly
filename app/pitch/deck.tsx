@@ -369,7 +369,7 @@ const SLIDES: Slide[] = [
           <p className="pd-in" style={d(1800)}><span>Code</span><b>{BRAND.repoUrl}</b></p>
         </div>
         <p className="pd-in pd-fade pd-fine" style={d(2200)}>
-          PayPal Sandbox with a fictional family. Subscriptions and charges are seeded under our own Sandbox business account; PayPal shows a merchant its own customers. Executor authority is simulated; in production it needs notary verification.
+          Built on the PayPal Sandbox with a fictional family. Every PayPal call in the demo is real.
         </p>
       </div>
     ),
