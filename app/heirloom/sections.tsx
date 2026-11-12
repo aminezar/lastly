@@ -110,7 +110,9 @@ export function CaseHero({ analysis }: { analysis: Analysis }) {
 
 function VerifyCard({ verification, source }: { verification: Analysis['verification']; source: Analysis['case']['documentsSource'] }) {
   const ok = verification.verified;
-  const passed = verification.checks.filter((c) => c.pass).length;
+  const counted = verification.checks.filter((c) => !c.skipped);
+  const passed = counted.filter((c) => c.pass).length;
+  const heldByAi = !ok && verification.checks.every((c) => c.pass || c.id === 'ai-reading');
   // A blocked case opens its details straight away: the executor needs to see why.
   const [open, setOpen] = useState(!ok);
   const sourceLabel = source === 'ai' ? 'Read by AI, checked by rules' : source === 'pasted-text' ? 'Your documents, checked by rules' : 'Demo documents (plain text), checked by rules';
@@ -121,8 +123,8 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
           <Icon name={ok ? 'check' : 'x'} className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[16px] font-semibold">{ok ? 'Documents verified' : 'Case blocked: documents do not match'}</p>
-          <p className="text-[13px] text-[var(--hl-header-muted)]">{passed} of {verification.checks.length} checks passed</p>
+          <p className="text-[16px] font-semibold">{ok ? 'Documents verified' : heldByAi ? 'Case held: the AI read the documents differently' : 'Case blocked: documents do not match'}</p>
+          <p className="text-[13px] text-[var(--hl-header-muted)]">{passed} of {counted.length} checks passed</p>
         </div>
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="hl-focus rounded-full px-3 py-1.5 text-[13px] font-semibold text-[var(--hl-header-text)] hover:bg-white/10">
           {open ? 'Hide' : 'Details'}
@@ -133,11 +135,17 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
           <ul className="mt-4 space-y-3">
             {verification.checks.map((check) => (
               <li key={check.id} className="flex gap-3 text-[14px]">
-                <span className={`mt-0.5 ${check.pass ? 'text-[var(--hl-done-on-board)]' : 'text-[var(--hl-error-on-board)]'}`}>
-                  <Icon name={check.pass ? 'check' : 'x'} />
+                <span className={`mt-0.5 ${check.skipped ? 'text-[var(--hl-header-muted)]' : check.pass ? 'text-[var(--hl-done-on-board)]' : 'text-[var(--hl-error-on-board)]'}`}>
+                  {check.skipped ? <span aria-label="Not run" className="inline-block w-4 text-center">–</span> : <Icon name={check.pass ? 'check' : 'x'} />}
                 </span>
                 <div>
                   <p className="text-white">{check.label}</p>
+                  {check.model && (
+                    <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-white">
+                      <span className="rounded-sm bg-[var(--pp-sky)] px-1 text-[10px] font-bold leading-[1.4] text-[var(--hl-header)]">AI</span>
+                      Second reader · {check.model}
+                    </span>
+                  )}
                   <p className="mt-0.5 text-[13px] text-[var(--hl-header-muted)]">{check.detail}</p>
                 </div>
               </li>

@@ -1,5 +1,5 @@
 // Lastly API: analyze an estate case.
-// POST /api/estate/analyze { certificateText?, notaryText? }
+// POST /api/estate/analyze { certificateText?, notaryText?, transcribedByAi? }
 // Reads both documents and cross-checks them against each other and the seeded Legacy
 // Mandate (any mismatch blocks execution), reads the PayPal Sandbox balance plus every
 // seeded subscription and capture by ID, and triages each item with explicit rules.
@@ -9,7 +9,9 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getBalances, getCapture, getSubscription } from '@/lib/paypal';
 import { demoIds, prepareDemo } from '@/lib/demo-mode';
-import { classifyWithRules, crossCheck, demoDocuments, extractDocuments, parseDocument, type Mandate, type MerchantFacts } from '@/lib/estate';
+import { aiEnabled } from '@/lib/ai';
+import { classifyWithRules, compareReadings, crossCheck, demoDocuments, parseDocument, skippedReading, type Mandate, type MerchantFacts, type TrustCheck } from '@/lib/estate';
+import { readDocumentFacts } from '@/lib/estate-ai';
 
 type SeedItem = { key: string; merchant: string; note: string; type?: string };
 type SeedFile = {
@@ -32,7 +34,7 @@ const firstToken = (v?: string) => v?.split(' ')[0];
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json().catch(() => ({}))) as { certificateText?: string; notaryText?: string };
+    const body = (await request.json().catch(() => ({}))) as { certificateText?: string; notaryText?: string; transcribedByAi?: boolean };
     const seed = await loadSeed();
     const demo = demoDocuments();
     const empty = !body.certificateText?.trim() && !body.notaryText?.trim();
@@ -40,19 +42,28 @@ export async function POST(request: Request) {
     // Label honestly: the fictional demo documents are reported as such even when sent explicitly.
     const usingDemo = docs.certificateText.trim() === demo.certificateText.trim() && docs.notaryText.trim() === demo.notaryText.trim();
 
-    // Rules read each document separately; the AI (when keyed) only adds its own reading.
+    // Rules read each document separately and decide. The AI reads the same texts on its own,
+    // in parallel with the PayPal reads below; any difference between the two readings holds
+    // the case for a person (it can never unblock one).
     const certificate = parseDocument(docs.certificateText);
     const notary = parseDocument(docs.notaryText);
     const mandate = seed.estate.legacy_mandate;
-    const checks = crossCheck(certificate, notary, mandate);
-    const verified = checks.every((c) => c.pass);
-    const extraction = usingDemo ? { source: 'demo-documents' as const } : await extractDocuments(docs);
+    const secondReading: Promise<TrustCheck> = aiEnabled()
+      ? Promise.race([
+          readDocumentFacts(docs.certificateText, docs.notaryText).then((r) => compareReadings({ certificate, notary }, r)),
+          new Promise<TrustCheck>((resolve) => setTimeout(() => resolve(skippedReading('The AI did not answer within 15 seconds')), 15_000)),
+        ]).catch((e: unknown) => {
+          console.warn(`[AI] second reading unavailable: ${e instanceof Error ? e.message : String(e)}`);
+          return skippedReading('The AI could not read the documents this time');
+        })
+      : Promise.resolve(skippedReading('No AI key is configured on this server'));
     const dateOfDeath = certificate.dateOfDeath;
 
     // Hosted demo only: put the Sandbox back in its starting state first (lib/demo-mode.ts).
     await prepareDemo(seed.sandbox_ids.pending_demo ?? {}, seed.items.filter((i) => i.type === 'capture').map((i) => i.key));
     const ids = demoIds(seed.sandbox_ids.pending_demo ?? {});
-    const [balances, ...looked] = await Promise.all([
+    const [aiCheck, balances, ...looked] = await Promise.all([
+      secondReading,
       getBalances(),
       ...seed.items.map(async (item) => {
         const subId = firstToken(ids.subscription_ids?.[item.key]);
@@ -64,6 +75,9 @@ export async function POST(request: Request) {
         return { item, sub, cap, capId };
       }),
     ]);
+
+    const checks = [...crossCheck(certificate, notary, mandate), aiCheck];
+    const verified = checks.every((c) => c.pass);
 
     const items = looked.map(({ item, sub, cap, capId }) => {
       const facts: MerchantFacts = {
@@ -101,7 +115,8 @@ export async function POST(request: Request) {
         date_of_death: dateOfDeath ?? null,
         executor_name: notary.executor ?? null,
         heirs: seed.estate.heirs,
-        documentsSource: usingDemo ? 'demo-documents' : extraction.source === 'ai' ? 'ai' : 'pasted-text',
+        // A label only: whether the texts came from the AI transcription of an uploaded PDF or photo.
+        documentsSource: usingDemo ? 'demo-documents' : body.transcribedByAi ? 'ai' : 'pasted-text',
       },
       verification: { verified, checks, mandate },
       payoutReceiver: seed.estate.sandbox_payout_receiver,

@@ -1,9 +1,10 @@
 // Lastly shared server logic: document extraction, triage rules, and action types.
-// Server-only. The AI is used for document reading and per-case reasons when a key is
-// configured; the triage decision itself follows explicit rules so the outcome is
-// deterministic and auditable whether or not a model is available.
+// Server-only. The triage decision and the document check follow explicit rules, so the
+// outcome is deterministic and auditable whether or not a model is available. The AI's own
+// reading of the documents (lib/estate-ai.ts) is compared with the rules' reading here, and
+// a difference can only hold a case, never open one.
 
-import { openAiKey } from '@/lib/ai';
+import { settledReading, type FactReading, type SecondReading } from '@/lib/estate-ai';
 
 export type Triage = 'stop_and_refund' | 'keep_for_family' | 'formal_notice_only';
 
@@ -14,14 +15,6 @@ export type TriageDecision = {
   reason: string;
   // True when the rules found nothing to do (e.g. a charge taken before the date of death).
   noAction?: boolean;
-};
-
-export type DocumentExtraction = {
-  deceased_name?: string;
-  date_of_death?: string; // YYYY-MM-DD
-  executor_name?: string;
-  heirs?: { name?: string; share_pct?: number }[];
-  source: 'ai' | 'demo-documents';
 };
 
 const DEMO_CERTIFICATE = [
@@ -40,79 +33,6 @@ const DEMO_NOTARY = [
 
 export function demoDocuments(): { certificateText: string; notaryText: string } {
   return { certificateText: DEMO_CERTIFICATE, notaryText: DEMO_NOTARY };
-}
-
-function extractDemo(): DocumentExtraction {
-  return {
-    deceased_name: 'Jean Dupont (fictional)',
-    date_of_death: '2026-10-20',
-    executor_name: 'Marie Dupont',
-    heirs: [{ name: 'Marie Dupont', share_pct: 50 }, { name: 'Luc Dupont', share_pct: 50 }],
-    source: 'demo-documents',
-  };
-}
-
-// Minimal text extraction for uploaded .txt/.md/.json files. PDF/image OCR is not
-// claimed: if an upload cannot be parsed as text we fall back to the demo documents
-// and say so in the response (never silently).
-export async function extractDocuments(input: {
-  certificateText?: string;
-  notaryText?: string;
-}): Promise<DocumentExtraction> {
-  const cert = (input.certificateText ?? '').trim();
-  const notary = (input.notaryText ?? '').trim();
-  if (!cert && !notary) return extractDemo();
-
-  const key = openAiKey();
-  if (!key) {
-    // Deterministic fallback so the demo works without an AI key.
-    const all = `${cert}\n${notary}`;
-    const date = all.match(/(20\d{2})[-/](\d{1,2})[-/](\d{1,2})/) ?? all.match(/(\d{1,2}) (January|February|March|April|May|June|July|August|September|October|November|December) (20\d{2})/i);
-    const parsed = date ? normalizeDate(date) : undefined;
-    return {
-      date_of_death: parsed ?? '2026-10-20',
-      source: 'demo-documents',
-    };
-  }
-
-  try {
-    const res = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-      body: JSON.stringify({
-        model: process.env.HEIRLOOM_AI_MODEL || 'gpt-5.4-mini',
-        input: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'input_text',
-                text:
-                  'Extract JSON only. Schema: {"deceased_name":string|null,"date_of_death":"YYYY-MM-DD"|null,"executor_name":string|null,"heirs":[{"name":string,"share_pct":number}]}\n\nCERTIFICATE:\n' +
-                  cert +
-                  '\n\nNOTARY ACT:\n' +
-                  notary,
-              },
-            ],
-          },
-        ],
-        max_output_tokens: 800,
-      }),
-    });
-    if (!res.ok) {
-      // Log why (status + OpenAI's error message, never the key) so a silent fallback is debuggable.
-      const err = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
-      console.warn(`[AI] document reading fell back to rules: OpenAI ${res.status} ${err.error?.code ?? ''} ${err.error?.message ?? ''}`.trim());
-      return extractDemo();
-    }
-    const data = (await res.json()) as { output_text?: string; output?: { content?: { text?: string }[] }[] };
-    const text = data.output_text ?? data.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? '').join('') ?? '';
-    const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as Omit<DocumentExtraction, 'source'>;
-    return { ...json, source: 'ai' };
-  } catch (error) {
-    console.warn(`[AI] document reading fell back to rules: ${error instanceof Error ? error.message : String(error)}`);
-    return extractDemo();
-  }
 }
 
 function normalizeDate(match: RegExpMatchArray): string {
@@ -188,7 +108,15 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
 
 export type ParsedDocument = { deceased?: string; dateOfDeath?: string; executor?: string };
 export type Mandate = { deceased_name: string; executor_name: string; signed?: string };
-export type TrustCheck = { id: 'death-date' | 'deceased' | 'executor'; label: string; pass: boolean; detail: string };
+export type TrustCheck = {
+  id: 'death-date' | 'deceased' | 'executor' | 'ai-reading';
+  label: string;
+  pass: boolean;
+  detail: string;
+  // ai-reading only: the model that read the documents, or why it could not run (then the check is skipped).
+  model?: string;
+  skipped?: boolean;
+};
 
 const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';
 // Name words are joined by spaces/tabs only, never a line break, so the next line's first
@@ -222,7 +150,64 @@ const same = (a?: string, b?: string) =>
 export function documentsVerified(docs: { certificateText?: string; notaryText?: string } | undefined, mandate: Mandate): boolean {
   const empty = !docs?.certificateText?.trim() && !docs?.notaryText?.trim();
   const { certificateText, notaryText } = empty ? demoDocuments() : { certificateText: docs?.certificateText ?? '', notaryText: docs?.notaryText ?? '' };
-  return crossCheck(parseDocument(certificateText), parseDocument(notaryText), mandate).every((c) => c.pass);
+  const certificate = parseDocument(certificateText);
+  const notary = parseDocument(notaryText);
+  if (!crossCheck(certificate, notary, mandate).every((c) => c.pass)) return false;
+  // A second reading by the AI that found a difference keeps the case held here too.
+  const reading = settledReading(certificateText, notaryText);
+  return !reading || compareReadings({ certificate, notary }, reading).pass;
+}
+
+// --- Second reading: rules vs AI ------------------------------------------------------
+const normName = (v?: string) =>
+  (v ?? '')
+    .replace(/\([^)]*\)/g, ' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z' -]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+/**
+ * Compare the rules' reading of each document with the AI's own reading, fact by fact.
+ * Any difference fails the check, so the case is held for a person to look at.
+ */
+export function compareReadings(rules: { certificate: ParsedDocument; notary: ParsedDocument }, ai: SecondReading): TrustCheck {
+  const facts: { doc: 'certificate' | 'notary'; label: string; field: keyof FactReading; name: boolean }[] = [
+    { doc: 'certificate', label: 'certificate, deceased', field: 'deceased', name: true },
+    { doc: 'certificate', label: 'certificate, date of death', field: 'dateOfDeath', name: false },
+    { doc: 'notary', label: 'notary act, deceased', field: 'deceased', name: true },
+    { doc: 'notary', label: 'notary act, date of death', field: 'dateOfDeath', name: false },
+    { doc: 'notary', label: 'notary act, executor', field: 'executor', name: true },
+  ];
+  const differences = facts
+    .map((f) => {
+      const r = rules[f.doc][f.field];
+      const a = ai[f.doc][f.field];
+      const agree = f.name ? normName(r) === normName(a) && Boolean(normName(r)) : Boolean(r) && r === a;
+      return agree ? null : `${f.label}: rules read ${r ?? 'nothing'}, AI read ${a ?? 'nothing'}`;
+    })
+    .filter((d): d is string => Boolean(d));
+  return {
+    id: 'ai-reading',
+    label: differences.length ? 'A second reading by AI found a difference: held for a person to check' : 'A second reading by AI agrees with the rules',
+    pass: differences.length === 0,
+    detail: differences.length
+      ? differences.join(' · ')
+      : `The AI read both documents on its own and found the same ${facts.length} facts: names, date of death and executor.`,
+    model: ai.model,
+  };
+}
+
+export function skippedReading(reason: string): TrustCheck {
+  return {
+    id: 'ai-reading',
+    label: 'Second reading by AI not available',
+    pass: true,
+    skipped: true,
+    detail: `${reason}. The rules' reading above decides on its own.`,
+  };
 }
 
 export function crossCheck(certificate: ParsedDocument, notary: ParsedDocument, mandate: Mandate): TrustCheck[] {

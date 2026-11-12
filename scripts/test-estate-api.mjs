@@ -19,12 +19,12 @@ function check(name, cond, info = '') {
 const CERT = 'Deceased: Jean Dupont (fictional)\nDate of death: 20 October 2026';
 const NOTARY = 'Notary act for the estate of Jean Dupont, deceased 20 October 2026.\nExecutor: Marie Dupont (daughter)';
 
-// 1. Demo case opens, all three checks really pass, 4 items come back with real states.
+// 1. Demo case opens, all checks really pass (three rule checks + the AI second reading, which may be skipped), 4 items come back with real states.
 {
   const { status, data } = await post('/api/estate/analyze', {});
   check('analyze demo → 200', status === 200, JSON.stringify(data).slice(0, 200));
   check('demo documents verified', data.verification?.verified === true, JSON.stringify(data.verification?.checks));
-  check('three checks returned', data.verification?.checks?.length === 3);
+  check('three rule checks + AI second reading returned', data.verification?.checks?.length === 4 && data.verification.checks[3].id === 'ai-reading');
   check('date of death from documents', data.case?.date_of_death === '2026-10-20', data.case?.date_of_death);
   check('4 estate items', data.items?.length === 4);
   check('every item has a PayPal state', data.items?.every((i) => typeof i.status === 'string'));

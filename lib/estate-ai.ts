@@ -1,12 +1,16 @@
-// Lastly AI helpers (server-only): the two places a model does real work.
+// Lastly AI helpers (server-only): where a model does real work on the documents and letters.
 //   1. writeNoticeLetter — writes the formal bereavement notice for one contract-bound
 //      merchant from the verified case facts.
 //   2. transcribeDocument — reads an uploaded PDF or photo of a document and returns its
 //      text, which then goes through the same deterministic cross-check as typed text.
-// The AI never decides anything: triage and the document check stay rule-based. Every
-// result carries the model name so the portal can label it; on any failure we throw and
-// the caller says so (never a fake AI result).
+//   3. readDocumentFacts — a second, independent reading of both documents, compared fact by
+//      fact with the rules' reading; any difference holds the case for a person.
+// (The plan review in lib/estate-review.ts explains each payment's decision.)
+// The AI never approves anything: triage and the document check stay rule-based, and the AI
+// can only hold a case, never open one. Every result carries the model name so the portal can
+// label it; on any failure we throw and the caller says so (never a fake AI result).
 
+import { createHash } from 'node:crypto';
 import { openAiKey } from '@/lib/ai';
 
 const MODEL = () => process.env.HEIRLOOM_AI_MODEL || 'gpt-5.4-mini';
@@ -104,4 +108,57 @@ export async function transcribeDocument(file: { name: string; type: string; bas
   const dataUrl = `data:${file.type};base64,${file.base64}`;
   const part = kind === 'pdf' ? { type: 'input_file', filename: file.name, file_data: dataUrl } : { type: 'input_image', image_url: dataUrl };
   return respond([part, { type: 'input_text', text: 'Transcribe this document.' }], 2000, READ_INSTRUCTIONS);
+}
+
+// --- 3. Second reading of the documents ----------------------------------------------------
+// The rules read each document with fixed patterns (lib/estate.ts parseDocument). The model
+// reads the same two texts on its own, and the portal compares both readings fact by fact.
+// Any difference holds the case for a person to check. The AI can only stop a case this way,
+// never open one: when it is unavailable, the rules' reading stands and the portal says so.
+
+export type FactReading = { deceased?: string; dateOfDeath?: string; executor?: string };
+export type SecondReading = { certificate: FactReading; notary: FactReading; model: string };
+
+const SECOND_READ_INSTRUCTIONS = [
+  'You check estate documents for an executor. You get the text of a death certificate and of a notary act of heredity.',
+  'Read each document on its own and report only what that document itself states. Never fill a fact from the other document, never guess or correct.',
+  'Names: the full name as written, without titles, roles or remarks in brackets. Dates: YYYY-MM-DD. Use null when the document does not state the fact.',
+  'The death certificate has no executor: always null there.',
+  'Answer with JSON only: {"certificate":{"deceased":...,"dateOfDeath":...,"executor":null},"notary":{"deceased":...,"dateOfDeath":...,"executor":...}}',
+].join('\n');
+
+const readings = new Map<string, Promise<SecondReading>>();
+const settled = new Map<string, SecondReading>();
+const docsKey = (cert: string, notary: string) => createHash('sha256').update(`${cert.trim()}\u0000${notary.trim()}`).digest('hex');
+
+const clean = (v: unknown) => (typeof v === 'string' && v.trim() && v.trim().toLowerCase() !== 'null' ? v.trim() : undefined);
+const facts = (v: unknown): FactReading => {
+  const o = (v ?? {}) as Record<string, unknown>;
+  return { deceased: clean(o.deceased), dateOfDeath: clean(o.dateOfDeath), executor: clean(o.executor) };
+};
+
+/** The model's own reading of both documents. Same texts, same answer: cached per server. */
+export function readDocumentFacts(certificateText: string, notaryText: string): Promise<SecondReading> {
+  const id = docsKey(certificateText, notaryText);
+  let pending = readings.get(id);
+  if (!pending) {
+    pending = respond(
+      [{ type: 'input_text', text: `DEATH CERTIFICATE:\n${certificateText.trim()}\n\nNOTARY ACT:\n${notaryText.trim()}` }],
+      600,
+      SECOND_READ_INSTRUCTIONS,
+    ).then(({ text, model }) => {
+      const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as Record<string, unknown>;
+      const reading = { certificate: facts(json.certificate), notary: facts(json.notary), model };
+      settled.set(id, reading);
+      return reading;
+    });
+    readings.set(id, pending);
+    pending.catch(() => readings.delete(id));
+  }
+  return pending;
+}
+
+/** The second reading already made for these documents on this server, if any. */
+export function settledReading(certificateText: string, notaryText: string): SecondReading | undefined {
+  return settled.get(docsKey(certificateText, notaryText));
 }

@@ -94,7 +94,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     try {
       if (!cert || !act) return;
       const body = { certificateText: cert.text, notaryText: act.text };
-      const data = await call<Analysis>('/api/estate/analyze', body);
+      const data = await call<Analysis>('/api/estate/analyze', { ...body, transcribedByAi: Boolean(cert.aiModel || act.aiModel) });
       runId.current = newRunId();
       caseDocs.current = body;
       const initial = Object.fromEntries(data.items.map((i) => [i.key, initialProgress(i)]));
@@ -109,7 +109,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       const name = data.case.deceased_name ?? 'unknown person';
       setAudit([
         { at: data.generatedAt, item: 'Case', action: `Case opened for the estate of ${name}`, status: 'OPENED', tone: 'info' },
-        ...data.verification.checks.map((c) => ({ at: data.generatedAt, item: 'Documents', action: c.label, status: c.pass ? 'MATCH' : 'MISMATCH', tone: (c.pass ? 'ok' : 'error') as AuditEntry['tone'] })),
+        ...data.verification.checks.map((c) => ({ at: data.generatedAt, item: 'Documents', action: c.model ? `${c.label} (${c.model})` : c.label, status: c.skipped ? 'NOT RUN' : c.pass ? 'MATCH' : 'MISMATCH', tone: (c.pass ? 'ok' : 'error') as AuditEntry['tone'] })),
         { at: data.generatedAt, item: 'PayPal', action: `Read ${data.items.length} recurring payments`, status: 'READ', tone: 'info' },
       ]);
     } catch (e) {

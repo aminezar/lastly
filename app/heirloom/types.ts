@@ -21,7 +21,7 @@ export type EstateItem = {
   note: string;
 };
 
-export type TrustCheck = { id: 'death-date' | 'deceased' | 'executor'; label: string; pass: boolean; detail: string };
+export type TrustCheck = { id: 'death-date' | 'deceased' | 'executor' | 'ai-reading'; label: string; pass: boolean; detail: string; model?: string; skipped?: boolean };
 
 export type Analysis = {
   ok: true;
