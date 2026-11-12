@@ -520,7 +520,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         )}
       </main>
 
-      {analysis && <PrintReport analysis={analysis} audit={audit} mode={mode} />}
+      {analysis && <PrintReport analysis={analysis} audit={audit} mode={mode} rows={rows} payout={payout} />}
     </div>
   );
 }

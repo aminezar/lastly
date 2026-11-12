@@ -448,15 +448,6 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
           <Button onClick={() => window.print()}><Icon name="print" /> Print the report for the notary</Button>
           <Button variant="onDark" onClick={onDownload}><Icon name="download" /> Machine-readable copy (JSON)</Button>
         </div>
-        <Link
-          href="/estate/family-letter"
-          className="hl-focus group mt-8 block max-w-[60ch] rounded-xl border border-[var(--hl-board-line-strong)] px-6 py-5 hover:bg-white/5"
-        >
-          <span className="hl-serif block text-[22px] text-white">A letter for the family <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-1">→</span></span>
-          <span className="mt-1 block text-[15px] text-[var(--hl-board-text)]">
-            One page, in plain words, telling the family what was done and what is still waiting. Ready to print or save.
-          </span>
-        </Link>
       </div>
     </section>
   );
@@ -585,8 +576,33 @@ function AuditList({ entries }: { entries: AuditEntry[] }) {
 }
 
 // --- Print-only notary report -----------------------------------------------------------
-export function PrintReport({ analysis, audit, mode }: { analysis: Analysis; audit: AuditEntry[]; mode: Mode }) {
+export function PrintReport({ analysis, audit, mode, rows = [], payout }: { analysis: Analysis; audit: AuditEntry[]; mode: Mode; rows?: LedgerRow[]; payout?: PayoutState }) {
   const c = analysis.case;
+  // A plain statement of what was done and what still waits on others, for the notary and the other heirs.
+  const done: string[] = [];
+  const waiting: string[] = [];
+  const notDone: string[] = [];
+  for (const r of rows) {
+    const m = merchantName(r.merchant);
+    const p = r.progress;
+    if (p.step === 'skipped') continue;
+    if (p.step !== 'done') {
+      if (p.step !== 'running') notDone.push(`${m}: not changed${p.step === 'error' ? ' (PayPal did not complete the action)' : p.step === 'excluded' ? ' (left out by the executor)' : ''}.`);
+      continue;
+    }
+    if (r.triage === 'formal_notice_only') {
+      done.push(`${m}: formal notice written for the executor to send. Payment continues, as the membership is contract-bound.`);
+      waiting.push(`${m}: reply to the formal notice.`);
+    } else if (r.triage === 'keep_for_family') {
+      done.push(`${m}: kept running. New subscription on the same plan created${p.resultId ? ` (${p.resultId})` : ''}.`);
+      waiting.push(`${m}: a family member approves the new subscription in PayPal.`);
+    } else if (r.captureId) {
+      done.push(p.refunded ? `${m}: ${money(p.refunded)} charged${r.chargedAt ? ` on ${longDate(r.chargedAt)}` : ''}, after the date of death, refunded to its original payment source${p.refundId ? ` (refund ${p.refundId})` : ''}.` : `${m}: refund ${(p.paypalStatus ?? 'pending').toLowerCase()}${p.refundId ? ` (refund ${p.refundId})` : ''}.`);
+    } else if (r.subscriptionId) {
+      done.push(`${m}: subscription ${p.paypalStatus === 'CANCELLED' ? 'cancelled' : 'paused'} (${r.subscriptionId}).`);
+    }
+  }
+  if (payout?.step === 'done' && payout.batchId) done.push(`Refunded money paid out to the heir (payout ${payout.batchId}, ${payout.status}).`);
   return (
     <div className="hidden text-black print:block">
       <h1 className="text-2xl font-bold">Lastly estate resolution: audit report</h1>
@@ -596,6 +612,24 @@ export function PrintReport({ analysis, audit, mode }: { analysis: Analysis; aud
         <div><dt className="font-semibold">Date of death</dt><dd>{c.date_of_death ? longDate(c.date_of_death) : '—'}</dd></div>
         <div><dt className="font-semibold">Executor</dt><dd>{c.executor_name ?? '—'}</dd></div>
       </dl>
+      {done.length + waiting.length + notDone.length > 0 && (
+        <div className="mt-5 grid grid-cols-2 gap-6 text-sm">
+          <div>
+            <h2 className="font-semibold">Done</h2>
+            <ul className="mt-1 list-disc pl-5">{done.map((l) => <li key={l}>{l}</li>)}</ul>
+            {notDone.length > 0 && (
+              <>
+                <h2 className="mt-3 font-semibold">Not done</h2>
+                <ul className="mt-1 list-disc pl-5">{notDone.map((l) => <li key={l}>{l}</li>)}</ul>
+              </>
+            )}
+          </div>
+          <div>
+            <h2 className="font-semibold">Still waiting on others</h2>
+            {waiting.length ? <ul className="mt-1 list-disc pl-5">{waiting.map((l) => <li key={l}>{l}</li>)}</ul> : <p className="mt-1">Nothing.</p>}
+          </div>
+        </div>
+      )}
       <table className="mt-6 w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-black text-left"><th className="py-1 pr-2">Date and time</th><th className="pr-2">Item</th><th className="pr-2">Action</th><th className="pr-2">PayPal ID</th><th className="pr-2">Status</th><th>Amount</th></tr>
