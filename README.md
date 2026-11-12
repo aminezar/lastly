@@ -6,7 +6,7 @@ When someone dies, their PayPal subscriptions keep charging. Lastly is for the p
 
 We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
 
-**Live demo: https://heirloom-vxgl.onrender.com/estate**
+**Live demo: https://lastly-rdeo.onrender.com/estate**
 
 It runs on Render's free plan, so the first load after a quiet spell can take about a minute.
 
@@ -46,7 +46,7 @@ Two results we didn't expect:
 The full table is in [`docs/red-team-results.md`](docs/red-team-results.md). You can rerun it yourself. It only calls the AI and the rule checks, and touches nothing in PayPal:
 
 ```bash
-BASE=https://heirloom-vxgl.onrender.com node scripts/red-team/run.mjs
+BASE=https://lastly-rdeo.onrender.com node scripts/red-team/run.mjs
 ```
 
 ## What we got wrong along the way

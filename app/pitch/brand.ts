@@ -2,6 +2,6 @@
 export const BRAND = {
   name: 'Lastly',
   tagline: 'Nobody should keep paying after they’re gone.',
-  demoUrl: 'heirloom-vxgl.onrender.com',
+  demoUrl: 'lastly-rdeo.onrender.com',
   repoUrl: 'github.com/aminezar/lastly',
 } as const;
