@@ -351,8 +351,8 @@ const SLIDES: Slide[] = [
       },
       {
         at: '2:34',
-        show: 'The close, quiet and slow. Back in the finished case from the main take, under the report buttons on “Everything is done”: click the card “A letter for the family”. Let the letter sit on screen for two or three seconds before the line. If you like, print it (or save as PDF) and hold the printed letter in hand on camera instead.',
-        say: 'And when it’s done, the case closes with a letter for the family: what was stopped, what came back, and what was handed on.',
+        show: 'The close, quiet and slow. Back in the finished case from the main take: hold on “Everything is done” and the one sentence under it. Then click “Print the report for the notary” and hold on the report; if you like, hold the printed report in hand on camera.',
+        say: 'When it’s done, Lastly says plainly what happened, and Marie has one record, with every PayPal ID, for the notary and the other heirs.',
       },
     ],
     body: (
@@ -710,7 +710,7 @@ function ScriptView() {
       <header>
         <p className="pd-wordmark-sm">{BRAND.name}</p>
         <h1>Pitch video script</h1>
-        <p>About 2:55 in total: the receipt, slides 2–5, the live demo, slides 6–7 with the forged-scan recording and the family letter, and the closing slide. Open <code>/pitch</code> to present, press P for this script beside the slides.</p>
+        <p>About 2:55 in total: the receipt, slides 2–5, the live demo, slides 6–7 with the forged-scan recording and the closing record, and the closing slide. Open <code>/pitch</code> to present, press P for this script beside the slides.</p>
       </header>
       {SLIDES.map((s, i) => (
         <section key={s.id}>
