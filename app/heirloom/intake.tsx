@@ -52,6 +52,12 @@ const NEEDS: Record<Kind, string> = {
   notary: 'Name of the deceased, the date of death and the executor',
 };
 
+// Fictional scanned specimens for the demo case (scripts/make-sample-documents.py).
+const SAMPLE: Record<Kind, string> = {
+  certificate: '/samples/death-certificate-jean-dupont.pdf',
+  notary: '/samples/notary-act-jean-dupont.pdf',
+};
+
 function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoText: string; onChange: (slot: DocSlot) => void }) {
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -169,6 +175,9 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
               Use demo document
             </Button>
           </div>
+          <a href={SAMPLE[props.kind]} download className="hl-focus mt-3 rounded text-[13px] font-semibold text-pp-blue hover:underline">
+            No document to hand? Download a sample PDF
+          </a>
           <input
             ref={input}
             type="file"

@@ -113,7 +113,7 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
   const passed = verification.checks.filter((c) => c.pass).length;
   // A blocked case opens its details straight away: the executor needs to see why.
   const [open, setOpen] = useState(!ok);
-  const sourceLabel = source === 'ai' ? 'Read by AI, checked by rules' : source === 'pasted-text' ? 'Your documents, checked by rules' : 'Demo documents, checked by rules · no AI key set';
+  const sourceLabel = source === 'ai' ? 'Read by AI, checked by rules' : source === 'pasted-text' ? 'Your documents, checked by rules' : 'Demo documents (plain text), checked by rules';
   return (
     <div className={`w-full rounded-xl px-5 py-4 sm:w-[420px] ${ok ? 'bg-white/[0.06]' : 'bg-[var(--hl-blocked-bg)]'}`} role={ok ? undefined : 'alert'}>
       <div className="flex items-center gap-3">
@@ -324,7 +324,8 @@ export function Settlement(props: {
           {payout.step === 'confirm' && (
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-[15px]">
-                Send <strong className="tabular-nums">{money(recovered)}</strong> to <strong>{analysis.payoutReceiver.email}</strong>?
+                Send <strong className="tabular-nums">{money(recovered)}</strong> to <strong>{analysis.case.heirs[0]?.name ?? 'the heir'}&apos;s PayPal account</strong>?
+                <span className="block text-[12px] text-pp-muted">Sandbox account {analysis.payoutReceiver.email}</span>
               </p>
               <Button onClick={props.onConfirm}>Send payout</Button>
               <Button variant="quiet" onClick={props.onBack}>Not yet</Button>

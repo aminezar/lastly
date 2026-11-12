@@ -9,24 +9,26 @@ After a death, recurring PayPal payments keep charging someone who is gone. Refu
 The pre-authorized family executor / next-of-kin. Not a merchant, not PayPal support.
 
 ## Pitch (Devpost opening)
-Lastly is an Estate Resolution Portal. The executor uploads a death certificate + notary act; AI extracts date of death, scans PayPal activity, triages every recurring payment, and executes approved actions live in PayPal Sandbox (cancel, refund, handover), then pays the recovered net balance to verified heirs with a notary-ready audit report.
+Lastly is an Estate Resolution Portal. The executor uploads a death certificate + notary act; Lastly checks them against the Legacy Mandate, reads each recurring payment from PayPal, sorts it with explicit rules, and executes the approved actions live in PayPal Sandbox (pause or cancel, refund to source, family handover), then pays the recovered money to the heir in the notary act with a notary-ready audit report.
+
+**AI reads and writes, rules decide.** AI (OpenAI `gpt-5.4-mini`, Responses API) transcribes uploaded PDFs and photos, explains each payment's decision and flags concerns for a human, and writes the bereavement letter for contract-bound merchants. The document check and the triage are rules (`lib/estate.ts`); the executor approves every PayPal action.
 
 ## Trust model
 1. **Legacy Mandate:** while alive, user names a Trusted Executor (Apple Legacy Contact model). Only that person can start a case.
-2. **Document cross-check:** AI extracts name / date of death / executor from death certificate + notary act of heredity; cross-checks both docs against each other and the mandate. Mismatch = stop, human review.
+2. **Document cross-check:** rules read name / date of death / executor from the death certificate and the notary act of heredity (AI transcribes them first when they are PDFs or photos), and compare both docs with each other and with the mandate. Mismatch = stop, in the UI and again on the server before every PayPal action. This proves consistency, not authenticity.
 3. **Refund-to-source:** PayPal refunds only return to original payment source (estate), never to uploader. A forged PDF cannot redirect money.
 4. **Gated payout:** final balance → pre-named / notary-verified heirs only, after wind-down. Demo: Sandbox payout to Sandbox heir accounts.
 5. **Honest limit:** production executor authority is legal/notary verification. Demo simulates it (seeded mandate + docs) and says so in README.
 
 ## Demo flow (video, <3 min)
-1. Executor opens case: seeded mandate + upload death certificate + notary act. AI reads date of death: **Oct 20, 2026**.
-2. AI scans Sandbox transactions + subscriptions: flags post-death charges, renewals ≤30 days, shared household, contract-bound.
-3. **AG Grid Estate Ledger** triages each item:
+1. Executor opens case: seeded mandate + upload death certificate + notary act (sample scans in `public/samples/`). AI transcribes them; rules find the date of death, **Oct 20, 2026**, in both and match them to the mandate.
+2. Lastly reads the estate's seeded Sandbox subscriptions and the post-death capture by ID; rules use the charge date and the seeded merchant notes (shared household, contract-bound).
+3. **AG Grid Estate Ledger** shows the rules' decision for each item, with an AI explanation beside it:
    - **Stop & Refund** — cancel + clawback refund for post-death charges
    - **Keep for Family** — handover link to surviving partner
    - **Formal Notice Only** — AI drafts bereavement letter (stopping payment alone would create estate debt)
-4. Executor approves → live Sandbox calls: cancel (204), refund, handover order. Ledger rows flip live. *This flip is the video moment.*
-5. Net balance (balance + refunds) → Payouts to heirs. Downloadable audit report: action, amount, PayPal ID, timestamp.
+4. Executor approves → live Sandbox calls: pause (public demo) or cancel, refund, handover subscription. Ledger rows flip live. *This flip is the video moment.*
+5. Recovered refunds → Payouts to the heir account (each refund paid out once, in its own batch). Downloadable audit report: action, amount, PayPal ID, timestamp.
 
 ## Seed estate (exactly this, no more)
 | Item | Type | Expected triage |
@@ -38,13 +40,12 @@ Lastly is an Estate Resolution Portal. The executor uploads a death certificate 
 
 Deceased: fictional. Executor: fictional son/daughter. Heirs: 2 Sandbox personal accounts.
 
-## PayPal API map (Spike 001 verified routes, live run pending)
-- Read: `GET /v1/reporting/transactions`, `GET /v1/reporting/balances` — in `lib/paypal.ts` ✅
-- Subscriptions list/get: `GET /v1/billing/subscriptions[/{id}]` — to add
-- Cancel: `POST /v1/billing/subscriptions/{id}/cancel` {reason} → 204 — to add
-- Refund: `POST /v2/payments/captures/{capture_id}/refund` — to add
-- Handover: `POST /v2/checkout/orders` CAPTURE — to add
-- Payout: `POST /v1/payments/payouts`, `GET /v1/payments/payouts/{id}` (no SDK controller; fetch) — to add
+## PayPal API map (all in `lib/paypal.ts`, run live against Sandbox)
+- Read: `GET /v1/reporting/balances`, `GET /v1/billing/subscriptions/{id}`, `GET /v2/payments/captures/{id}`, `GET /v2/payments/refunds/{id}` (`GET /v1/reporting/transactions` is in the client and the smoke script, not in the estate flow)
+- Pause / resume / cancel: `POST /v1/billing/subscriptions/{id}/suspend|activate|cancel`
+- Refund: `POST /v2/payments/captures/{capture_id}/refund` (to the original source only)
+- Handover: `POST /v1/billing/subscriptions` (new subscription on the same plan for the family member to approve)
+- Payout: `POST /v1/payments/payouts`, `GET /v1/payments/payouts/{id}` (no SDK controller; fetch)
 - Base: `https://api-m.sandbox.paypal.com`. Boilerplate client: `lib/paypal.ts` (plain fetch, token cache, retries).
 
 ## Prize targets

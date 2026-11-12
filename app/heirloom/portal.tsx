@@ -371,7 +371,13 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
                   </p>
                 </div>
                 {!approving && !running && !settled && actionableCount > 0 && (
-                  <Button onClick={() => setApproving(true)} disabled={blocked} className="w-full sm:w-auto sm:min-w-[200px]">
+                  <Button
+                    onClick={() => {
+                      setApproving(true);
+                      // The panel opens below the ledger, often off screen: bring it into view.
+                      window.setTimeout(() => document.getElementById('approve-title')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                    }}
+                    disabled={blocked} className="w-full sm:w-auto sm:min-w-[200px]">
                     {anyRan ? 'Review what is left' : 'Review and approve'} <Icon name="arrow" />
                   </Button>
                 )}

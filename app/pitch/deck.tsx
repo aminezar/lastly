@@ -88,7 +88,7 @@ const SLIDES: Slide[] = [
     tone: 'paper',
     say: [
       'Meet Marie. Her father Jean died on October 20th.',
-      'Two weeks later his PayPal was still charging StreamFlix. His family cloud renewed. His gym contract kept billing.',
+      'Three weeks later his PayPal was still charging StreamFlix. His family cloud renewed. His gym contract kept billing.',
       'Marie has to find every payment and contact every merchant by hand, while the money charged after his death sits there, unclaimed.',
     ],
     body: (
@@ -197,8 +197,8 @@ const SLIDES: Slide[] = [
     shots: [
       {
         at: '0:52',
-        show: 'Portal: sign in as Marie, click “Use the demo documents”. Hold on the verified check.',
-        say: 'Marie uploads the death certificate and the notary act. AI reads both, finds October 20th, and checks that they agree with each other and with Jean’s mandate.',
+        show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents verified”.',
+        say: 'Marie uploads the death certificate and the notary act, scanned. AI reads both. Then rules check that they agree with each other and with Jean’s mandate: same person, same date of death, October 20th, and Marie as executor.',
       },
       {
         at: '1:08',
@@ -207,7 +207,7 @@ const SLIDES: Slide[] = [
       },
       {
         at: '1:32',
-        show: '“Approve these actions”, then let the rows flip green one by one. Zoom on a PayPal ID.',
+        show: '“Review and approve”, then “Approve and run 4 actions”, and let the rows flip green one by one. Zoom on a PayPal ID.',
         say: 'Nothing moves until Marie approves. Now watch: each row flips as PayPal confirms it. Subscription paused, refund issued, each with its real Sandbox ID.',
       },
       {
@@ -217,7 +217,7 @@ const SLIDES: Slide[] = [
       },
       {
         at: '2:02',
-        show: '“Pay the heirs” → Send payout, then “Estate resolved” and Download audit report.',
+        show: '“Pay the heirs” → “Release €9.99 to the heir”, then “Estate resolved” and Download audit report.',
         say: 'What was recovered goes to the heir named in the notary act, never more than PayPal confirmed as refunded. And the notary gets an audit report with every PayPal ID and timestamp.',
       },
     ],
@@ -288,7 +288,7 @@ const SLIDES: Slide[] = [
         <div className="pd-lanes">
           <Lane
             delay={900}
-            kicker="AI · OpenAI"
+            kicker="AI · OpenAI gpt-5.4-mini"
             dot="ai"
             items={[
               'Reads the death certificate and notary act, PDF or photo',

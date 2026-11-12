@@ -124,36 +124,53 @@ export async function POST(request: Request) {
         return fail(403, 'Payouts go only to the heir account recorded for this estate.');
       // Gate 2: never more than what refunds actually recovered, re-read from PayPal.
       // Gate 3: only refunds of this estate's own charges count.
-      const refunds = (await Promise.all(refundIds.slice(0, 10).map((id) => getRefund(id).catch(() => undefined)))).filter((r) =>
-        own.captures.has(refundedCapture(r) ?? ''),
+      const refunds = (await Promise.all([...new Set(refundIds)].slice(0, 10).map((id) => getRefund(id).catch(() => undefined)))).filter(
+        (r): r is NonNullable<typeof r> => Boolean(r && own.captures.has(refundedCapture(r) ?? '') && r.status === 'COMPLETED' && r.amount?.currency_code === currency),
       );
-      const recovered = refunds
-        .filter((r) => r?.status === 'COMPLETED' && r.amount?.currency_code === currency)
-        .reduce((sum, r) => sum + Number(r!.amount!.value), 0);
+      const recovered = refunds.reduce((sum, r) => sum + Number(r.amount!.value), 0);
       const value = Number(amount);
       if (!/^\d+(\.\d{1,2})?$/.test(amount ?? '') || value <= 0) return fail(400, 'Enter an amount greater than zero, with at most two decimals.');
       if (value > recovered + 1e-9)
         return fail(400, `The payout (${value.toFixed(2)} ${currency}) is more than the refunds PayPal confirms as recovered (${recovered.toFixed(2)} ${currency}).`);
+      if (Math.abs(value - recovered) > 0.005)
+        return fail(400, `Each recovered refund is paid out once and in full, so the payout must be the full recovered amount (${recovered.toFixed(2)} ${currency}).`);
 
-      // The batch ID is derived from the refunds being paid out. PayPal rejects a repeated
-      // sender_batch_id, so the same recovered money can never be paid out twice, even
-      // from a new case run or another browser.
-      const paidRefunds = refunds.filter((r) => r?.status === 'COMPLETED').map((r) => r!.id).sort();
-      const senderBatchId = `heirloom-${createHash('sha256').update(paidRefunds.join(',')).digest('hex').slice(0, 32)}`;
-      const batch = await createPayout(
-        {
-          senderBatchId,
-          subject: 'Lastly estate payout',
-          message: 'Recovered estate balance share (Lastly demo)',
-          items: [{ receiver, amount: { value: value.toFixed(2), currency_code: currency }, note: 'Lastly estate payout', sender_item_id: `heir-${runId}`.slice(0, 63) }],
+      // Gate 4: each refund is paid out in its own batch, whose ID is derived from that refund
+      // alone. PayPal rejects a repeated sender_batch_id, so a refund already paid out (from this
+      // case run, a new one, or another browser) is skipped and never paid twice, even when it
+      // comes back together with a new refund.
+      const sent: { batchId?: string; status?: string; amount: number }[] = [];
+      for (const r of refunds.sort((a, b) => a.id.localeCompare(b.id))) {
+        const refundAmount = Number(r.amount!.value);
+        const batch = await createPayout(
+          {
+            senderBatchId: `heirloom-${createHash('sha256').update(r.id).digest('hex').slice(0, 32)}`,
+            subject: 'Lastly estate payout',
+            message: 'Recovered estate balance share (Lastly demo)',
+            items: [{ receiver, amount: { value: refundAmount.toFixed(2), currency_code: currency }, note: `Lastly estate payout of refund ${r.id}`, sender_item_id: `heir-${r.id}`.slice(0, 63) }],
+          },
+          key('payout', r.id),
+        ).catch((e: unknown) => {
+          if (e instanceof PayPalApiError && /"field":"SENDER_BATCH_ID"/.test(e.message)) return null;
+          throw e;
+        });
+        if (batch) sent.push({ batchId: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status, amount: refundAmount });
+      }
+      if (!sent.length) return fail(409, 'These recovered refunds have already been paid out. Nothing was sent again.');
+      const paid = sent.reduce((sum, b) => sum + b.amount, 0);
+      return NextResponse.json({
+        ok: true,
+        at,
+        payout: {
+          batchId: sent[0].batchId,
+          status: sent[0].status,
+          batchIds: sent.map((b) => b.batchId),
+          receiver,
+          amount: paid.toFixed(2),
+          recovered: recovered.toFixed(2),
+          alreadyPaidOut: (recovered - paid).toFixed(2),
         },
-        key('payout', 'heir'),
-      ).catch((e: unknown) => {
-        if (e instanceof PayPalApiError && /"field":"SENDER_BATCH_ID"/.test(e.message)) return null;
-        throw e;
       });
-      if (!batch) return fail(409, 'These recovered refunds have already been paid out. Nothing was sent again.');
-      return NextResponse.json({ ok: true, at, payout: { batchId: batch.batch_header?.payout_batch_id, status: batch.batch_header?.batch_status, receiver, amount: value.toFixed(2), recovered: recovered.toFixed(2) } });
     }
 
     return fail(400, 'Provide subscriptionId, captureId, handover, payout, or pollBatchId.');
