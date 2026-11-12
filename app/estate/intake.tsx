@@ -23,7 +23,7 @@ export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-[440px] flex-col justify-center py-16">
       <h1 className="hl-serif text-[36px] leading-tight text-pp-navy">Sign in to Lastly</h1>
-      <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person chosen to settle someone&apos;s PayPal affairs after they die.</p>
+      <p className="mt-3 text-[17px] leading-relaxed text-pp-muted">For the person someone chose, while they were alive, to look after their PayPal account when they die.</p>
 
       <div className="mt-8 rounded-2xl border border-pp-border bg-white p-6 shadow-[0_10px_30px_-18px_rgba(0,20,53,0.35)]">
         <div className="flex items-center gap-4">
@@ -39,7 +39,8 @@ export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: 
           Continue as {mandate.executor_name.split(' ')[0]} <Icon name="arrow" />
         </Button>
       </div>
-      <p className="mt-4 text-center text-[13px] text-pp-muted">Demo sign-in: no password, fictional people.</p>
+      <p className="mt-4 text-center text-[14px] leading-relaxed text-pp-muted">It takes a few minutes. Nothing changes in PayPal until you approve, so you can stop at any point.</p>
+      <p className="mt-2 text-center text-[13px] text-pp-muted">Demo sign-in: no password, fictional people.</p>
     </div>
   );
 }
@@ -49,7 +50,7 @@ export function SignIn({ mandate, onSignIn }: { mandate: MandateInfo; onSignIn: 
 // What the reader will look for, so the executor knows what a document must contain.
 const NEEDS: Record<Kind, string> = {
   certificate: 'Name of the person who died and the date of death',
-  notary: 'Name of the deceased, the date of death and the executor',
+  notary: 'The same name and date, and you as executor',
 };
 
 // Fictional scanned specimens for the demo case (scripts/make-sample-documents.py).
@@ -216,10 +217,10 @@ export function Intake(props: {
   return (
     <div className="mx-auto mt-12 max-w-[980px] pb-8">
       <h1 className="hl-serif text-balance text-[36px] leading-[1.06] text-pp-navy sm:text-[50px]">
-        Close a PayPal life, one approved step at a time.
+        We&apos;ll go through {mandate.deceased_name}&apos;s PayPal payments with you, one step at a time.
       </h1>
       <p className="mt-4 max-w-[64ch] text-[18px] leading-relaxed text-pp-muted">
-        Three steps before anything happens: we confirm you are the person {mandate.deceased_name} chose, read the documents, and check that they agree. Nothing changes in PayPal until you approve a plan.
+        First, two documents, checked against what {mandate.deceased_name} set up while alive. Then a plan for each payment, in plain words. Nothing changes in PayPal until you approve it, and you won&apos;t need to call PayPal or any company: where a letter is needed, it is written for you.
       </p>
 
       {props.onQuickDemo && !props.certificate && !props.notary && (
@@ -251,13 +252,13 @@ export function Intake(props: {
               <p className="text-[17px] font-semibold">{mandate.signed ? longDate(mandate.signed) : '—'}</p>
             </div>
             <p className="w-full text-[14px] text-pp-muted">
-              While still alive, {mandate.deceased_name} chose who may settle their PayPal affairs. Only that person can open this case. <span className="text-pp-ink">Demo: sign-in and mandate are simulated.</span>
+              While still alive, {mandate.deceased_name} chose you to look after this PayPal account. Only you can open this case. <span className="text-pp-ink">Demo: sign-in and mandate are simulated.</span>
             </p>
           </div>
         </li>
 
         <li className="rounded-2xl border border-pp-border bg-white p-6">
-          <StepHead n={2} title="Upload the two documents" done={ready} />
+          <StepHead n={2} title="Add the two documents" done={ready} />
           <div className="mt-5 grid gap-6 sm:pl-10 md:grid-cols-2">
             <DocumentSlot kind="certificate" title="Death certificate" slot={props.certificate} demoText={props.demo.certificateText} onChange={props.onCertificate} />
             <DocumentSlot kind="notary" title="Notary act of heredity" slot={props.notary} demoText={props.demo.notaryText} onChange={props.onNotary} />
@@ -268,10 +269,10 @@ export function Intake(props: {
           <StepHead n={3} title="Check and open the case" done={false} />
           <div className="mt-4 sm:pl-10">
             <p className="max-w-[70ch] text-[15px] text-pp-muted">
-              Lastly compares both documents with each other and with the mandate: same person, same date of death, and you as executor. If anything differs, the case stays blocked. Then it reads the recurring payments in PayPal. Nothing is paid, cancelled or refunded yet.
+              Lastly checks that both documents and the mandate agree: the same person, the same date of death, and you as executor. If anything differs, it stops there and shows you what. Then it reads the regular payments in PayPal. Nothing is paid, stopped or refunded yet.
             </p>
             {props.error && (
-              <p role="alert" className="mt-4 rounded-lg bg-[#fdecef] px-4 py-3 text-[15px] text-pp-danger">The case could not be opened. {props.error}</p>
+              <p role="alert" className="mt-4 rounded-lg bg-[#fdecef] px-4 py-3 text-[15px] text-pp-danger">We couldn&apos;t open the case just now. {props.error}</p>
             )}
             <Button className="mt-5 w-full sm:w-auto sm:min-w-[260px]" onClick={props.onOpen} disabled={!ready || props.opening}>
               {props.opening ? 'Checking documents and PayPal…' : ready ? (props.error ? 'Try again' : 'Check documents and open the case') : 'Add both documents first'}
@@ -307,7 +308,7 @@ function TrustExplainer() {
       <div className="grid gap-6 border-t border-pp-border px-6 py-6 md:grid-cols-3">
         <div>
           <h3 className="font-semibold">1. Chosen while alive</h3>
-          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">The account holder names a Trusted Executor in advance, like a legacy contact on a phone. No one else can open a case.</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">While alive, a person names their Trusted Executor, like a legacy contact on a phone. No one else can open a case.</p>
         </div>
         <div>
           <h3 className="font-semibold">2. Documents must agree</h3>

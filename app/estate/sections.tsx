@@ -6,7 +6,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { draftNotice } from './letter';
-import { fictional, longDate, merchantName, money, planFor, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money } from './types';
+import { fictional, heirAccount, longDate, merchantName, money, planFor, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money } from './types';
 
 export type Mode = 'rehearsal' | 'final';
 export type PayoutState = { step: 'idle' | 'confirm' | 'sending' | 'polling' | 'stalled' | 'done' | 'error'; batchId?: string; status?: string; message?: string; at?: string };
@@ -23,7 +23,7 @@ export function AiBadge({ label }: { label: string }) {
   );
 }
 
-export function Icon({ name, className = 'size-4' }: { name: 'check' | 'x' | 'arrow' | 'lock' | 'download' | 'upload' | 'print' | 'copy'; className?: string }) {
+export function Icon({ name, className = 'size-4' }: { name: 'check' | 'x' | 'arrow' | 'lock' | 'download' | 'upload' | 'print' | 'copy' | 'pause'; className?: string }) {
   const paths: Record<typeof name, string> = {
     check: 'M4 10.5l4 4 8-9',
     x: 'M5 5l10 10M15 5L5 15',
@@ -33,6 +33,7 @@ export function Icon({ name, className = 'size-4' }: { name: 'check' | 'x' | 'ar
     upload: 'M10 13V3M5.5 7.5L10 3l4.5 4.5M4 17h12',
     print: 'M6 8V3h8v5M6 14H4V8h12v6h-2M6 12h8v5H6z',
     copy: 'M7 7V4h9v9h-3M4 7h9v9H4z',
+    pause: 'M7.5 5v10M12.5 5v10',
   };
   return (
     <svg viewBox="0 0 20 20" className={`shrink-0 ${className}`} aria-hidden="true">
@@ -64,7 +65,7 @@ export function TopBar({ mode, hasCase, user, onReset, onSignOut, busy }: { mode
         <Link href="/" className="hl-serif hl-focus rounded text-[21px] text-white">Lastly</Link>
         {hasCase && (
           <span title={mode === 'rehearsal' ? 'Rehearsal: subscriptions are paused, not cancelled, so every step can be undone' : 'Final: subscriptions are cancelled for good'} className={`ml-2 hidden rounded-full px-3 py-1 text-[12px] font-semibold sm:inline ${mode === 'rehearsal' ? 'bg-white/10 text-[var(--hl-header-muted)]' : 'bg-[var(--hl-final)] text-white'}`}>
-            {mode === 'rehearsal' ? 'Rehearsal · reversible' : 'Final'}
+            {mode === 'rehearsal' ? 'Pause only · can be undone' : 'Final'}
           </span>
         )}
         <span className="ml-auto hidden text-[12px] text-[var(--hl-header-muted)] lg:block">Sandbox demo · fictional estate</span>
@@ -94,12 +95,12 @@ export function CaseHero({ analysis }: { analysis: Analysis }) {
     <section className="bg-[var(--hl-header)] text-white print:hidden">
       <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-start justify-between gap-x-10 gap-y-6 px-6 py-8 lg:px-10">
         <div>
-          <p className="text-[15px] text-[var(--hl-header-muted)]">Estate of</p>
+          <p className="text-[15px] text-[var(--hl-header-muted)]">PayPal account of</p>
           <h1 className="hl-serif mt-1 text-balance text-[38px] leading-[1.05] sm:text-[46px]">{name}</h1>
           <p className="mt-3 text-[16px] text-[var(--hl-header-text)]">
             {c.date_of_death ? <>Died {longDate(c.date_of_death)}</> : <>Date of death not found</>}
             <span className="mx-2 text-[var(--hl-header-muted)]">·</span>
-            {c.executor_name ? <>Executor {c.executor_name}</> : <>Executor not found</>}
+            {c.executor_name ? <>Executor {c.executor_name}</> : <>Executor not named in the notary act</>}
           </p>
         </div>
         <VerifyCard verification={verification} source={c.documentsSource} />
@@ -117,14 +118,19 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
   const [open, setOpen] = useState(!ok);
   const sourceLabel = source === 'ai' ? 'Read by AI, checked by rules' : source === 'pasted-text' ? 'Your documents, checked by rules' : 'Demo documents (plain text), checked by rules';
   return (
-    <div className={`w-full rounded-xl px-5 py-4 sm:w-[420px] ${ok ? 'bg-white/[0.06]' : 'bg-[var(--hl-blocked-bg)]'}`} role={ok ? undefined : 'alert'}>
+    <div className={`w-full rounded-xl px-5 py-4 sm:w-[420px] ${ok ? 'bg-white/[0.06]' : 'bg-[var(--hl-blocked-bg)] ring-1 ring-[var(--hl-warn-on-board)]/30'}`} role={ok ? undefined : 'status'}>
       <div className="flex items-center gap-3">
-        <span className={`grid size-7 shrink-0 place-items-center rounded-full ${ok ? 'bg-[var(--hl-done-on-board)] text-[var(--hl-header)]' : 'bg-[var(--hl-error-on-board)] text-[var(--hl-header)]'}`}>
-          <Icon name={ok ? 'check' : 'x'} className="size-4" />
+        <span className={`grid size-7 shrink-0 place-items-center rounded-full ${ok ? 'bg-[var(--hl-done-on-board)] text-[var(--hl-header)]' : 'bg-[var(--hl-warn-on-board)] text-[var(--hl-header)]'}`}>
+          {ok ? <Icon name="check" className="size-4" /> : <Icon name="pause" className="size-4" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[16px] font-semibold">{ok ? 'Documents agree' : heldByAi ? 'Case held: the AI read the documents differently' : 'Case blocked: documents do not match'}</p>
+          <p className="text-[16px] font-semibold">{ok ? 'Documents agree' : heldByAi ? 'On hold: the AI read the documents differently' : 'On hold: the documents do not agree'}</p>
           <p className="text-[13px] text-[var(--hl-header-muted)]">{passed} of {counted.length} checks passed</p>
+          {!ok && (
+            <p className="mt-1.5 text-[13.5px] leading-snug text-[var(--hl-header-text)]">
+              Nothing in PayPal has been touched. {heldByAi ? 'A person needs to compare the documents before anything can go ahead.' : 'See what differs below. You can start over with the right document.'}
+            </p>
+          )}
         </div>
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="hl-focus rounded-full px-3 py-1.5 text-[13px] font-semibold text-[var(--hl-header-text)] hover:bg-white/10">
           {open ? 'Hide' : 'Details'}
@@ -135,7 +141,7 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
           <ul className="mt-4 space-y-3">
             {verification.checks.map((check) => (
               <li key={check.id} className="flex gap-3 text-[14px]">
-                <span className={`mt-0.5 ${check.skipped ? 'text-[var(--hl-header-muted)]' : check.pass ? 'text-[var(--hl-done-on-board)]' : 'text-[var(--hl-error-on-board)]'}`}>
+                <span className={`mt-0.5 ${check.skipped ? 'text-[var(--hl-header-muted)]' : check.pass ? 'text-[var(--hl-done-on-board)]' : 'text-[var(--hl-warn-on-board)]'}`}>
                   {check.skipped ? <span aria-label="Not run" className="inline-block w-4 text-center">–</span> : <Icon name={check.pass ? 'check' : 'x'} />}
                 </span>
                 <div>
@@ -162,11 +168,11 @@ function VerifyCard({ verification, source }: { verification: Analysis['verifica
 
 // --- Journey --------------------------------------------------------------------------
 const STAGES: { id: Stage; label: string }[] = [
-  { id: 'verify', label: 'Verify documents' },
-  { id: 'review', label: 'Approve the plan' },
-  { id: 'act', label: 'Act in PayPal' },
-  { id: 'settle', label: 'Pay the heirs' },
-  { id: 'resolved', label: 'Report' },
+  { id: 'verify', label: 'Documents' },
+  { id: 'review', label: 'The plan' },
+  { id: 'act', label: 'In PayPal' },
+  { id: 'settle', label: 'The heirs' },
+  { id: 'resolved', label: 'The report' },
 ];
 
 export function Journey({ stage, blocked }: { stage: Stage; blocked: boolean }) {
@@ -183,10 +189,10 @@ export function Journey({ stage, blocked }: { stage: Stage; blocked: boolean }) 
               {i > 0 && <span className="mx-1 h-px w-6 bg-pp-border lg:w-10" aria-hidden="true" />}
               <span
                 className={`grid size-6 place-items-center rounded-full text-[12px] font-bold tabular-nums ${
-                  failed ? 'bg-pp-danger text-white' : done ? 'bg-pp-success text-white' : active ? 'bg-pp-blue text-white' : 'bg-pp-canvas text-pp-muted ring-1 ring-pp-border'
+                  failed ? 'bg-[#f6e3bf] text-[#6b4300]' : done ? 'bg-pp-success text-white' : active ? 'bg-pp-blue text-white' : 'bg-pp-canvas text-pp-muted ring-1 ring-pp-border'
                 }`}
               >
-                {failed ? <Icon name="x" className="size-3.5" /> : done ? <Icon name="check" className="size-3.5" /> : i + 1}
+                {failed ? <Icon name="pause" className="size-3.5" /> : done ? <Icon name="check" className="size-3.5" /> : i + 1}
               </span>
               <span className={`text-[14px] ${active || failed ? 'font-semibold text-pp-ink' : done ? 'text-pp-ink' : 'text-pp-muted'}`}>{s.label}</span>
             </li>
@@ -219,7 +225,7 @@ export function ApprovePanel(props: {
   const canRun = chosen.length > 0 && (!final || cancels === 0 || props.finalAck);
   return (
     <div className="border-t border-[var(--hl-board-line)] bg-[var(--hl-board-deep)] px-6 py-6 text-white">
-      <h3 id="approve-title" className="text-[18px] font-semibold">Approve these actions</h3>
+      <h3 id="approve-title" className="text-[18px] font-semibold">This is what will happen when you approve</h3>
       <p className="mt-1 text-[14px] text-[var(--hl-board-text)]">Untick anything that should wait.</p>
       <ul className="mt-5 grid gap-2 md:grid-cols-2">
         {actionable.map((r) => (
@@ -228,8 +234,7 @@ export function ApprovePanel(props: {
               <input type="checkbox" checked={!!props.included[r.key]} onChange={() => props.onToggle(r.key)} className="mt-1 size-4 accent-[var(--pp-sky)]" />
               <span>
                 <span className="block text-[15px] font-semibold">{planFor(r, !final)}</span>
-                <span className="block text-[13px] text-[var(--hl-board-text)]">{merchantName(r.merchant)}{r.captureId ? ' charge' : ''}</span>
-                <span className="mt-1 block text-[13px] leading-snug text-[var(--hl-board-muted)]">{r.reason}</span>
+                <span className="block text-[14px] text-[var(--hl-board-text)]">{merchantName(r.merchant)}{r.amount ? ` · ${money(r.amount)}${r.captureId ? '' : ' a month'}` : ''}</span>
               </span>
             </label>
           </li>
@@ -238,12 +243,13 @@ export function ApprovePanel(props: {
 
       {stopsAny && (
       <fieldset className="mt-6">
-        <legend className="text-[14px] font-semibold">How should subscriptions be stopped?</legend>
+        <legend className="text-[14px] font-semibold">Pause subscriptions for now, or cancel them for good?</legend>
+        <p className="mt-0.5 text-[13px] text-[var(--hl-board-text)]">If you are not sure, pause. It stops the charges just the same, and you can cancel later.</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {(['rehearsal', 'final'] as const).map((m) => (
             <label key={m} className={`hl-focus-within rounded-lg border px-4 py-2.5 text-[14px] ${m === 'final' && props.finalLocked ? 'cursor-not-allowed border-[var(--hl-board-line)] text-[var(--hl-board-muted)] opacity-70' : props.mode === m ? 'cursor-pointer border-white bg-white text-pp-navy' : 'cursor-pointer border-[var(--hl-board-line-strong)] text-[var(--hl-board-text)] hover:text-white'}`}>
               <input type="radio" name="mode" value={m} checked={props.mode === m} disabled={m === 'final' && props.finalLocked} onChange={() => props.onMode(m)} className="sr-only" />
-              <span className="font-semibold">{m === 'rehearsal' ? 'Pause (rehearsal)' : 'Cancel permanently'}</span>
+              <span className="font-semibold">{m === 'rehearsal' ? 'Pause for now' : 'Cancel for good'}</span>
               <span className="ml-2 opacity-80">{m === 'rehearsal' ? 'can be resumed later' : props.finalLocked ? 'off on the public demo' : 'cannot be undone'}</span>
             </label>
           ))}
@@ -262,10 +268,10 @@ export function ApprovePanel(props: {
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button variant={final ? 'danger' : 'primary'} onClick={props.onRun} disabled={!canRun} aria-describedby={final ? 'final-warning' : undefined}>
-          {final ? `Cancel permanently and run ${chosen.length}` : `Approve and run ${chosen.length} ${chosen.length === 1 ? 'action' : 'actions'}`}
+          {final ? `Approve, and cancel for good` : `Approve ${chosen.length === 1 ? 'this step' : `these ${chosen.length} steps`}`}
           <Icon name="arrow" />
         </Button>
-        <Button variant="onDark" onClick={props.onCancel}>Back</Button>
+        <Button variant="onDark" onClick={props.onCancel}>Not yet</Button>
       </div>
     </div>
   );
@@ -288,18 +294,20 @@ export function Settlement(props: {
   const value = Number(recovered.value);
   const heirs = analysis.case.heirs;
   const busy = payout.step === 'sending' || payout.step === 'polling';
+  const deceased = (analysis.case.deceased_name ?? '').replace(fictional, '');
+  const owner = deceased ? `${deceased}’s account` : 'the account';
   return (
     <section aria-labelledby="settle-title" className="mt-10">
-      <h2 id="settle-title" className="hl-serif text-[28px] text-pp-navy">Pay the heirs</h2>
+      <h2 id="settle-title" className="hl-serif text-[28px] text-pp-navy">Passing the money on</h2>
       <p className="mt-1 max-w-[70ch] text-[15px] text-pp-muted">
-        Money recovered by refunds goes back to the estate first. Lastly then releases it to the heirs named in the notary act.
+        Money returned by a refund goes back to {owner} first. When you are ready, it goes on to the heirs named in the notary act. Nobody else can receive it.
       </p>
       <div className="mt-5 overflow-hidden rounded-xl border border-pp-border bg-white">
         <div className="grid gap-px bg-pp-border md:grid-cols-[1fr_1.3fr]">
           <div className="bg-white px-6 py-6">
-            <p className="text-[14px] text-pp-muted">Recovered for the estate</p>
-            <p className="mt-1 text-[40px] font-semibold tabular-nums leading-none tracking-tight text-pp-ink">{money(recovered)}</p>
-            <p className="mt-3 text-[13px] text-pp-muted">From refunds PayPal confirmed as completed.</p>
+            <p className="text-[14px] text-pp-muted">Returned by refunds</p>
+            <p className="mt-1 text-[24px] font-semibold tabular-nums leading-tight text-pp-ink">{money(recovered)}</p>
+            <p className="mt-2 text-[13px] text-pp-muted">Only refunds PayPal has confirmed as completed.</p>
           </div>
           <div className="bg-white px-6 py-6">
             <p className="text-[14px] text-pp-muted">Heirs (notary act)</p>
@@ -318,12 +326,12 @@ export function Settlement(props: {
         </div>
 
         <div className="border-t border-pp-border bg-pp-canvas px-6 py-5" aria-live="polite">
-          {!props.unlocked && <p className="flex items-center gap-2 text-[14px] text-pp-muted"><Icon name="lock" /> Unlocks when every approved action has finished.</p>}
+          {!props.unlocked && <p className="flex items-center gap-2 text-[14px] text-pp-muted"><Icon name="lock" /> This opens once every step above is done.</p>}
           {props.unlocked && value === 0 && (
             <p className="text-[15px] text-pp-ink">
               {props.refundedBefore
-                ? 'Nothing to pay out: the post-death charge was already refunded before this case was opened, so this run recovered nothing new.'
-                : 'Nothing to pay out: no refunds were made in this run.'}
+                ? 'There is nothing to pass on: the charge taken after the death was already refunded before this case was opened.'
+                : 'There is nothing to pass on: no refunds were needed.'}
               {props.refundedBefore && (
                 <span className="mt-1 block text-[13px] text-pp-muted">
                   {props.publicDemo
@@ -334,21 +342,21 @@ export function Settlement(props: {
             </p>
           )}
           {props.unlocked && value > 0 && payout.step === 'idle' && (
-            <Button onClick={props.onStart}>Release {money(recovered)} to the heir <Icon name="arrow" /></Button>
+            <Button onClick={props.onStart}>Send {money(recovered)} to {heirAccount(analysis.case).to} <Icon name="arrow" /></Button>
           )}
           {payout.step === 'confirm' && (
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-[15px]">
-                Send <strong className="tabular-nums">{money(recovered)}</strong> to <strong>{analysis.case.heirs[0]?.name ?? 'the heir'}&apos;s PayPal account</strong>?
+                Send <strong className="tabular-nums">{money(recovered)}</strong> to <strong>{heirAccount(analysis.case).to}</strong>?
                 <span className="block text-[12px] text-pp-muted">Sandbox account {analysis.payoutReceiver.email}</span>
               </p>
-              <Button onClick={props.onConfirm}>Send payout</Button>
+              <Button onClick={props.onConfirm}>Yes, send it</Button>
               <Button variant="quiet" onClick={props.onBack}>Not yet</Button>
             </div>
           )}
           {(busy || payout.step === 'done' || payout.step === 'stalled' || (payout.step === 'error' && payout.batchId)) && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px]">
-              <span className="font-semibold">{busy ? 'PayPal is sending the payout…' : payout.status === 'SUCCESS' ? 'Payout delivered' : 'Payout sent'}</span>
+              <span className="font-semibold">{busy ? 'PayPal is sending it. This usually takes under a minute…' : payout.status === 'SUCCESS' ? `Received in ${heirAccount(analysis.case).to}` : 'Sent, waiting for PayPal to confirm'}</span>
               {payout.batchId && <span className="text-pp-muted">Payout <span className="font-mono text-pp-ink">{payout.batchId}</span></span>}
               {payout.status && <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${payout.status === 'SUCCESS' ? 'bg-[var(--hl-success-bg)] text-[var(--hl-success-ink)]' : 'bg-[#fff4e5] text-[#8a4600]'}`}>{payout.status}</span>}
             </div>
@@ -363,44 +371,76 @@ export function Settlement(props: {
 }
 
 // --- Resolved ----------------------------------------------------------------------------
-export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRow[]; recovered: Money; paid?: string; onDownload: () => void }) {
+// One calm sentence of what happened, built only from rows PayPal confirmed.
+function outcomeLine(done: LedgerRow[], heir?: string, paid?: boolean): string {
+  const parts: string[] = [];
+  for (const r of done) {
+    const m = merchantName(r.merchant);
+    if (r.triage === 'formal_notice_only') parts.push(`the letter to ${m} is written`);
+    else if (r.triage === 'keep_for_family') parts.push(`${m} is waiting for the family to take it over`);
+    else if (r.progress.refunded) parts.push(`the ${money(r.progress.refunded)} ${m} took after the death has gone back${paid && heir ? `, and on to ${heir}` : ''}`);
+    else if (r.subscriptionId) parts.push(`${m} is ${r.progress.paypalStatus === 'CANCELLED' ? 'cancelled' : 'paused'}`);
+  }
+  if (!parts.length) return '';
+  const text = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;
+}
+
+export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: LedgerRow[]; recovered: Money; paid?: string; heir?: string; onDownload: () => void }) {
   const done = rows.filter((r) => r.progress.step === 'done');
   const stoppedRows = done.filter((r) => r.subscriptionId && r.triage === 'stop_and_refund');
   const stopped = stoppedRows.length;
   // What the stopped subscriptions would have charged the estate over the next twelve months.
   const yearly = stoppedRows.reduce((sum, r) => sum + Number(r.amount?.value ?? 0) * 12, 0);
   const yearlyCurrency = stoppedRows.find((r) => r.amount)?.amount?.currency_code ?? recovered.currency_code;
-  const handed = done.filter((r) => r.triage === 'keep_for_family').length;
-  const notices = done.filter((r) => r.triage === 'formal_notice_only').length;
+  const handedRows = done.filter((r) => r.triage === 'keep_for_family');
+  const noticeRows = done.filter((r) => r.triage === 'formal_notice_only');
+  const handed = handedRows.length;
+  const notices = noticeRows.length;
   // Handovers wait for the family to approve, notices for the merchant to answer.
   const waiting = handed + notices;
   // Only what actually happened: a zero or an empty figure is noise on the closing screen.
   const stats = [
     { label: 'Subscriptions stopped', value: String(stopped), show: stopped > 0 },
     { label: 'Future charges stopped, per year', value: money({ value: yearly.toFixed(2), currency_code: yearlyCurrency }), show: yearly > 0 },
-    { label: 'Refunded to the estate', value: money(recovered), show: Number(recovered.value) > 0 },
-    { label: 'Handed to family', value: String(handed), show: handed > 0 },
-    { label: 'Formal notices', value: String(notices), show: notices > 0 },
-    { label: 'Paid to the heir', value: paid ? money({ value: paid, currency_code: recovered.currency_code }) : '', show: Boolean(paid) },
+    { label: 'Returned by refunds', value: money(recovered), show: Number(recovered.value) > 0 },
+    { label: 'Handed to the family', value: String(handed), show: handed > 0 },
+    { label: 'Letters written', value: String(notices), show: notices > 0 },
+    { label: 'Passed on to the heir', value: paid ? money({ value: paid, currency_code: recovered.currency_code }) : '', show: Boolean(paid) },
   ].filter((s) => s.show);
   return (
     <section id="resolved" aria-labelledby="resolved-title" className="hl-board mt-10 scroll-mt-20 overflow-hidden rounded-2xl text-white shadow-[0_18px_40px_-20px_rgba(0,20,53,0.6)] print:hidden">
       <div className="px-8 pb-8 pt-9">
-        <div className="hl-pill flex items-center gap-4">
-          <span className="grid size-12 place-items-center rounded-full bg-[var(--hl-done-on-board)] text-[var(--hl-header)]">
-            <Icon name="check" className="size-6" />
+        <div className="flex items-center gap-4">
+          <span className="grid size-10 place-items-center rounded-full bg-[var(--hl-done-on-board)] text-[var(--hl-header)]">
+            <Icon name="check" className="size-5" />
           </span>
-          <h2 id="resolved-title" className="hl-serif text-[38px] sm:text-[46px]">{waiting ? 'Approved steps done' : 'Estate resolved'}</h2>
+          <h2 id="resolved-title" className="hl-serif text-[32px] leading-tight sm:text-[40px]">{waiting ? 'PayPal has done what you approved' : 'Everything is done'}</h2>
         </div>
-        <p className="mt-3 text-[16px] text-[var(--hl-board-text)]">
-          Every approved step is confirmed by PayPal.
-          {waiting > 0 && ` ${waiting} now ${waiting === 1 ? 'waits' : 'wait'} on others: ${[handed && `the family approves the handover`, notices && `the merchant answers the formal notice`].filter(Boolean).join(', and ')}.`}
+        {outcomeLine(done, heir, Boolean(paid)) && (
+          <p className="hl-serif mt-5 max-w-[42ch] text-[24px] leading-snug sm:text-[28px]">{outcomeLine(done, heir, Boolean(paid))}</p>
+        )}
+        <p className="mt-3 max-w-[70ch] text-[16px] text-[var(--hl-board-text)]">
+          PayPal has confirmed each step. {waiting ? 'The rest now waits on other people. What is left for you is small.' : 'There is nothing more you need to do here.'}
         </p>
-        <dl className="mt-8 flex flex-wrap gap-x-14 gap-y-6">
+        {waiting > 0 && (
+          <div className="mt-5 max-w-[70ch]">
+            <h3 className="text-[15px] font-semibold">What is left, when you are ready</h3>
+            <ul className="mt-2 space-y-1.5 text-[15px] text-[var(--hl-board-text)]">
+              {noticeRows.map((r) => (
+                <li key={r.key}>Send the letter to {merchantName(r.merchant)}. It is already written: you will find it below, under Letters. The payment keeps running until they answer.</li>
+              ))}
+              {handedRows.map((r) => (
+                <li key={r.key}>Send the {merchantName(r.merchant)} link to whoever in the family will keep it. It is below, under Family handover.</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-5">
           {stats.map((s) => (
             <div key={s.label}>
               <dt className="text-[13px] text-[var(--hl-board-muted)]">{s.label}</dt>
-              <dd className="mt-1 text-[26px] font-semibold tabular-nums tracking-tight">{s.value}</dd>
+              <dd className="mt-1 text-[20px] font-semibold tabular-nums">{s.value}</dd>
             </div>
           ))}
         </dl>
@@ -463,16 +503,16 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
             return (
               <article key={item.key} className="rounded-xl border border-pp-border bg-white">
                 <header className="flex flex-wrap items-center gap-3 border-b border-pp-border px-6 py-4">
-                  <h3 className="text-[17px] font-semibold">Formal notice to {merchantName(item.merchant)}</h3>
+                  <h3 className="text-[17px] font-semibold">Letter to {merchantName(item.merchant)}</h3>
                   {letter?.source === 'ai' && <AiBadge label={`Written by AI · ${letter.model}`} />}
                   <span className="text-[14px] text-pp-muted">
                     {!ready
                       ? item.progress.step === 'running'
                         ? 'The AI is writing this letter from the verified facts…'
-                        : 'Preview of the template. When you approve the plan, the AI writes the letter for this merchant from the verified facts.'
+                        : 'A first draft. When you approve the plan, the AI writes the letter for this company from the checked facts.'
                       : letter?.source === 'ai'
-                        ? 'Review every line, then send it yourself. Nothing is sent by Lastly.'
-                        : 'AI was unavailable, so this is the fixed template. Review it, then send it yourself.'}
+                        ? 'It is written. Read it through, then send it yourself when you are ready. Lastly sends nothing.'
+                        : 'It is written from a fixed template, because the AI was unavailable. Read it through, then send it yourself when you are ready.'}
                   </span>
                   {ready && (
                     <Button
@@ -498,7 +538,7 @@ export function Records({ analysis, rows, audit }: { analysis: Analysis; rows: L
               {row.progress.approveUrl ? (
                 <>
                   <p className="mt-2 max-w-[70ch] text-[15px] text-pp-muted">
-                    A new subscription on the same plan is waiting for the surviving family member to approve it in PayPal. The original keeps running until then, so the service never drops. Subscription <span className="font-mono text-pp-ink">{row.progress.resultId}</span>.
+                    A new subscription on the same plan is waiting for whoever in the family will keep it to approve it in PayPal. Send them this link when it suits you. The original keeps running until then, so nothing is cut off. Subscription <span className="font-mono text-pp-ink">{row.progress.resultId}</span>.
                   </p>
                   <a href={row.progress.approveUrl} target="_blank" rel="noreferrer" className="hl-focus mt-4 inline-flex items-center gap-2 font-semibold text-pp-blue underline decoration-pp-blue/40 underline-offset-4 hover:text-pp-blue-dark">
                     Open the family approval link in PayPal <Icon name="arrow" />

@@ -90,10 +90,17 @@ export const longDate = (iso: string) =>
 // What Lastly will do for a row, in plain words, before anything runs.
 export function planFor(item: EstateItem, rehearsal: boolean): string {
   if (item.noAction) return 'Nothing to do';
-  if (item.triage === 'formal_notice_only') return 'Send a formal notice';
+  if (item.triage === 'formal_notice_only') return 'Write to end the contract';
   if (item.triage === 'keep_for_family') return 'Hand over to the family';
   if (item.captureId) return `Refund ${money(item.amount)}`;
   return rehearsal ? 'Pause the subscription' : 'Cancel the subscription';
+}
+
+// Where the payout goes, from the executor's side: when the executor is also the heir, it is "your" account.
+export function heirAccount(c: Analysis['case']): { to: string; short: string } {
+  const heir = c.heirs[0]?.name;
+  if (heir && heir === c.executor_name) return { to: 'your PayPal account', short: 'you' };
+  return heir ? { to: `${heir}\u2019s PayPal account`, short: heir } : { to: 'the heir\u2019s PayPal account', short: 'the heir' };
 }
 
 export type MandateInfo = { deceased_name: string; executor_name: string; signed?: string; note?: string };

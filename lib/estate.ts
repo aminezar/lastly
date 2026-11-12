@@ -66,7 +66,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'formal_notice_only',
       confidence: 'high',
       source: 'rules',
-      reason: 'Contract-bound service: cancelling payment alone would create estate debt, so Lastly drafts a formal bereavement notice instead.',
+      reason: 'A membership bound by a contract: stopping the payment alone would leave a debt, so a letter asks them to end it from the date of death.',
     };
   }
   if (note.includes('shared') || note.includes('household') || note.includes('family')) {
@@ -74,7 +74,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'keep_for_family',
       confidence: 'high',
       source: 'rules',
-      reason: 'Shared household service: keep it running and hand billing over to the surviving family member.',
+      reason: 'Shared by the household: it keeps running, and the billing passes to the family member who keeps it.',
     };
   }
   if (item.captureId && item.chargedAt && dateOfDeath && item.chargedAt.slice(0, 10) < dateOfDeath) {
@@ -82,7 +82,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'stop_and_refund',
       confidence: 'high',
       source: 'rules',
-      reason: `Charged on ${item.chargedAt.slice(0, 10)}, before the date of death (${dateOfDeath}): a valid charge, nothing to refund.`,
+      reason: `Charged on ${item.chargedAt.slice(0, 10)}, before the death on ${dateOfDeath}: a fair charge, nothing to refund.`,
       noAction: true,
     };
   }
@@ -91,14 +91,14 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'stop_and_refund',
       confidence: 'high',
       source: 'rules',
-      reason: `A charge was taken${dateOfDeath ? ` after the date of death (${dateOfDeath})` : ''}: refund it back to the estate.`,
+      reason: `Taken after the death${dateOfDeath ? ` on ${dateOfDeath}` : ''}: it goes back to the account it was taken from.`,
     };
   }
   return {
     triage: 'stop_and_refund',
     confidence: 'medium',
     source: 'rules',
-    reason: 'Personal recurring payment with no shared use or contract flag: stop it, and refund any post-death charge.',
+    reason: 'A personal subscription with no contract or shared use: stop it, and return anything charged after the death.',
   };
 }
 

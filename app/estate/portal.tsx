@@ -23,7 +23,7 @@ import {
   type Stage,
 } from './sections';
 import { draftNotice } from './letter';
-import { fictional, merchantName, money, type NoticeLetter, type MandateInfo, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money, type RowProgress } from './types';
+import { fictional, heirAccount, merchantName, money, type NoticeLetter, type MandateInfo, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money, type RowProgress } from './types';
 
 async function call<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -162,7 +162,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     const saved = readSaved();
     if (!saved?.signedIn) return;
     const progress = Object.fromEntries(
-      Object.entries(saved.progress ?? {}).map(([k, p]) => [k, p.step === 'running' ? { step: 'error', paypalStatus: 'NOT CHANGED', message: 'Interrupted by a page reload. Run it again: PayPal will not act twice.' } : p]),
+      Object.entries(saved.progress ?? {}).map(([k, p]) => [k, p.step === 'running' ? { step: 'error', paypalStatus: 'NOT CHANGED', message: 'Stopped by a page reload. Approve it again: PayPal will not do it twice.' } : p]),
     ) as Record<string, RowProgress>;
     progressRef.current = progress;
     runId.current = saved.runId ?? '';
@@ -231,7 +231,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         } catch (e) {
           letter = { text: draftNotice(item, analysis!), source: 'template', fallbackReason: e instanceof Error ? e.message : String(e) };
         }
-        setRow(item.key, { step: 'done', paypalStatus: item.status, message: letter.source === 'ai' ? 'Notice written by AI' : 'Notice drafted', at: now(), letter });
+        setRow(item.key, { step: 'done', paypalStatus: item.status, message: letter.source === 'ai' ? 'Letter written by AI, for you to send' : 'Letter written, for you to send', at: now(), letter });
         log({
           item: name,
           action: `Formal notice ${letter.source === 'ai' ? `written by AI (${letter.model})` : 'drafted from the template (AI unavailable)'}; payment left running because the membership is contract-bound`,
@@ -246,7 +246,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
           documents: caseDocs.current,
           handover: { key: item.key, merchant: name },
         });
-        setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Family link ready', at: r.at });
+        setRow(item.key, { step: 'done', paypalStatus: r.handover.status, resultId: r.handover.subscriptionId, resultKind: 'Handover', approveUrl: r.handover.approveUrl, message: 'Waiting for the family to approve', at: r.at });
         log({ at: r.at, item: name, action: 'New subscription on the same plan created for the family to approve; original keeps running until then', paypalId: r.handover.subscriptionId, status: r.handover.status, tone: 'pending' });
         return;
       }
@@ -447,12 +447,12 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
                     {running
                       ? `Working in PayPal · ${running.index} of ${running.total} · ${running.label}`
                       : blocked
-                        ? 'Preview only: nothing can run in PayPal until the documents match.'
+                        ? 'Preview only. Nothing will happen in PayPal while the documents are on hold.'
                         : settled
-                          ? 'Done. PayPal confirmed every action.'
+                          ? 'PayPal has confirmed each step.'
                           : actionableCount === 0
-                            ? 'Nothing left to do.'
-                            : `${actionableCount} ${actionableCount === 1 ? 'action' : 'actions'} to approve`}
+                            ? 'There is nothing left to do here.'
+                            : `${actionableCount} ${actionableCount === 1 ? 'step' : 'steps'} for you to look over. Nothing happens until you approve.`}
                   </p>
                 </div>
                 {!approving && !running && !settled && actionableCount > 0 && (
@@ -478,6 +478,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
               <div className="border-t border-[var(--hl-board-line)] md:hidden">
                 <LedgerCards rows={rows} />
               </div>
+              <p className="border-t border-[var(--hl-board-line)] px-6 py-2.5 text-[12px] text-[var(--hl-board-muted)]">Estate ledger · AG Grid · every status and ID comes from PayPal Sandbox</p>
               {approving && (
                 <ApprovePanel
                   rows={rows}
@@ -497,7 +498,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
               )}
             </section>
 
-            {stage === 'resolved' && <Resolved rows={rows} recovered={recovered} paid={payout.step === 'done' ? recovered.value : undefined} onDownload={downloadReport} />}
+            {stage === 'resolved' && <Resolved rows={rows} recovered={recovered} paid={payout.step === 'done' ? recovered.value : undefined} heir={heirAccount(analysis.case).short} onDownload={downloadReport} />}
 
             {(stage === 'settle' || stage === 'resolved') && (
             <Settlement

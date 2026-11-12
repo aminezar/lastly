@@ -88,10 +88,10 @@ function Why({ row }: { row: ReviewedRow }) {
     <div className="mt-1.5 max-w-[46em] text-[13.5px] leading-snug text-[var(--hl-board-text)]">
       {note ? (
         <>
-          <span className="mr-1.5 inline-flex translate-y-[-1px] items-center rounded-[5px] bg-[var(--pp-sky)]/20 px-1.5 py-px text-[10.5px] font-bold uppercase tracking-wider text-[#9fdcff]" title={`Written by ${ai?.state === 'ready' ? ai.model : 'AI'} from the PayPal facts. The rules decide; the AI explains.`}>
-            AI
+          <span className="mr-2 inline-flex translate-y-[-1px] items-center rounded-[5px] bg-[var(--pp-sky)]/20 px-1.5 py-px text-[12px] font-semibold text-[#9fdcff]" title={`Written by ${ai?.state === 'ready' ? ai.model : 'AI'} from the PayPal facts. The rules decide; the AI explains.`}>
+            AI explains
           </span>
-          {note.explanation}
+          <span className="hl-fade">{note.explanation}</span>
           {!note.agrees && note.concern && (
             <span className="mt-1.5 flex items-start gap-1.5 font-semibold text-[var(--hl-warn-on-board)]">
               <span aria-hidden="true">⚑</span> Check before approving: {note.concern}
@@ -100,8 +100,8 @@ function Why({ row }: { row: ReviewedRow }) {
         </>
       ) : (
         <>
-          <span className="mr-1.5 inline-flex translate-y-[-1px] items-center rounded-[5px] bg-white/10 px-1.5 py-px text-[10.5px] font-bold uppercase tracking-wider text-[var(--hl-board-muted)]">
-            {ai?.state === 'loading' ? 'AI reviewing' : 'Rule'}
+          <span className="mr-2 inline-flex translate-y-[-1px] items-center rounded-[5px] bg-white/10 px-1.5 py-px text-[12px] font-semibold text-[var(--hl-board-muted)]">
+            {ai?.state === 'loading' ? 'AI reading…' : 'Rule'}
           </span>
           <span className={ai?.state === 'loading' ? 'opacity-70' : ''}>{row.reason}</span>
         </>
@@ -150,7 +150,7 @@ const STATUS: Record<string, { label: string; tone: 'neutral' | 'good' | 'warn' 
   PARTIALLY_REFUNDED: { label: 'Partly refunded', tone: 'warn' },
   APPROVAL_PENDING: { label: 'Waiting for family', tone: 'live' },
   SENDING: { label: 'Sending…', tone: 'live' },
-  'NOT CHANGED': { label: 'Not changed', tone: 'bad' },
+  'NOT CHANGED': { label: 'Not changed', tone: 'warn' },
 };
 
 const PILL: Record<(typeof STATUS)[string]['tone'], string> = {
@@ -225,11 +225,11 @@ function ResultCell({ data }: ICellRendererParams<LedgerRow>) {
   const { step, message, at } = data.progress;
   if (step === 'ready') return <span className="text-[var(--hl-board-muted)]" aria-label="Not started">—</span>;
   const color =
-    step === 'error' ? 'text-[var(--hl-error-on-board)]'
+    step === 'error' ? 'text-[var(--hl-warn-on-board)]'
     : step === 'done' ? 'text-[var(--hl-done-on-board)]'
     : step === 'running' ? 'text-white'
     : 'text-[var(--hl-board-muted)]';
-  const text = message ?? (step === 'excluded' ? 'Left out' : step === 'running' ? 'Sending to PayPal…' : '');
+  const text = message ?? (step === 'excluded' ? 'Left for later' : step === 'running' ? 'Sending to PayPal…' : '');
   return (
     <div className={`py-4 text-[14px] leading-snug ${color}`}>
       <div key={step} className={step === 'done' || step === 'error' ? 'hl-pill font-semibold' : ''}>{text}</div>
@@ -254,7 +254,7 @@ export function Ledger({ rows }: { rows: LedgerRow[] }) {
       // The value includes the AI state so the cell re-renders when the review arrives.
       { headerName: 'Plan and why', colId: 'plan', valueGetter: ({ data }) => (data ? `${data.triage}:${data.ai?.state ?? ''}` : ''), cellRenderer: PlanCell, flex: 1, minWidth: 340, autoHeight: true },
       { headerName: 'PayPal', colId: 'paypal', valueGetter: ({ data }) => (data ? paypalStatus(data) : ''), cellRenderer: PayPalCell, width: 240, autoHeight: true },
-      { headerName: 'Result', colId: 'result', valueGetter: ({ data }) => data?.progress.message, cellRenderer: ResultCell, width: 240, autoHeight: true },
+      { headerName: 'What happened', colId: 'result', valueGetter: ({ data }) => data?.progress.message, cellRenderer: ResultCell, width: 240, autoHeight: true },
     ],
     [],
   );
