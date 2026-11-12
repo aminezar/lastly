@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { publicDemo } from '@/lib/demo-mode';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
 import { amountOf, searchTransactions, TRANSACTION_SEARCH_MAX_DAYS } from '@/lib/paypal';
@@ -7,6 +9,8 @@ export const metadata: Metadata = { title: 'Transactions' };
 
 export default async function TransactionsPage() {
   await connection();
+  // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
+  if (publicDemo()) redirect('/heirloom');
   const end = new Date();
   const start = new Date(end.getTime() - TRANSACTION_SEARCH_MAX_DAYS * 86_400_000);
   const transactions = await searchTransactions(start, end);

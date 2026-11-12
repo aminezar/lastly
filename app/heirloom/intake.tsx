@@ -75,6 +75,7 @@ function DocumentSlot(props: { kind: Kind; title: string; slot: DocSlot; demoTex
     try {
       const form = new FormData();
       form.append('file', file);
+      form.append('kind', props.kind);
       const res = await fetch('/api/estate/read-document', { method: 'POST', body: form });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; text?: string; model?: string; error?: string };
       if (!res.ok || !data.ok || !data.text) {

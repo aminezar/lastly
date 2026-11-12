@@ -16,10 +16,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s · PayPal × AG Grid",
-    default: "PayPal × AG Grid",
+    template: "%s · Lastly",
+    default: "Lastly · Nobody should keep paying after they're gone",
   },
-  description: "PayPal sandbox data in AG Grid and AG Studio",
+  description: "Lastly helps the executor of a loved one's estate settle their PayPal payments: stop post-death charges, recover refunds and pay the heirs, one approved step at a time.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

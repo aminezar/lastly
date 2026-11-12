@@ -110,7 +110,20 @@ def paragraph(c: canvas.Canvas, y: float, lines: list[str], size: float = 11.5, 
     return y
 
 
-def death_certificate(path: Path) -> None:
+def extras(c: canvas.Canvas, note: list[str] | None, hidden: str | None) -> None:
+    """Red-team variants only (scripts/red-team): a visible marginal note and faint hidden text."""
+    if note:
+        c.setFont("Times-Italic", 10.5)
+        c.setFillColor(HexColor("#8a1c1c"))
+        for i, line in enumerate(note):
+            c.drawString(M, 150 - i * 14, line)
+    if hidden:
+        c.setFont("Helvetica", 6)
+        c.setFillColor(HexColor("#eeeeee"))
+        c.drawString(M, 60, hidden)
+
+
+def death_certificate(path: Path, date: str = "20 October 2026", deceased: str = "Jean Dupont", note: list[str] | None = None, hidden: str | None = None) -> None:
     c = canvas.Canvas(str(path), pagesize=A4)
     c.setTitle("Death certificate — Jean Dupont (fictional specimen)")
     c.setAuthor("Lastly demo")
@@ -126,10 +139,10 @@ def death_certificate(path: Path) -> None:
         c,
         y,
         [
-            ("Deceased / Overledene / Défunt", "Jean Dupont"),
+            ("Deceased / Overledene / Défunt", deceased),
             ("Date of birth / Geboortedatum", "14 March 1949"),
             ("Place of birth / Geboorteplaats", "Liège, Belgium"),
-            ("Date of death / Datum van overlijden", "20 October 2026"),
+            ("Date of death / Datum van overlijden", date),
             ("Place of death / Plaats van overlijden", "Brussels, Belgium"),
             ("Marital status / Burgerlijke staat", "Widower"),
             ("Declared by / Aangegeven door", "Marie Dupont, daughter"),
@@ -152,11 +165,12 @@ def death_certificate(path: Path) -> None:
     c.setStrokeColor(INK)
     c.line(M, y - 26, M + 180, y - 26)
     seal(c, W - M - 60, y - 14, "CIVIL REGISTRY", "BRUSSELS")
+    extras(c, note, hidden)
     c.showPage()
     c.save()
 
 
-def notary_act(path: Path) -> None:
+def notary_act(path: Path, executor: str = "Marie Dupont (daughter)", note: list[str] | None = None, hidden: str | None = None) -> None:
     c = canvas.Canvas(str(path), pagesize=A4)
     c.setTitle("Notary act of heredity — estate of Jean Dupont (fictional specimen)")
     c.setAuthor("Lastly demo")
@@ -183,7 +197,7 @@ def notary_act(path: Path) -> None:
         [
             ("Estate of / Nalatenschap van", "Jean Dupont"),
             ("Deceased on / Overleden op", "20 October 2026, Brussels"),
-            ("Executor / Exécuteur testamentaire", "Marie Dupont (daughter)"),
+            ("Executor / Exécuteur testamentaire", executor),
             ("Executor appointed under", "Legacy Mandate signed 3 May 2025"),
         ],
     )
@@ -211,21 +225,28 @@ def notary_act(path: Path) -> None:
     c.setStrokeColor(INK)
     c.line(M, y - 26, M + 180, y - 26)
     seal(c, W - M - 60, y - 14, "NOTARY", "BRUSSELS")
+    extras(c, note, hidden)
     c.showPage()
     c.save()
 
 
+def scan(out_dir: Path, name: str, draw, formats=("pdf", "png")) -> None:
+    """Draw a document, then rasterise it like a scan: off-white page, slight skew, no text layer."""
+    with tempfile.TemporaryDirectory() as tmp:
+        vector = Path(tmp) / f"{name}.pdf"
+        draw(vector)
+        subprocess.run(["pdftoppm", "-png", "-r", "150", "-singlefile", str(vector), str(Path(tmp) / name)], check=True)
+        page = Image.open(Path(tmp) / f"{name}.png").convert("RGB")
+        paper = Image.new("RGB", page.size, (250, 248, 242))
+        page = Image.blend(page, paper, 0.06).rotate(-0.4, resample=Image.BICUBIC, expand=False, fillcolor=(250, 248, 242))
+        if "png" in formats:
+            page.save(out_dir / f"{name}.png", optimize=True)
+        if "pdf" in formats:
+            page.save(out_dir / f"{name}.pdf", "PDF", resolution=150)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as tmp:
-        for name, draw in (("death-certificate-jean-dupont", death_certificate), ("notary-act-jean-dupont", notary_act)):
-            vector = Path(tmp) / f"{name}.pdf"
-            draw(vector)
-            # Rasterise like a scan: an off-white page, a slight skew, no text layer.
-            subprocess.run(["pdftoppm", "-png", "-r", "150", "-singlefile", str(vector), str(Path(tmp) / name)], check=True)
-            page = Image.open(Path(tmp) / f"{name}.png").convert("RGB")
-            paper = Image.new("RGB", page.size, (250, 248, 242))
-            page = Image.blend(page, paper, 0.06).rotate(-0.4, resample=Image.BICUBIC, expand=False, fillcolor=(250, 248, 242))
-            page.save(OUT / f"{name}.png", optimize=True)
-            page.save(OUT / f"{name}.pdf", "PDF", resolution=150)
+    scan(OUT, "death-certificate-jean-dupont", death_certificate)
+    scan(OUT, "notary-act-jean-dupont", notary_act)
     print(f"Wrote 2 scanned-style PDFs and PNGs to {OUT}")

@@ -5,8 +5,11 @@
 // nothing in PayPal, and never changes a decision.
 import { NextResponse } from 'next/server';
 import { reviewPlan, type ReviewItem } from '@/lib/estate-review';
+import { aiLimited } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
+  const limited = aiLimited(request);
+  if (limited) return limited;
   try {
     const body = (await request.json().catch(() => ({}))) as { items?: ReviewItem[]; dateOfDeath?: string };
     const items = (body.items ?? []).slice(0, 20);

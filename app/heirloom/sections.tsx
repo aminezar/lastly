@@ -393,8 +393,8 @@ export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRo
           ))}
         </dl>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button onClick={onDownload}><Icon name="download" /> Download audit report</Button>
-          <Button variant="onDark" onClick={() => window.print()}><Icon name="print" /> Print for the notary</Button>
+          <Button onClick={() => window.print()}><Icon name="print" /> Print the report for the notary</Button>
+          <Button variant="onDark" onClick={onDownload}><Icon name="download" /> Machine-readable copy (JSON)</Button>
         </div>
       </div>
     </section>

@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
     const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'seed-estate.json'), 'utf8')) as Seed;
     // Gate 0, for every action: the documents must still pass the cross-check that unlocked the plan.
-    if (!documentsVerified(body.documents, seed.estate.legacy_mandate))
+    if (!(await documentsVerified(body.documents, seed.estate.legacy_mandate)))
       return fail(403, 'The documents do not match the Legacy Mandate, so no action can run for this case.');
     const own = estateIds(seed.sandbox_ids.pending_demo ?? {});
 

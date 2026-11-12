@@ -6,10 +6,13 @@
 import { NextResponse } from 'next/server';
 import { aiEnabled } from '@/lib/ai';
 import { writeNoticeLetter, type NoticeFacts } from '@/lib/estate-ai';
+import { aiLimited } from '@/lib/rate-limit';
 
 const str = (v: unknown, max = 200) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : undefined);
 
 export async function POST(request: Request) {
+  const limited = aiLimited(request);
+  if (limited) return limited;
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const facts: Partial<NoticeFacts> = {
     merchant: str(body.merchant),

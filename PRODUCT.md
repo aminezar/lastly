@@ -11,7 +11,7 @@ The pre-authorized family executor / next-of-kin. Not a merchant, not PayPal sup
 ## Pitch (Devpost opening)
 Lastly is an Estate Resolution Portal. The executor uploads a death certificate + notary act; Lastly checks them against the Legacy Mandate, reads each recurring payment from PayPal, sorts it with explicit rules, and executes the approved actions live in PayPal Sandbox (pause or cancel, refund to source, family handover), then pays the recovered money to the heir in the notary act with a notary-ready audit report.
 
-**AI reads and writes, rules decide.** AI (OpenAI `gpt-5.4-mini`, Responses API) transcribes uploaded PDFs and photos, reads both documents a second time on its own (any fact where it differs from the rules holds the case), explains each payment's decision and flags concerns for a human, and writes the bereavement letter for contract-bound merchants. The document check and the triage are rules (`lib/estate.ts`); the executor approves every PayPal action.
+**AI reads and writes, rules decide.** AI (OpenAI `gpt-5.4-mini`, Responses API) transcribes uploaded PDFs and photos, reads each document's facts a second time, from the original file for uploads (any fact where it differs from the rules, or an unusable answer, holds the case), explains each payment's decision and flags concerns for a human, and writes the bereavement letter for contract-bound merchants. The document check and the triage are rules (`lib/estate.ts`); the executor approves every PayPal action.
 
 ## Trust model
 1. **Legacy Mandate:** while alive, user names a Trusted Executor (Apple Legacy Contact model). Only that person can start a case.

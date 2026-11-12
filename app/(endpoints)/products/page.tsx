@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { publicDemo } from '@/lib/demo-mode';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
 import { listProducts } from '@/lib/paypal';
@@ -8,6 +10,8 @@ export const metadata: Metadata = { title: 'Catalog products' };
 export default async function ProductsPage() {
   // Live PayPal data: render per request, not at build time.
   await connection();
+  // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
+  if (publicDemo()) redirect('/heirloom');
   const products = await listProducts();
 
   return (

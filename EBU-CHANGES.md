@@ -32,7 +32,6 @@ What changed in the Lastly system, apart from the frontend. Short version; full 
 - `README.md` honest limits now explain who plays which role in the Sandbox, that the document check runs on rules (no AI key), the payout guard, and what the handover means.
 
 ## Still open
-- **No AI key yet.** Document reading and the letter are rules and a template; reading PDFs needs AI. Biggest risk for the hackathon requirement.
-- **StreamFlix subscription is cancelled.** A new one needs one approval in the browser (`scripts/seed-estate.mjs`).
+- (Updated Nov 12) AI is live: OpenAI gpt-5.4-mini reads uploaded PDFs and photos, gives the documents a second reading that can hold a case, explains the plan and writes the merchant letter. See the README and `docs/red-team-results.md`.
 - **The Sandbox is shared with the teammate.** Agree who tests when, because test charges get refunded by each other.
-- **Before submitting:** the repo is private, and the APIMatic claim is unverified.
+- **Before submitting:** the APIMatic claim is unverified.

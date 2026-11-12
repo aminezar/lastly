@@ -4,7 +4,8 @@
 // reading of the documents (lib/estate-ai.ts) is compared with the rules' reading here, and
 // a difference can only hold a case, never open one.
 
-import { settledReading, type FactReading, type SecondReading } from '@/lib/estate-ai';
+import { aiEnabled } from '@/lib/ai';
+import { readDocumentFacts, UnusableAnswer, type FactReading, type SecondReading } from '@/lib/estate-ai';
 
 export type Triage = 'stop_and_refund' | 'keep_for_family' | 'formal_notice_only';
 
@@ -147,15 +148,45 @@ const same = (a?: string, b?: string) =>
  * The same document gate /api/estate/analyze applies, for re-checking on the server before any
  * PayPal action. No text at all means the fictional demo documents, exactly as analyze reads it.
  */
-export function documentsVerified(docs: { certificateText?: string; notaryText?: string } | undefined, mandate: Mandate): boolean {
+/** Longest document text accepted, so a padded text cannot slow the AI reading into a skip. */
+export const MAX_DOC_CHARS = 6000;
+
+export async function documentsVerified(docs: { certificateText?: string; notaryText?: string } | undefined, mandate: Mandate): Promise<boolean> {
   const empty = !docs?.certificateText?.trim() && !docs?.notaryText?.trim();
   const { certificateText, notaryText } = empty ? demoDocuments() : { certificateText: docs?.certificateText ?? '', notaryText: docs?.notaryText ?? '' };
+  if (certificateText.length > MAX_DOC_CHARS || notaryText.length > MAX_DOC_CHARS) return false;
   const certificate = parseDocument(certificateText);
   const notary = parseDocument(notaryText);
   if (!crossCheck(certificate, notary, mandate).every((c) => c.pass)) return false;
-  // A second reading by the AI that found a difference keeps the case held here too.
-  const reading = settledReading(certificateText, notaryText);
-  return !reading || compareReadings({ certificate, notary }, reading).pass;
+  // The AI second reading that opened the case must still agree (cached, so usually instant).
+  return (await secondReadingCheck(certificateText, notaryText, { certificate, notary })).pass;
+}
+
+/**
+ * The AI second reading as a check. Differences and unusable answers hold the case. Only when
+ * the model cannot be reached at all (no key, OpenAI error, 15 s timeout) is the check marked
+ * "not run" and the rules decide alone, so the portal keeps working when OpenAI is down.
+ */
+export async function secondReadingCheck(certificateText: string, notaryText: string, rules: { certificate: ParsedDocument; notary: ParsedDocument }): Promise<TrustCheck> {
+  if (!aiEnabled()) return skippedReading('No AI key is configured on this server');
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      readDocumentFacts(certificateText, notaryText).then((r) => compareReadings(rules, r)),
+      new Promise<TrustCheck>((resolve) => {
+        timer = setTimeout(() => resolve(skippedReading('The AI did not answer within 15 seconds')), 15_000);
+      }),
+    ]);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    if (e instanceof UnusableAnswer) {
+      return { id: 'ai-reading', label: 'The AI second reading could not be used: held for a person to check', pass: false, detail: `${message}.` };
+    }
+    console.warn(`[AI] second reading unavailable: ${message}`);
+    return skippedReading('The AI could not be reached this time');
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // --- Second reading: rules vs AI ------------------------------------------------------
@@ -195,7 +226,7 @@ export function compareReadings(rules: { certificate: ParsedDocument; notary: Pa
     pass: differences.length === 0,
     detail: differences.length
       ? differences.join(' · ')
-      : `The AI read both documents on its own and found the same ${facts.length} facts: names, date of death and executor.`,
+      : `The AI read ${ai.certificate.from === 'scan' && ai.notary.from === 'scan' ? 'both uploaded files' : 'both documents'} separately and found the same ${facts.length} facts: names, date of death and executor.`,
     model: ai.model,
   };
 }
@@ -203,7 +234,7 @@ export function compareReadings(rules: { certificate: ParsedDocument; notary: Pa
 export function skippedReading(reason: string): TrustCheck {
   return {
     id: 'ai-reading',
-    label: 'Second reading by AI not available',
+    label: 'Second reading by AI not run',
     pass: true,
     skipped: true,
     detail: `${reason}. The rules' reading above decides on its own.`,

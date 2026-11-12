@@ -1,5 +1,5 @@
 // Lastly API: analyze an estate case.
-// POST /api/estate/analyze { certificateText?, notaryText?, transcribedByAi? }
+// POST /api/estate/analyze { certificateText?, notaryText?, transcribedByAi?, checkOnly? }
 // Reads both documents and cross-checks them against each other and the seeded Legacy
 // Mandate (any mismatch blocks execution), reads the PayPal Sandbox balance plus every
 // seeded subscription and capture by ID, and triages each item with explicit rules.
@@ -9,9 +9,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getBalances, getCapture, getSubscription } from '@/lib/paypal';
 import { demoIds, prepareDemo } from '@/lib/demo-mode';
-import { aiEnabled } from '@/lib/ai';
-import { classifyWithRules, compareReadings, crossCheck, demoDocuments, parseDocument, skippedReading, type Mandate, type MerchantFacts, type TrustCheck } from '@/lib/estate';
-import { readDocumentFacts } from '@/lib/estate-ai';
+import { classifyWithRules, crossCheck, demoDocuments, MAX_DOC_CHARS, parseDocument, secondReadingCheck, type Mandate, type MerchantFacts } from '@/lib/estate';
+import { aiLimited } from '@/lib/rate-limit';
 
 type SeedItem = { key: string; merchant: string; note: string; type?: string };
 type SeedFile = {
@@ -33,8 +32,10 @@ async function loadSeed(): Promise<SeedFile> {
 const firstToken = (v?: string) => v?.split(' ')[0];
 
 export async function POST(request: Request) {
+  const limited = aiLimited(request);
+  if (limited) return limited;
   try {
-    const body = (await request.json().catch(() => ({}))) as { certificateText?: string; notaryText?: string; transcribedByAi?: boolean };
+    const body = (await request.json().catch(() => ({}))) as { certificateText?: string; notaryText?: string; transcribedByAi?: boolean; checkOnly?: boolean };
     const seed = await loadSeed();
     const demo = demoDocuments();
     const empty = !body.certificateText?.trim() && !body.notaryText?.trim();
@@ -45,19 +46,18 @@ export async function POST(request: Request) {
     // Rules read each document separately and decide. The AI reads the same texts on its own,
     // in parallel with the PayPal reads below; any difference between the two readings holds
     // the case for a person (it can never unblock one).
+    if (docs.certificateText.length > MAX_DOC_CHARS || docs.notaryText.length > MAX_DOC_CHARS)
+      return NextResponse.json({ ok: false, error: `Each document can be at most ${MAX_DOC_CHARS} characters.` }, { status: 413 });
     const certificate = parseDocument(docs.certificateText);
     const notary = parseDocument(docs.notaryText);
     const mandate = seed.estate.legacy_mandate;
-    const secondReading: Promise<TrustCheck> = aiEnabled()
-      ? Promise.race([
-          readDocumentFacts(docs.certificateText, docs.notaryText).then((r) => compareReadings({ certificate, notary }, r)),
-          new Promise<TrustCheck>((resolve) => setTimeout(() => resolve(skippedReading('The AI did not answer within 15 seconds')), 15_000)),
-        ]).catch((e: unknown) => {
-          console.warn(`[AI] second reading unavailable: ${e instanceof Error ? e.message : String(e)}`);
-          return skippedReading('The AI could not read the documents this time');
-        })
-      : Promise.resolve(skippedReading('No AI key is configured on this server'));
+    const secondReading = secondReadingCheck(docs.certificateText, docs.notaryText, { certificate, notary });
     const dateOfDeath = certificate.dateOfDeath;
+    // Document checks only (scripts/red-team.mjs): no PayPal call at all.
+    if (body.checkOnly) {
+      const checks = [...crossCheck(certificate, notary, mandate), await secondReading];
+      return NextResponse.json({ ok: true, verification: { verified: checks.every((c) => c.pass), checks, mandate } });
+    }
 
     // Hosted demo only: put the Sandbox back in its starting state first (lib/demo-mode.ts).
     await prepareDemo(seed.sandbox_ids.pending_demo ?? {}, seed.items.filter((i) => i.type === 'capture').map((i) => i.key));

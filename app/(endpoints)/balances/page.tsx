@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { publicDemo } from '@/lib/demo-mode';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
 import { amountOf, getBalances } from '@/lib/paypal';
@@ -7,6 +9,8 @@ export const metadata: Metadata = { title: 'Balances' };
 
 export default async function BalancesPage() {
   await connection();
+  // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
+  if (publicDemo()) redirect('/heirloom');
   const { as_of_time, balances = [] } = await getBalances();
 
   return (

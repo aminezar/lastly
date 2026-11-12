@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { publicDemo } from '@/lib/demo-mode';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
 import { amountOf, listPlans, type BillingCycle } from '@/lib/paypal';
@@ -11,6 +13,8 @@ const interval = (cycle?: BillingCycle) =>
 
 export default async function PlansPage() {
   await connection();
+  // The hosted public demo shows only the Lastly portal; these boilerplate pages are for local use.
+  if (publicDemo()) redirect('/heirloom');
   const plans = await listPlans();
 
   return (

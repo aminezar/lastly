@@ -72,12 +72,10 @@ const preview = [
 ];
 
 const devPages = [
-  { href: '/dashboard', label: 'AG Studio dashboard' },
-  { href: '/transactions', label: 'Transactions' },
-  { href: '/balances', label: 'Balances' },
-  { href: '/plans', label: 'Billing plans' },
-  { href: '/products', label: 'Catalog products' },
-  { href: '/invoices', label: 'Invoices' },
+  { href: '/heirloom', label: 'Executor portal' },
+  { href: '/pitch', label: 'Pitch deck' },
+  { href: 'https://github.com/aminezar/lastly', label: 'Source code' },
+  { href: 'https://github.com/aminezar/lastly/blob/main/docs/red-team-results.md', label: 'Red-team results' },
 ];
 
 function Arrow() {
