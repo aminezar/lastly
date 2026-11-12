@@ -66,8 +66,8 @@ function Thumb({ t }: { t: AttackCard['thumbs'][number] }) {
   return (
     <div className="relative h-[118px] min-w-0 flex-1 overflow-hidden rounded-md border border-[var(--home-line)] bg-white shadow-[0_1px_2px_rgba(0,20,53,0.06)]">
       {t.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={t.image} alt={`${t.label} used in this attack`} className="h-full w-full object-cover object-top" loading="lazy" />
+        // Zoomed on the part of the page with the names and dates, so the forgery is legible at card size.
+        <div role="img" aria-label={`${t.label} used in this attack`} className="h-full w-full bg-no-repeat" style={{ backgroundImage: `url(${t.image})`, backgroundSize: '175%', backgroundPosition: '55% 31%' }} />
       ) : (
         <pre className="h-full whitespace-pre-wrap [overflow-wrap:anywhere] p-2 font-[family-name:var(--font-geist-mono)] text-[8.5px] leading-[1.35] text-[#3d4656]">{t.text?.trim() || '(empty)'}</pre>
       )}
