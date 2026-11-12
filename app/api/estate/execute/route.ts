@@ -146,7 +146,7 @@ export async function POST(request: Request) {
           {
             senderBatchId: `lastly-${createHash('sha256').update(r.id).digest('hex').slice(0, 32)}`,
             subject: 'Lastly estate payout',
-            message: 'Recovered estate balance share (Lastly demo)',
+            message: 'Refund of a charge taken after the date of death (Lastly demo)',
             items: [{ receiver, amount: { value: refundAmount.toFixed(2), currency_code: currency }, note: `Lastly estate payout of refund ${r.id}`, sender_item_id: `heir-${r.id}`.slice(0, 63) }],
           },
           key('payout', r.id),
