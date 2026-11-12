@@ -10,6 +10,33 @@ We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and
 
 It runs on Render's free plan, so the first load after a quiet spell can take about a minute.
 
+## For judges: where to find each thing you score
+
+| Criterion | What we did | Check it in under a minute |
+|---|---|---|
+| Technological Implementation | The running app calls 10 PayPal Sandbox endpoints (table below), and each write has its own idempotency key. The AI reads the documents, reads them again on its own, explains each decision and writes the merchant letter. | Open the demo case and approve. Each ledger row shows the ID PayPal returns. Code: [`lib/paypal.ts`](lib/paypal.ts) and [`app/api/estate/execute/route.ts`](app/api/estate/execute/route.ts). |
+| Design | One flow from sign-in to the report for the notary, written for someone a few weeks after a death. | [Try it](#try-it) (four steps) and [Writing for someone grieving](docs/writing-for-someone-grieving.md). |
+| Potential Impact | Charges that keep running after a death, refunded to source, and a family subscription handed over instead of lost. We also say what only PayPal could do for real. | [What happens to each payment](#what-happens-to-each-payment) and [What it doesn't do](#what-it-doesnt-do). |
+| Innovation/Idea | A mandate signed while alive decides who can act, and money has only two exits fixed in code: the original card and the heir on file. The AI can hold a case but never open one. | [The diagram](#where-the-ai-is-used), [Every rule has a reason](docs/every-rule-has-a-reason.md) and the [red-team results](docs/red-team-results.md) (21 of 21 attacks stopped). |
+| Presentation | A video under 3 minutes and a short deck. | The video is linked on our Devpost page. The deck is at https://lastly-rdeo.onrender.com/pitch. |
+
+**PayPal APIs the app calls**
+
+| Endpoint | What Lastly does with it | Where |
+|---|---|---|
+| `POST /v1/oauth2/token` | One cached server-side token for every call | [`paypal.ts:27`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L27) |
+| `GET /v1/billing/subscriptions/{id}` | Reads each subscription's status, amount and billing dates | [`paypal.ts:279`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L279) |
+| `POST /v1/billing/subscriptions/{id}/suspend` | Pauses a charge (the default stop, and it can be undone) | [`paypal.ts:290`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L290) |
+| `POST /v1/billing/subscriptions/{id}/cancel` | Stops it for good, after a second confirmation (off on the public demo) | [`paypal.ts:284`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L284) |
+| `POST /v1/billing/subscriptions` | Handover: a new subscription on the same plan for the partner to approve | [`paypal.ts:326`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L326) |
+| `GET /v2/payments/captures/{id}` | Confirms the post-death charge, its amount and its date | [`paypal.ts:386`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L386) |
+| `POST /v2/payments/captures/{id}/refund` | Refunds that charge to its original payment source | [`paypal.ts:382`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L382) |
+| `GET /v2/payments/refunds/{id}` | Confirms the refund completed before anything is paid out | [`paypal.ts:392`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L392) |
+| `POST /v1/payments/payouts`, `GET /v1/payments/payouts/{id}` | Pays each refund to the heir on file, then checks until it's delivered | [`paypal.ts:404`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L404) |
+| `GET /v1/reporting/balances` | Shows the account balance on the case overview | [`paypal.ts:250`](https://github.com/aminezar/lastly/blob/9406fa9f8c460307edf16b0b072e443236ee6023/lib/paypal.ts#L250) |
+
+On the public demo, the app also re-activates paused subscriptions and creates a fresh post-death charge with PayPal's test card (Subscriptions `activate` and Orders), so every visitor gets the same case ([`lib/demo-mode.ts`](lib/demo-mode.ts)). The ledger is AG Grid ([`app/estate/ledger.tsx`](app/estate/ledger.tsx)), and the demo runs on Render ([`render.yaml`](render.yaml)).
+
 ## Try it
 
 1. Click **Continue as Marie**. You're Marie Dupont, the executor her father Jean named before he died.
