@@ -15,11 +15,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute URLs for the link-preview image (app/opengraph-image.tsx).
+  metadataBase: new URL('https://lastly-rdeo.onrender.com'),
+  applicationName: 'Lastly',
   title: {
     template: "%s · Lastly",
     default: "Lastly · Nobody should keep paying after they're gone",
   },
   description: "Lastly helps the executor of a loved one's estate settle their PayPal payments: stop post-death charges, recover refunds and pay the heirs, one approved step at a time.",
+  openGraph: { type: 'website', siteName: 'Lastly' },
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

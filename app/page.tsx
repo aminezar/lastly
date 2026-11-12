@@ -71,11 +71,25 @@ const preview = [
   { merchant: 'FitGym', detail: 'Contract-bound membership', plan: 'Formal notice', dot: 'bg-[#f5a623]', result: 'Letter drafted' },
 ];
 
+// The demo video. Paste the full link (YouTube, Vimeo…) between the quotes; while it is
+// empty, the landing page shows no video link at all.
+const VIDEO_URL = '';
+
+const REPO_URL = 'https://github.com/aminezar/lastly';
+const RED_TEAM_URL = `${REPO_URL}/blob/main/docs/red-team-results.md`;
+
+// The quickest path through the demo, for judges. Labels match the buttons in the portal.
+const judgeSteps = [
+  { lead: 'Choose “Continue as Marie”.', body: 'She is the daughter and Trusted Executor of the fictional Jean Dupont. No account or password.' },
+  { lead: 'Choose “Open the demo case”.', body: 'Lastly checks the documents against the Legacy Mandate and lays out a plan for each payment, with its reason.' },
+  { lead: 'Approve the plan, then pay the heirs.', body: 'A real Sandbox refund and payout run, and the ledger shows the ID PayPal returned for each step.' },
+];
+
 const devPages = [
   { href: '/estate', label: 'Executor portal' },
   { href: '/pitch', label: 'Pitch deck' },
-  { href: 'https://github.com/aminezar/lastly', label: 'Source code' },
-  { href: 'https://github.com/aminezar/lastly/blob/main/docs/red-team-results.md', label: 'Red-team results' },
+  { href: REPO_URL, label: 'Source code' },
+  { href: RED_TEAM_URL, label: 'Red-team results' },
 ];
 
 function Arrow() {
@@ -153,6 +167,63 @@ export default function Home() {
             </div>
             <figcaption className="sr-only">Illustration of the Lastly plan for a fictional estate.</figcaption>
           </figure>
+        </section>
+
+        {/* For judges */}
+        <section id="judges" aria-labelledby="judges-title" className="mx-auto w-full max-w-[1200px] scroll-mt-8 px-6 pb-20 lg:px-10">
+          <div className="grid gap-10 rounded-2xl border border-[var(--home-line)] bg-white/60 p-6 sm:p-8 lg:grid-cols-[1.5fr_1fr] lg:gap-14">
+            <div>
+              <h2 id="judges-title" className="font-[family-name:var(--font-serif)] text-[26px] font-medium leading-tight text-[var(--home-ink)]">
+                Judging? Start here.
+              </h2>
+              <p className="mt-2 text-[15px] leading-relaxed text-[var(--home-body)]">
+                No login needed, and the demo case resets itself for the next visitor.{' '}
+                <Link href="/estate" className="home-focus font-semibold text-[#0070e0] underline-offset-2 hover:underline">Open the portal</Link>, then:
+              </p>
+              <ol className="mt-6 space-y-4">
+                {judgeSteps.map((s, i) => (
+                  <li key={s.lead} className="grid grid-cols-[auto_1fr] gap-x-4">
+                    <span className="w-4 font-[family-name:var(--font-serif)] text-[22px] font-medium leading-none text-[var(--home-accent)]">{i + 1}</span>
+                    <p className="text-[15px] leading-relaxed text-[var(--home-body)]">
+                      <span className="font-semibold text-[var(--home-ink)]">{s.lead}</span> {s.body}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-6 text-[14px] leading-relaxed text-[var(--home-muted)]">
+                Optional: to watch AI read a scan, download the{' '}
+                <a href="/samples/death-certificate-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">death certificate</a>{' '}
+                and the{' '}
+                <a href="/samples/notary-act-jean-dupont.pdf" download className="home-focus font-semibold text-[var(--home-ink)] underline underline-offset-2">notary act</a>{' '}
+                and upload them in place of the demo documents.
+              </p>
+            </div>
+            <ul className="flex flex-col gap-3 self-start text-[15px]">
+              {VIDEO_URL && (
+                <li>
+                  <a href={VIDEO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                    Watch the demo video <Arrow />
+                  </a>
+                </li>
+              )}
+              <li>
+                <a href={RED_TEAM_URL} target="_blank" rel="noreferrer" className="home-focus block rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 hover:border-[var(--home-ink)]">
+                  <span className="flex items-center justify-between gap-3 font-semibold text-[var(--home-ink)]">Attack results <Arrow /></span>
+                  <span className="mt-1 block text-[13px] leading-snug text-[var(--home-muted)]">21 attacks tried, 21 held. Both genuine cases opened.</span>
+                </a>
+              </li>
+              <li>
+                <a href={REPO_URL} target="_blank" rel="noreferrer" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                  Source code <Arrow />
+                </a>
+              </li>
+              <li>
+                <Link href="/pitch" className="home-focus flex items-center justify-between gap-3 rounded-xl border border-[var(--home-line)] bg-[var(--home-paper)] px-4 py-3 font-semibold text-[var(--home-ink)] hover:border-[var(--home-ink)]">
+                  Pitch deck <Arrow />
+                </Link>
+              </li>
+            </ul>
+          </div>
         </section>
 
         {/* Problem */}
@@ -236,6 +307,8 @@ export default function Home() {
       <footer className="border-t border-[var(--home-line)]">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-6 py-10 text-[13px] text-[var(--home-muted)] lg:flex-row lg:items-start lg:justify-between lg:px-10">
           <p className="max-w-[46em] leading-relaxed">
+            <span className="font-semibold text-[var(--home-ink)]">Lastly</span> · built for the PayPal AI Hackathon 2026.
+            <br />
             Demo on the PayPal Sandbox with fictional people. Subscriptions and charges are seeded under the demo&rsquo;s own Sandbox business account; PayPal&rsquo;s APIs show a merchant its own customers, not anyone&rsquo;s subscriptions everywhere. Executor authority is simulated here; in production it needs legal or notary verification.
           </p>
           <nav aria-label="Under the hood" className="shrink-0">

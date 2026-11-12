@@ -8,7 +8,7 @@ import { Portal } from './portal';
 import type { MandateInfo } from './types';
 
 export const metadata: Metadata = {
-  title: 'Lastly executor portal',
+  title: 'Executor portal',
   description: 'Resolve a PayPal estate: stop, refund, hand over, notify, and pay the heirs, with an audit report.',
 };
 
