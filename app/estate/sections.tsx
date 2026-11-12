@@ -448,6 +448,15 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
           <Button onClick={() => window.print()}><Icon name="print" /> Print the report for the notary</Button>
           <Button variant="onDark" onClick={onDownload}><Icon name="download" /> Machine-readable copy (JSON)</Button>
         </div>
+        <Link
+          href="/estate/family-letter"
+          className="hl-focus group mt-8 block max-w-[60ch] rounded-xl border border-[var(--hl-board-line-strong)] px-6 py-5 hover:bg-white/5"
+        >
+          <span className="hl-serif block text-[22px] text-white">A letter for the family <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-1">→</span></span>
+          <span className="mt-1 block text-[15px] text-[var(--hl-board-text)]">
+            One page, in plain words, telling the family what was done and what is still waiting. Ready to print or save.
+          </span>
+        </Link>
       </div>
     </section>
   );

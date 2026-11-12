@@ -18,7 +18,7 @@ const MODEL = () => setting('AI_MODEL') || 'gpt-5.4-mini';
 
 type ResponsesOutput = { output_text?: string; output?: { content?: { type?: string; text?: string }[] }[] };
 
-async function respond(content: unknown[], maxTokens: number, instructions: string): Promise<{ text: string; model: string }> {
+export async function respond(content: unknown[], maxTokens: number, instructions: string): Promise<{ text: string; model: string }> {
   const key = openAiKey();
   if (!key) throw new Error('No OpenAI key is configured');
   const model = MODEL();
