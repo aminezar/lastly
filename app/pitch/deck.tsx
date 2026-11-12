@@ -219,7 +219,7 @@ const SLIDES: Slide[] = [
       {
         at: '1:39',
         show: 'Scroll below the payout box to the records. Click “Letters (1)”: the FitGym letter. Then “Handover (1)”: the FamilyCloud handover link.',
-        say: 'For FitGym, AI writes the letter she would otherwise have to write herself. Whoever keeps FamilyCloud gets a link to take it over.',
+        say: 'For FitGym, AI writes the letter she would otherwise have to write herself. And a link is ready for whoever keeps FamilyCloud.',
       },
       {
         at: '1:48',
@@ -250,7 +250,7 @@ const SLIDES: Slide[] = [
           <ul className="pd-rows">
             {[
               { m: 'StreamFlix', why: 'Charged after the date of death', plan: 'Stop & refund', dot: 'stop', done: '€9.99 back to the estate' },
-              { m: 'FamilyCloud', why: 'Shared with the household', plan: 'Hand over', dot: 'keep', done: 'Handover link sent' },
+              { m: 'FamilyCloud', why: 'Shared with the household', plan: 'Hand over', dot: 'keep', done: 'Handover link ready' },
               { m: 'FitGym', why: 'Contract-bound membership', plan: 'Formal notice', dot: 'notice', done: 'Letter drafted' },
             ].map((r, i) => (
               <li key={r.m} className="pd-in pd-row" style={d(900 + i * 180)}>
