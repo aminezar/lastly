@@ -556,12 +556,12 @@ function useFit(box: () => { w: number; h: number }) {
   return scale;
 }
 
-function Stage({ index, scale }: { index: number; scale: number }) {
+function Stage({ index, scale, run = 0 }: { index: number; scale: number; run?: number }) {
   return (
     <div className="pd-stage" style={{ transform: `translate(-50%, -50%) scale(${scale})`, visibility: scale ? 'visible' : 'hidden' }}>
       {SLIDES.map((s, i) => (
         <section
-          key={s.id}
+          key={i === index ? `${s.id}-${run}` : s.id}
           className={`pd-slide pd-tone-${s.tone}${i === index ? ' is-active' : ''}`}
           aria-hidden={i !== index}
           aria-label={s.title}
@@ -580,6 +580,8 @@ function DeckView() {
   const [index, go] = useSlideIndex();
   const [notes, setNotes] = useState(false);
   const [idle, setIdle] = useState(false);
+  const [full, setFull] = useState(false);
+  const [run, setRun] = useState(0);
   const scale = useFit(useCallback(() => ({ w: window.innerWidth, h: window.innerHeight }), []));
 
   const extra = useCallback((e: KeyboardEvent) => {
@@ -587,7 +589,8 @@ function DeckView() {
     if (k === 'f') {
       if (document.fullscreenElement) void document.exitFullscreen();
       else void document.documentElement.requestFullscreen?.();
-    } else if (k === 'n') setNotes((v) => !v);
+    } else if (k === 'r') setRun((v) => v + 1);
+    else if (k === 'n') setNotes((v) => !v);
     else if (k === 'p') window.open('/pitch?view=presenter', 'pitch-presenter', 'width=980,height=760');
   }, []);
   useKeys(go, extra);
@@ -600,27 +603,36 @@ function DeckView() {
       t = setTimeout(() => setIdle(true), 2200);
     };
     wake();
+    // Only the mouse brings the controls back, so keys never put them on a recording.
     window.addEventListener('mousemove', wake);
-    window.addEventListener('keydown', wake);
     return () => {
       clearTimeout(t);
       window.removeEventListener('mousemove', wake);
-      window.removeEventListener('keydown', wake);
     };
+  }, []);
+
+  // Entering or leaving full screen replays the current slide, so it can be filmed from the start.
+  useEffect(() => {
+    const onFull = () => {
+      setFull(!!document.fullscreenElement);
+      setRun((v) => v + 1);
+    };
+    document.addEventListener('fullscreenchange', onFull);
+    return () => document.removeEventListener('fullscreenchange', onFull);
   }, []);
 
   const slide = SLIDES[index];
   return (
     <div
-      className={`pd-root pd-viewport${idle ? ' is-idle' : ''}`}
+      className={`pd-root pd-viewport${idle ? ' is-idle' : ''}${full ? ' is-full' : ''}`}
       onClick={(e) => go(e.clientX > window.innerWidth / 3 ? 1 : -1)}
     >
-      <Stage index={index} scale={scale} />
+      <Stage index={index} scale={scale} run={run} />
       <div className="pd-hud" onClick={(e) => e.stopPropagation()}>
         <button onClick={() => go(-1)} aria-label="Previous slide">←</button>
         <span>{index + 1} / {SLIDES.length}</span>
         <button onClick={() => go(1)} aria-label="Next slide">→</button>
-        <span className="pd-hud-keys">F full screen · N notes · P presenter</span>
+        <span className="pd-hud-keys">F full screen · R replay slide · N notes · P presenter</span>
       </div>
       {notes && (
         <aside className="pd-notes" onClick={(e) => e.stopPropagation()}>

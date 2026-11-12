@@ -326,6 +326,7 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
   transition: opacity 400ms ease;
 }
 .pd-viewport.is-idle .pd-hud { opacity: 0; pointer-events: none; }
+.pd-viewport.is-full .pd-hud, .pd-viewport.is-full .pd-progress { display: none; }
 .pd-hud button { width: 28px; height: 28px; border-radius: 50%; color: #fff; }
 .pd-hud button:hover { background: rgba(255, 255, 255, 0.15); }
 .pd-hud-keys { color: var(--board-muted); }
