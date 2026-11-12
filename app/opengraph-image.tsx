@@ -33,7 +33,7 @@ export default function OpengraphImage() {
             Nobody should keep paying after they’re gone.
           </div>
           <div style={{ fontSize: 30, lineHeight: 1.4, color: '#3d4656', maxWidth: 960 }}>
-            One calm place to settle a loved one’s PayPal payments: stop the charges, return what was taken after the death, and pay the heirs.
+            One calm place to settle someone’s PayPal payments after they die: stop the charges, return what was taken after the death, and pay the heirs.
           </div>
         </div>
         <div style={{ display: 'flex', fontSize: 24, color: '#b4532a' }}>PayPal Sandbox demo · fictional estate</div>

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Lastly",
     default: "Lastly · Nobody should keep paying after they're gone",
   },
-  description: "One calm place to settle a loved one's PayPal payments after they die: stop the charges, return what was taken after the death, and pay the heirs, one step you approve at a time.",
+  description: "One calm place to settle someone's PayPal payments after they die: stop the charges, return what was taken after the death, and pay the heirs, one step you approve at a time.",
   openGraph: { type: 'website', siteName: 'Lastly' },
   twitter: { card: 'summary_large_image' },
 };

@@ -8,7 +8,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: { absolute: "Lastly · Nobody should keep paying after they're gone" },
   description:
-    "One calm place to settle a loved one's PayPal payments after they die: stop the charges, return what was taken after the death, hand over what the family keeps, and pay the heirs, one step you approve at a time.",
+    "One calm place to settle someone's PayPal payments after they die: stop the charges, return what was taken after the death, hand over what the family keeps, and pay the heirs, one step you approve at a time.",
 };
 
 const steps = [
