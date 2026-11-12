@@ -1,5 +1,9 @@
 # Lastly
 
+![Lastly in 30 seconds: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan, PayPal Sandbox pauses StreamFlix, returns the €9.99 taken after he died, hands FamilyCloud to the family, and a letter for the family is written](docs/stages/lastly-stages.gif)
+
+The whole case in 30 seconds, from the documents to the letter for the family.
+
 When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
 ![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, send FitGym a formal notice, refund the €9.99 charged after his death](docs/portal-plan.png)

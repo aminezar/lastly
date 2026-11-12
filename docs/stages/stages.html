@@ -1,0 +1,302 @@
+<!doctype html>
+<!--
+  The README animation: Lastly's stages in 30 seconds, drawn from the real portal screens and the
+  demo estate's real figures, written for someone grieving (docs/writing-for-someone-grieving.md).
+  Every motion is a CSS animation with an absolute delay, so record.mjs can seek to any frame.
+  Open it in a browser to watch it play.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lastly in 30 seconds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Geist+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+:root {
+  --paper: #fbf8f3; --paper-deep: #f4efe6; --line: #e6dfd2;
+  --ink: #001c64; --navy: #001c64; --night: #001435;
+  --body: #3d4656; --muted: #5f6673; --accent: #b4532a;
+  --board-text: #c9d5ec; --board-muted: #a9bbdd; --sky: #7cc8ff;
+  --green: #5fd3a1; --ok: #10804f; --notice: #f5a623; --calm: #c9d5ec;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #efe9de; }
+body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+
+/* Scenes: the outer box fades in at --a, the inner box fades out at --b. Slow, soft fades. */
+.sc { position: absolute; inset: 0; animation: fin 900ms ease var(--a) both; }
+.sc > .sc-i { position: absolute; inset: 0; animation: fout 700ms ease calc(var(--b) - 700ms) both; }
+@keyframes fin { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fout { from { opacity: 1; } to { opacity: 0; } }
+
+.in { animation: rise 1300ms var(--ease) var(--d) both; }
+.soft { animation: soft 900ms var(--ease) var(--d) both; }
+.fade { animation: fin 1100ms ease var(--d) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes soft { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+
+/* ——— Stepper ——— */
+.stepper { position: absolute; left: 0; right: 0; top: 0; height: 112px; display: flex; align-items: center; gap: 20px;
+  padding: 0 110px; background: #fff; border-bottom: 2px solid var(--line); }
+.brand { font-family: var(--serif); font-weight: 600; font-size: 40px; letter-spacing: -0.02em; margin-right: 34px; }
+.st { display: flex; align-items: center; gap: 14px; font-size: 27px; }
+.st .dot { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #cfd6e2; color: var(--muted);
+  display: grid; place-items: center; font-size: 22px; font-weight: 600; animation: dot-on 600ms ease var(--a) both; }
+.st .ck { position: absolute; inset: -2px; border-radius: 50%; background: var(--ok); display: grid; place-items: center;
+  animation: fin 600ms ease var(--b) both; }
+.st .ck svg { width: 22px; height: 22px; }
+.st .lbl { color: var(--muted); animation: lbl-on 600ms ease var(--a) both; }
+.st + .bar { width: 34px; height: 2px; background: #d9dee7; }
+@keyframes dot-on { from { background: #fff; } to { background: var(--navy); border-color: var(--navy); color: #fff; } }
+@keyframes lbl-on { from { color: var(--muted); } to { color: var(--ink); font-weight: 600; } }
+
+/* ——— Headline slot ——— */
+.head { position: absolute; left: 110px; right: 110px; top: 168px; }
+.h { font-family: var(--serif); font-weight: 500; font-size: 64px; line-height: 1.1; letter-spacing: -0.02em; }
+.h2 { margin-top: 14px; font-size: 32px; color: var(--body); }
+
+/* ——— Title ——— */
+.title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.title .word { font-family: var(--serif); font-weight: 600; font-size: 190px; letter-spacing: -0.03em; line-height: 1; }
+.title .line { margin-top: 48px; font-family: var(--serif); font-weight: 500; font-size: 60px; line-height: 1.15; max-width: 1700px; }
+.title .sub { margin-top: 28px; font-size: 34px; color: var(--body); }
+
+/* ——— Documents ——— */
+.docs { position: absolute; left: 0; right: 0; top: 400px; display: flex; justify-content: center; gap: 80px; }
+.doc { position: relative; width: 720px; height: 500px; background: #fffefb; border: 2px solid var(--line); border-radius: 10px;
+  box-shadow: 0 30px 60px -34px rgba(0, 28, 100, 0.3); padding: 44px 50px; overflow: hidden; font-family: var(--serif); }
+.doc:first-child { transform: rotate(-1deg); }
+.doc:last-child { transform: rotate(0.8deg); }
+.doc .kind { font-size: 20px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-family: var(--sans); font-weight: 600; }
+.doc .t { margin-top: 10px; font-size: 40px; font-weight: 600; }
+.doc .rows { margin-top: 30px; display: grid; gap: 22px; }
+.doc .r { font-size: 28px; color: var(--body); }
+.doc .r b { font-weight: 600; color: var(--ink); padding: 2px 8px; margin-left: -8px; border-radius: 6px; }
+.doc .r b.hl { animation: hl 900ms ease var(--d) both; }
+@keyframes hl { from { background: transparent; } to { background: rgba(0, 112, 224, 0.11); } }
+.doc .lines { margin-top: 34px; display: grid; gap: 16px; }
+.doc .lines i { display: block; height: 10px; border-radius: 5px; background: #ece6da; }
+.doc .file { position: absolute; left: 50px; bottom: 34px; font-family: var(--mono); font-size: 20px; color: var(--muted); }
+.scan { position: absolute; left: 0; right: 0; top: -60px; height: 60px; background: linear-gradient(to bottom, rgba(0, 112, 224, 0), rgba(0, 112, 224, 0.12));
+  border-bottom: 2px solid rgba(0, 112, 224, 0.45); opacity: 0; animation: scan 2200ms cubic-bezier(0.45, 0, 0.55, 1) var(--d) both; }
+@keyframes scan { 0% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; } 100% { opacity: 0; transform: translateY(560px); } }
+.ai { position: absolute; right: 30px; top: 30px; display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px;
+  background: #eef4fb; border: 2px solid #c9dcf2; border-radius: 999px; font-family: var(--sans); font-size: 22px; font-weight: 600; color: var(--ink); }
+.tag { background: #0070e0; color: #fff; font-size: 17px; font-weight: 700; padding: 3px 9px; border-radius: 6px; }
+
+/* ——— Checks ——— */
+.checks { position: absolute; left: 110px; top: 400px; width: 1080px; display: grid; gap: 20px; }
+.chk { display: flex; align-items: center; gap: 26px; padding: 26px 32px; background: #fff; border: 2px solid var(--line); border-radius: 14px; font-size: 32px; color: var(--ink); }
+.chk .c { flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--ok); display: grid; place-items: center; }
+.chk .c svg { width: 24px; height: 24px; }
+.agree { position: absolute; right: 110px; top: 400px; width: 560px; padding: 44px; border-radius: 22px; background: var(--night); color: #fff; }
+.agree .big { display: flex; align-items: center; gap: 22px; font-size: 42px; font-weight: 600; }
+.agree .big .c { width: 60px; height: 60px; border-radius: 50%; background: var(--green); display: grid; place-items: center; }
+.agree .big .c svg { width: 32px; height: 32px; }
+.agree .s { margin-top: 16px; font-size: 30px; color: var(--board-muted); }
+.agree .note { margin-top: 38px; padding-top: 30px; border-top: 2px solid rgba(255, 255, 255, 0.14); font-size: 30px; line-height: 1.4; color: #fff; }
+
+/* ——— The plan ——— */
+.board { position: absolute; left: 110px; right: 110px; top: 360px; border-radius: 24px; background: var(--navy); color: #fff; overflow: hidden;
+  box-shadow: 0 40px 80px -44px rgba(0, 28, 100, 0.5); }
+.board .top { display: flex; align-items: center; justify-content: space-between; padding: 30px 40px; }
+.board .bt { font-family: var(--serif); font-weight: 500; font-size: 42px; }
+.board .bs { margin-top: 6px; font-size: 24px; color: var(--board-muted); }
+.btn { position: relative; padding: 20px 34px; border-radius: 999px; background: #0070e0; font-size: 28px; font-weight: 600; overflow: hidden; }
+.btn .done { position: absolute; inset: 0; border-radius: 999px; background: #1d3a7a; color: #fff; display: flex; align-items: center; justify-content: center; gap: 12px;
+  animation: fin 700ms ease var(--d) both; }
+.btn .done svg { width: 24px; height: 24px; }
+.grid { display: grid; grid-template-columns: 300px 620px 320px 1fr; }
+.grid > div { padding: 22px 0 22px 40px; border-top: 2px solid rgba(255, 255, 255, 0.08); }
+.grid .hd { font-size: 22px; font-weight: 600; color: var(--board-muted); padding-top: 16px; padding-bottom: 16px; }
+.m1 { font-size: 30px; font-weight: 700; }
+.m2 { margin-top: 4px; font-size: 24px; color: var(--board-text); }
+.pl { display: flex; gap: 16px; }
+.pl .d { flex: none; width: 14px; height: 14px; margin-top: 13px; border-radius: 50%; }
+.pl .p1 { font-size: 29px; font-weight: 700; }
+.pl .p2 { margin-top: 6px; font-size: 23px; line-height: 1.35; color: var(--board-text); }
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 6px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); font-size: 23px; font-weight: 600; }
+.id { margin-top: 10px; font-family: var(--mono); font-size: 20px; color: var(--board-muted); letter-spacing: 0.02em; }
+.res { position: relative; min-height: 70px; }
+.res .dash { position: absolute; left: 40px; top: 32px; width: 24px; height: 3px; background: var(--board-muted); animation: fout 500ms ease var(--d) both; }
+.res .ok { font-size: 27px; font-weight: 600; display: flex; align-items: center; gap: 12px; color: #fff; }
+.res .ok .c { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; }
+.res .ok .c svg { width: 16px; height: 16px; }
+
+/* ——— The letter ——— */
+.letter { position: absolute; left: 50%; top: 330px; width: 1240px; margin-left: -620px; background: #fffefb; border: 2px solid var(--line); border-radius: 6px;
+  box-shadow: 0 40px 80px -44px rgba(0, 28, 100, 0.3); padding: 54px 80px 50px; font-family: var(--serif); color: #1f2a44; }
+.letter p { font-size: 29px; line-height: 1.5; margin-top: 18px; }
+.letter .greet { margin-top: 0; font-size: 32px; }
+.letter .sign { margin-top: 26px; font-style: italic; }
+.letter .m { color: var(--muted); }
+
+/* ——— End card ——— */
+.end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: radial-gradient(1200px 700px at 85% 15%, rgba(0, 112, 224, 0.18), transparent 60%), var(--navy); color: #fff; }
+.end .word { font-family: var(--serif); font-weight: 600; font-size: 150px; letter-spacing: -0.03em; line-height: 1; }
+.end .line { margin-top: 34px; font-family: var(--serif); font-weight: 500; font-size: 52px; }
+.end .url { margin-top: 50px; font-size: 36px; color: var(--sky); font-weight: 600; }
+.end .fine { margin-top: 18px; font-size: 26px; color: var(--board-muted); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="tick-n" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#00154d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<div class="stage" id="stage">
+
+  <!-- Title -->
+  <div class="sc" style="--a:0s;--b:3.6s"><div class="sc-i"><div class="title">
+    <div class="word in" style="--d:0.2s">Lastly</div>
+    <div class="line in" style="--d:0.8s">When someone dies, their PayPal account keeps paying.</div>
+    <div class="sub in" style="--d:1.5s">Lastly settles it for the family, one approved step at a time.</div>
+  </div></div></div>
+
+  <!-- Stepper, shared by every stage -->
+  <div class="sc" style="--a:3.2s;--b:27.4s"><div class="sc-i">
+    <div class="stepper">
+      <div class="brand">Lastly</div>
+      <div class="st" style="--a:3.5s;--b:6.9s"><span class="dot">1<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Documents</span></div><i class="bar"></i>
+      <div class="st" style="--a:6.9s;--b:10.2s"><span class="dot">2<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Read by AI</span></div><i class="bar"></i>
+      <div class="st" style="--a:10.2s;--b:13.4s"><span class="dot">3<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Checked</span></div><i class="bar"></i>
+      <div class="st" style="--a:13.4s;--b:17.2s"><span class="dot">4<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The plan</span></div><i class="bar"></i>
+      <div class="st" style="--a:17.2s;--b:21.8s"><span class="dot">5<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">In PayPal</span></div><i class="bar"></i>
+      <div class="st" style="--a:21.8s;--b:27s"><span class="dot">6<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The family letter</span></div>
+    </div>
+  </div></div>
+
+  <!-- 1–2 · Documents, then read by AI (the documents stay on screen) -->
+  <div class="sc" style="--a:3.5s;--b:6.9s"><div class="sc-i"><div class="head">
+    <div class="h in" style="--d:3.6s">Jean Dupont died on 20 October.</div>
+    <div class="h2 in" style="--d:4.1s">His daughter Marie, the executor he chose, adds two documents.</div>
+  </div></div></div>
+  <div class="sc" style="--a:6.9s;--b:10.2s"><div class="sc-i"><div class="head">
+    <div class="h">AI reads them, so Marie types nothing.</div>
+    <div class="h2">The names and the date are taken from the documents themselves.</div>
+  </div></div></div>
+  <div class="sc" style="--a:3.5s;--b:10.2s"><div class="sc-i"><div class="docs">
+    <div class="doc in" style="--d:4.2s">
+      <div class="kind">Death certificate</div>
+      <div class="t">Certificate of death</div>
+      <div class="rows">
+        <div class="r">Name of the deceased: <b class="hl" style="--d:7.6s">Jean Dupont</b></div>
+        <div class="r">Date of death: <b class="hl" style="--d:8s">20 October 2026</b></div>
+      </div>
+      <div class="lines"><i style="width:92%"></i><i style="width:78%"></i><i style="width:86%"></i></div>
+      <div class="file fade" style="--d:4.9s">death-certificate-jean-dupont.pdf</div>
+      <div class="scan" style="--d:7.1s"></div>
+      <div class="ai soft" style="--d:8.8s"><span class="tag">AI</span>Read by AI</div>
+    </div>
+    <div class="doc in" style="--d:4.6s">
+      <div class="kind">Notary act of heredity</div>
+      <div class="t">Act of heredity</div>
+      <div class="rows">
+        <div class="r">Deceased: <b class="hl" style="--d:8.2s">Jean Dupont</b>, died <b class="hl" style="--d:8.4s">20 Oct 2026</b></div>
+        <div class="r">Executor: <b class="hl" style="--d:8.7s">Marie Dupont</b></div>
+        <div class="r">Heirs: Marie Dupont, Luc Dupont</div>
+      </div>
+      <div class="lines"><i style="width:88%"></i><i style="width:70%"></i></div>
+      <div class="file fade" style="--d:5.3s">notary-act-jean-dupont.pdf</div>
+      <div class="scan" style="--d:7.5s"></div>
+      <div class="ai soft" style="--d:9.2s"><span class="tag">AI</span>Read by AI</div>
+    </div>
+  </div></div></div>
+
+  <!-- 3 · Checked -->
+  <div class="sc" style="--a:10.2s;--b:13.4s"><div class="sc-i">
+    <div class="head">
+      <div class="h">Rules check that everything agrees.</div>
+      <div class="h2">Nothing is touched before that.</div>
+    </div>
+    <div class="checks">
+      <div class="chk in" style="--d:10.5s"><span class="c"><svg><use href="#tick"/></svg></span>Same date of death on both documents</div>
+      <div class="chk in" style="--d:10.85s"><span class="c"><svg><use href="#tick"/></svg></span>Both name Jean, who signed the mandate</div>
+      <div class="chk in" style="--d:11.2s"><span class="c"><svg><use href="#tick"/></svg></span>The notary act names Marie as executor</div>
+      <div class="chk in" style="--d:11.55s"><span class="c"><svg><use href="#tick"/></svg></span>A second AI reading agrees with the rules</div>
+    </div>
+    <div class="agree in" style="--d:12s">
+      <div class="big"><span class="c"><svg><use href="#tick-n"/></svg></span>Documents agree</div>
+      <div class="s">4 of 4 checks passed</div>
+      <div class="note">The AI reads. The rules decide. Marie approves.</div>
+    </div>
+  </div></div>
+
+  <!-- 4–5 · The plan, then Marie approves and PayPal acts (the table stays on screen) -->
+  <div class="sc" style="--a:13.4s;--b:17.2s"><div class="sc-i"><div class="head">
+    <div class="h">For each payment, what happens and why.</div>
+  </div></div></div>
+  <div class="sc" style="--a:17.2s;--b:21.8s"><div class="sc-i"><div class="head">
+    <div class="h">Marie approves once. Lastly does the rest.</div>
+  </div></div></div>
+  <div class="sc" style="--a:13.4s;--b:21.8s"><div class="sc-i"><div class="board in" style="--d:13.5s">
+    <div class="top">
+      <div><div class="bt">What happens to each payment</div><div class="bs">Jean Dupont · PayPal Sandbox</div></div>
+      <div class="btn">Review and approve →<span class="done" style="--d:17.6s"><svg><use href="#tick"/></svg>Approved by Marie</span></div>
+    </div>
+    <div class="grid">
+      <div class="hd">Payment</div><div class="hd">Plan and why</div><div class="hd">PayPal</div><div class="hd">Now</div>
+
+      <div class="in" style="--d:14.1s"><div class="m1">StreamFlix</div><div class="m2">€9.99 / month</div></div>
+      <div class="in" style="--d:14.1s"><div class="pl"><i class="d" style="background:var(--calm)"></i><div><div class="p1">Pause the subscription</div><div class="p2">His alone. No more charges.</div></div></div></div>
+      <div class="in" style="--d:14.1s"><span class="pill">Active</span><div class="id">I-MN83BBV5ENFM</div></div>
+      <div class="res"><i class="dash" style="--d:18.2s"></i><div class="in" style="--d:18.2s"><div class="ok"><span class="c" style="background:var(--calm)"><svg><use href="#tick-n"/></svg></span>Paused</div></div></div>
+
+      <div class="in" style="--d:14.6s"><div class="m1">FamilyCloud</div><div class="m2">€12.00 / month</div></div>
+      <div class="in" style="--d:14.6s"><div class="pl"><i class="d" style="background:var(--sky)"></i><div><div class="p1">Hand over to the family</div><div class="p2">Shared at home. It keeps running.</div></div></div></div>
+      <div class="in" style="--d:14.6s"><span class="pill">Active</span><div class="id">I-AKDGPFEWRSNA</div></div>
+      <div class="res"><i class="dash" style="--d:19s"></i><div class="in" style="--d:19s"><div class="ok"><span class="c" style="background:var(--sky)"><svg><use href="#tick-n"/></svg></span>Waiting for the family</div><div class="id">I-YSS51GUS9UJF</div></div></div>
+
+      <div class="in" style="--d:15.1s"><div class="m1">FitGym</div><div class="m2">€39.00 / month</div></div>
+      <div class="in" style="--d:15.1s"><div class="pl"><i class="d" style="background:var(--notice)"></i><div><div class="p1">Send a formal notice</div><div class="p2">Under contract. A letter, written for her.</div></div></div></div>
+      <div class="in" style="--d:15.1s"><span class="pill">Active</span><div class="id">I-91KEVMRAV679</div></div>
+      <div class="res"><i class="dash" style="--d:19.8s"></i><div class="in" style="--d:19.8s"><div class="ok"><span class="c" style="background:var(--notice)"><svg><use href="#tick-n"/></svg></span>Letter written</div></div></div>
+
+      <div class="in" style="--d:15.6s"><div class="m1">StreamFlix</div><div class="m2">One charge · €9.99</div></div>
+      <div class="in" style="--d:15.6s"><div class="pl"><i class="d" style="background:var(--green)"></i><div><div class="p1">Refund €9.99</div><div class="p2">Taken after he died. It goes back.</div></div></div></div>
+      <div class="in" style="--d:15.6s"><span class="pill">Charged</span><div class="id">7CS27202KU453884G</div></div>
+      <div class="res"><i class="dash" style="--d:20.6s"></i><div class="in" style="--d:20.6s"><div class="ok"><span class="c" style="background:var(--green)"><svg><use href="#tick-n"/></svg></span>Back on his card</div><div class="id">3A784550RV3218429</div></div></div>
+    </div>
+  </div></div></div>
+
+  <!-- 6 · The family letter -->
+  <div class="sc" style="--a:21.8s;--b:27.4s"><div class="sc-i">
+    <div class="head">
+      <div class="h">Then a letter for the family, in plain words.</div>
+    </div>
+    <div class="letter in" style="--d:22.1s">
+      <p class="greet fade" style="--d:22.6s">Dear Luc,</p>
+      <p class="fade" style="--d:23.1s">Jean died on 20 October 2026. Since then, Jean's PayPal account went on paying for things as if nothing had changed. I have now been through each of them, and I wanted you to have a plain account of what was done.</p>
+      <p class="fade m" style="--d:24s">StreamFlix was still charging €9.99 every month. I have paused it, so nothing more will be taken. …</p>
+      <p class="fade" style="--d:24.8s">Apart from that one approval, nothing is needed from you. Take care of yourselves.</p>
+      <p class="sign fade" style="--d:25.5s">With love,<br>Marie</p>
+    </div>
+  </div></div>
+
+  <!-- End card -->
+  <div class="sc" style="--a:27.1s;--b:30s"><div class="sc-i"><div class="end">
+    <div class="word in" style="--d:27.3s">Lastly</div>
+    <div class="line in" style="--d:27.7s">Nobody should keep paying after they’re gone.</div>
+    <div class="url in" style="--d:28.1s">lastly-rdeo.onrender.com/estate</div>
+    <div class="fine in" style="--d:28.3s">PayPal Sandbox · every person in it is fictional</div>
+  </div></div></div>
+</div>
+<script>
+  // Fit the 1920×1080 stage to the window when watched in a browser.
+  const fit = () => { const s = Math.min(innerWidth / 1920, innerHeight / 1080); const el = document.getElementById('stage');
+    if (!window.__recording) { el.style.transform = `scale(${s})`; el.style.transformOrigin = '0 0'; } };
+  addEventListener('resize', fit); fit();
+  // The recorder pauses every animation and seeks to an exact time.
+  window.DURATION = 30;
+  window.seek = (t) => { for (const a of document.getAnimations()) { a.pause(); a.currentTime = t * 1000; } };
+  // Watching in a browser: loop.
+  setInterval(() => { if (!window.__recording) for (const a of document.getAnimations()) { a.currentTime = 0; a.play(); } }, 30000);
+</script>
+</body>
+</html>
