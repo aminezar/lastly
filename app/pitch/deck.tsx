@@ -84,7 +84,7 @@ const SLIDES: Slide[] = [
   {
     id: 'problem',
     title: 'The problem',
-    time: '0:08–0:27',
+    time: '0:08–0:26',
     tone: 'paper',
     say: [
       'Meet Marie. Her father Jean died on October 20th.',
@@ -147,9 +147,9 @@ const SLIDES: Slide[] = [
   {
     id: 'solution',
     title: 'Who it’s for',
-    time: '0:27–0:34',
+    time: '0:26–0:36',
     tone: 'paper',
-    say: [`${BRAND.name} is for her: the one person Jean chose, while he was alive, to settle it.`],
+    say: [`${BRAND.name} is for her, the one person Jean chose while he was alive. It stops the charges, refunds what was taken after his death, hands over what the family keeps, and writes to the rest.`],
     body: (
       <div className="pd-pad pd-col pd-one">
         <p className="pd-in pd-eyebrow" style={d(100)}>Who it’s for</p>
@@ -157,9 +157,10 @@ const SLIDES: Slide[] = [
           <Words text="For the one person they chose to settle it." start={200} step={75} />
         </h2>
         <p className="pd-principle">
-          <span className="pd-in" style={d(1300)}><i className="pd-dot-ai" />AI reads and checks.</span>
-          <span className="pd-in" style={d(1550)}><i className="pd-dot-accent" />A person approves.</span>
-          <span className="pd-in" style={d(1800)}><i className="pd-dot-keep" />PayPal acts.</span>
+          <span className="pd-in" style={d(1300)}><i className="pd-dot-stop" />Stop the charges.</span>
+          <span className="pd-in" style={d(1550)}><i className="pd-dot-accent" />Refund what was taken.</span>
+          <span className="pd-in" style={d(1800)}><i className="pd-dot-keep" />Hand over what the family keeps.</span>
+          <span className="pd-in" style={d(2050)}><i className="pd-dot-notice" />Write to the rest.</span>
         </p>
       </div>
     ),
@@ -167,12 +168,12 @@ const SLIDES: Slide[] = [
   {
     id: 'demo',
     title: 'Demo cue',
-    time: '0:34–0:37, then demo to 2:05',
+    time: '0:36–0:38, then demo to 2:05',
     tone: 'navy',
     say: ['Here it is, live on the PayPal Sandbox. Every PayPal call you’ll see is real.'],
     shots: [
       {
-        at: '0:37',
+        at: '0:38',
         show: 'Record the browser at 1280px wide or more. “Continue as Marie”, then drop the two sample PDFs (public/samples, or “Download a sample PDF” in each box). Hold on “Read by AI · gpt-5.4-mini”, click “Check documents and open the case”, hold on “Documents agree”.',
         say: 'Marie uploads the scanned death certificate and notary act. AI reads both. Rules check that they agree with each other and with Jean’s mandate, and the AI reads them a second time on its own: same person, October 20th, Marie as executor. Four checks, all green.',
       },
@@ -258,7 +259,7 @@ const SLIDES: Slide[] = [
       <div className="pd-pad pd-col">
         <p className="pd-in pd-eyebrow" style={d(100)}>Under the hood</p>
         <h2 className="pd-h2 pd-h2-wide">
-          <Words text="AI reads and checks. Rules decide. PayPal acts." start={200} step={65} />
+          <Words text="Every payment gets the right ending." start={200} step={75} />
         </h2>
 
         <div className="pd-lanes">
@@ -315,6 +316,7 @@ const SLIDES: Slide[] = [
       'So, can it be abused? Here are the three locks before any money moves.',
       'Only the executor Jean chose while he was alive can open the case. Both documents must match his mandate, or the case stops for a person. And the AI reads them again on its own: it can hold a case, never open one.',
       'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on file. The server re-checks all of it on every single action.',
+      'We attacked it ourselves on the hosted demo: 21 attacks, 21 held, and both genuine cases still opened. One scan hid an instruction that fooled the AI transcribing it, and the second AI reader caught it.',
     ],
     body: (
       <div className="pd-pad pd-split pd-split-safe">
@@ -341,6 +343,9 @@ const SLIDES: Slide[] = [
           ))}
           <p className="pd-in pd-fade pd-lock-foot" style={d(2300)}>
             Re-checked on the server before every PayPal call, against the estate’s own IDs.
+          </p>
+          <p className="pd-in pd-redteam" style={d(2600)}>
+            <b>21 attacks, 21 held</b> forged facts, injected prompts, doctored scans, direct calls to the money routes. Both genuine cases still opened.
           </p>
         </div>
       </div>

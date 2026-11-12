@@ -436,3 +436,17 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
   font-weight: 700;
 }
 .pd-lock-foot { margin-top: 6px; padding-left: 4px; font-size: 21px; color: var(--sky); }
+.pd-redteam {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 4px;
+  padding: 18px 24px;
+  border-radius: 16px;
+  background: rgba(95, 211, 161, 0.12);
+  font-size: 21px;
+  line-height: 1.4;
+  color: var(--board-text);
+}
+.pd-redteam b { flex-shrink: 0; white-space: nowrap; font-family: var(--serif); font-size: 34px; font-weight: 500; color: var(--green); }
+.pd-one .pd-principle { flex-wrap: wrap; gap: 26px 60px; max-width: 1300px; font-size: 42px; }
