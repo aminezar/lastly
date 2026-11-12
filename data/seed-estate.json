@@ -21,7 +21,8 @@
       "deceased_name": "Jean Dupont",
       "executor_name": "Marie Dupont",
       "signed": "2025-05-03",
-      "note": "Seeded Legacy Mandate (simulated for the demo)"
+      "note": "Seeded Legacy Mandate (simulated for the demo)",
+      "relationship_to_executor": "father"
     },
     "sandbox_payout_receiver": {
       "label": "Heir stand-in (Sandbox personal account)",

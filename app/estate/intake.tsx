@@ -216,11 +216,27 @@ export function Intake(props: {
 
   return (
     <div className="mx-auto mt-12 max-w-[980px] pb-8">
-      <h1 className="hl-serif text-balance text-[36px] leading-[1.06] text-pp-navy sm:text-[50px]">
-        We&apos;ll go through {mandate.deceased_name}&apos;s PayPal payments with you, one step at a time.
+      <p className="text-[18px] text-pp-muted">
+        We&apos;re sorry about {mandate.relationship_to_executor ? `your ${mandate.relationship_to_executor}` : mandate.deceased_name}.
+      </p>
+      <h1 className="hl-serif mt-2 text-balance text-[36px] leading-[1.06] text-pp-navy sm:text-[50px]">
+        Here is what we can take off your hands.
       </h1>
-      <p className="mt-4 max-w-[64ch] text-[18px] leading-relaxed text-pp-muted">
-        First, two documents, checked against what {mandate.deceased_name} set up while alive. Then a plan for each payment, in plain words. Nothing changes in PayPal until you approve it, and you won&apos;t need to call PayPal or any company: where a letter is needed, it is written for you.
+      <ul className="mt-5 grid max-w-[64ch] gap-x-8 gap-y-2 text-[17px] text-pp-ink sm:grid-cols-2">
+        {[
+          `Stop ${mandate.deceased_name}\u2019s payments that should end`,
+          'Return money taken after the death',
+          'Hand shared services to the family',
+          'Write the letters that need writing',
+        ].map((line) => (
+          <li key={line} className="flex items-start gap-2.5">
+            <span className="mt-[0.6em] size-1.5 shrink-0 rounded-full bg-pp-muted" aria-hidden="true" />
+            {line}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-5 max-w-[64ch] text-[16px] leading-relaxed text-pp-muted">
+        First, two documents, checked against what {mandate.deceased_name} set up while alive. Then a plan for each payment, in plain words. Nothing changes in PayPal until you approve it, it takes a few minutes, and you won&apos;t need to call PayPal or any company.
       </p>
 
       {props.onQuickDemo && !props.certificate && !props.notary && (

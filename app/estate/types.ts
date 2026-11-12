@@ -103,4 +103,5 @@ export function heirAccount(c: Analysis['case']): { to: string; short: string } 
   return heir ? { to: `${heir}\u2019s PayPal account`, short: heir } : { to: 'the heir\u2019s PayPal account', short: 'the heir' };
 }
 
-export type MandateInfo = { deceased_name: string; executor_name: string; signed?: string; note?: string };
+// relationship_to_executor is display only (the opening line at intake); no check or money step reads it.
+export type MandateInfo = { deceased_name: string; executor_name: string; signed?: string; note?: string; relationship_to_executor?: string };
