@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getBalances, getCapture, getSubscription } from '@/lib/paypal';
-import { demoIds, prepareDemo } from '@/lib/demo-mode';
+import { prepareDemo } from '@/lib/demo-mode';
 import { classifyWithRules, crossCheck, demoDocuments, MAX_DOC_CHARS, parseDocument, secondReadingCheck, type Mandate, type MerchantFacts } from '@/lib/estate';
 import { aiLimited } from '@/lib/rate-limit';
 
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
     }
 
     // Hosted demo only: put the Sandbox back in its starting state first (lib/demo-mode.ts).
-    await prepareDemo(seed.sandbox_ids.pending_demo ?? {}, seed.items.filter((i) => i.type === 'capture').map((i) => i.key));
-    const ids = demoIds(seed.sandbox_ids.pending_demo ?? {});
+    // Each opening gets its own post-death charge, so two visitors never race for one refund.
+    const ids = await prepareDemo(seed.sandbox_ids.pending_demo ?? {}, seed.items.filter((i) => i.type === 'capture').map((i) => i.key));
     const [aiCheck, balances, ...looked] = await Promise.all([
       secondReading,
       getBalances(),

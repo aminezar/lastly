@@ -84,10 +84,13 @@ export async function POST(request: Request) {
       if (!rehearsal && body.confirmFinal !== true) return fail(400, 'Final mode cancels permanently and needs confirmFinal: true.');
       if (!rehearsal && publicDemo()) return fail(403, 'Final mode is turned off on the public demo, so the next visitor gets the same case. Rehearsal pauses the subscription instead.');
       const reason = body.reason ?? 'Subscriber deceased — Lastly estate wind-down';
-      if (rehearsal) await suspendSubscription(body.subscriptionId, reason, key('suspend', body.subscriptionId));
-      else await cancelSubscription(body.subscriptionId, reason, key('cancel', body.subscriptionId));
-      const after = await getSubscription(body.subscriptionId);
-      return NextResponse.json({ ok: true, at, mode: rehearsal ? 'rehearsal' : 'final', subscription: { id: after.id, status: after.status } });
+      // Another visitor's run may have paused it a moment ago: then it is already in the state asked for.
+      const before = rehearsal ? await getSubscription(body.subscriptionId).catch(() => undefined) : undefined;
+      const alreadyPaused = before?.status === 'SUSPENDED';
+      if (rehearsal && !alreadyPaused) await suspendSubscription(body.subscriptionId, reason, key('suspend', body.subscriptionId));
+      else if (!rehearsal) await cancelSubscription(body.subscriptionId, reason, key('cancel', body.subscriptionId));
+      const after = alreadyPaused ? before! : await getSubscription(body.subscriptionId);
+      return NextResponse.json({ ok: true, at, mode: rehearsal ? 'rehearsal' : 'final', subscription: { id: after.id, status: after.status }, alreadyPaused });
     }
 
     if (body.captureId) {

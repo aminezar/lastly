@@ -4,7 +4,7 @@
 // act in PayPal → pay the heirs → report. Every PayPal ID on screen comes from a real
 // Sandbox response via /api/estate/*; nothing here invents one.
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Intake, SignIn, type DocSlot } from './intake';
 import { Ledger, LedgerCards } from './ledger';
 import {
@@ -35,10 +35,34 @@ async function call<T>(url: string, body: unknown): Promise<T> {
 const now = () => new Date().toISOString();
 const newRunId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
+// The open case is kept in this tab's session storage, so a reload or the back button does not
+// lose it. Only what the page already showed is stored (no keys, no secrets); closing the tab clears it.
+const SAVED = 'lastly-case-v1';
+type Saved = {
+  signedIn: boolean;
+  analysis: Analysis | null;
+  progress: Record<string, RowProgress>;
+  included: Record<string, boolean>;
+  mode: Mode;
+  audit: AuditEntry[];
+  payout: PayoutState;
+  runId: string;
+  caseDocs: { certificateText: string; notaryText: string };
+};
+function readSaved(): Saved | null {
+  try {
+    const raw = window.sessionStorage.getItem(SAVED);
+    return raw ? (JSON.parse(raw) as Saved) : null;
+  } catch {
+    return null;
+  }
+}
+
 function friendlyError(message: string): string {
   if (/PAYPAL_CLIENT_ID|PAYPAL_SECRET/.test(message)) return 'PayPal is not connected yet: the Sandbox keys are missing on the server (.env.local).';
   if (/401|invalid_client/i.test(message)) return 'PayPal rejected the Sandbox keys on the server.';
   if (/Failed to fetch|NetworkError/i.test(message)) return 'Could not reach the Lastly server. Check that it is running, then try again.';
+  if (/CAPTURE_FULLY_REFUNDED|already been refunded|fully refunded/i.test(message)) return 'This charge was already refunded, by another run a moment ago. Start over to open the case with a fresh charge.';
   const issue = message.match(/"issue":"([^"]+)"/)?.[1] ?? message.match(/"message":"([^"]+)"/)?.[1];
   return issue ? `PayPal said: ${issue}` : message;
 }
@@ -76,6 +100,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
   // The documents this case was opened with; every action sends them so the server re-checks them.
   const caseDocs = useRef<{ certificateText: string; notaryText: string }>({ certificateText: '', notaryText: '' });
   const progressRef = useRef<Record<string, RowProgress>>({});
+  const restored = useRef(false);
 
   const log = useCallback((entry: Omit<AuditEntry, 'at'> & { at?: string }) => {
     setAudit((list) => [...list, { ...entry, at: entry.at ?? now() }]);
@@ -111,6 +136,18 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         { at: data.generatedAt, item: 'Case', action: `Case opened for the estate of ${name}`, status: 'OPENED', tone: 'info' },
         ...data.verification.checks.map((c) => ({ at: data.generatedAt, item: 'Documents', action: c.model ? `${c.label} (${c.model})` : c.label, status: c.skipped ? 'NOT RUN' : c.pass ? 'MATCH' : 'MISMATCH', tone: (c.pass ? 'ok' : 'error') as AuditEntry['tone'] })),
         { at: data.generatedAt, item: 'PayPal', action: `Read ${data.items.length} recurring payments`, status: 'READ', tone: 'info' },
+        // Rows with nothing to do still get a line, so the report accounts for every payment.
+        ...data.items
+          .filter((i) => initial[i.key].step === 'skipped')
+          .map((i) => ({
+            at: data.generatedAt,
+            item: i.captureId ? `${merchantName(i.merchant)} charge` : merchantName(i.merchant),
+            action: `No action: ${initial[i.key].message?.toLowerCase() ?? 'nothing to do'}`,
+            paypalId: i.captureId ?? i.subscriptionId,
+            status: i.captureId ? (i.captureStatus ?? 'NOT_FOUND') : (i.status ?? 'NOT_FOUND'),
+            tone: 'info' as AuditEntry['tone'],
+            amount: i.amount ? `${i.amount.value} ${i.amount.currency_code}` : undefined,
+          })),
       ]);
     } catch (e) {
       setOpenError(friendlyError(e instanceof Error ? e.message : String(e)));
@@ -118,6 +155,46 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
       setOpening(false);
     }
   }
+
+  // Restore the case after a reload. A step cut off mid-call is shown as interrupted: running it
+  // again is safe, because the same run ID makes PayPal replay its first answer.
+  useEffect(() => {
+    const saved = readSaved();
+    if (!saved?.signedIn) return;
+    const progress = Object.fromEntries(
+      Object.entries(saved.progress ?? {}).map(([k, p]) => [k, p.step === 'running' ? { step: 'error', paypalStatus: 'NOT CHANGED', message: 'Interrupted by a page reload. Run it again: PayPal will not act twice.' } : p]),
+    ) as Record<string, RowProgress>;
+    progressRef.current = progress;
+    runId.current = saved.runId ?? '';
+    caseDocs.current = saved.caseDocs ?? { certificateText: '', notaryText: '' };
+    const payout: PayoutState = saved.payout?.step === 'sending' || saved.payout?.step === 'confirm' ? { step: 'idle' } : (saved.payout ?? { step: 'idle' });
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time restore from session storage after hydration */
+    setSignedIn(true);
+    setAnalysis(saved.analysis ?? null);
+    setProgress(progress);
+    setIncluded(saved.included ?? {});
+    setMode(saved.mode ?? 'rehearsal');
+    setAudit(saved.audit ?? []);
+    setPayout(payout);
+    /* eslint-enable react-hooks/set-state-in-effect */
+    if (payout.step === 'polling' && payout.batchId) void pollPayout(payout.batchId);
+    // Runs once, on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // The first run is the empty initial state, before the restore above lands: do not save it over the case.
+    if (!restored.current) {
+      restored.current = true;
+      return;
+    }
+    try {
+      const saved: Saved = { signedIn, analysis, progress, included, mode, audit, payout, runId: runId.current, caseDocs: caseDocs.current };
+      window.sessionStorage.setItem(SAVED, JSON.stringify(saved));
+    } catch {
+      // Storage full or blocked: the page still works, a reload just starts over.
+    }
+  }, [signedIn, analysis, progress, included, mode, audit, payout]);
 
   const rows: LedgerRow[] = useMemo(
     () =>
@@ -181,15 +258,23 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         return;
       }
       if (item.subscriptionId) {
-        const r = await call<{ at: string; subscription: { id: string; status: string } }>('/api/estate/execute', {
+        const r = await call<{ at: string; subscription: { id: string; status: string }; alreadyPaused?: boolean }>('/api/estate/execute', {
           runId: runId.current,
           documents: caseDocs.current,
           subscriptionId: item.subscriptionId,
           rehearsal,
           confirmFinal: !rehearsal && finalAck,
         });
-        setRow(item.key, { step: 'done', paypalStatus: r.subscription.status, message: rehearsal ? 'Paused' : 'Cancelled', at: r.at });
-        log({ at: r.at, item: name, action: rehearsal ? 'Subscription paused (rehearsal, reversible)' : 'Subscription cancelled (final)', paypalId: r.subscription.id, status: r.subscription.status, tone: 'ok' });
+        setRow(item.key, { step: 'done', paypalStatus: r.subscription.status, message: r.alreadyPaused ? 'Already paused' : rehearsal ? 'Paused' : 'Cancelled', at: r.at });
+        log({
+          at: r.at,
+          item: name,
+          action: r.alreadyPaused ? 'Subscription already paused in PayPal (rehearsal, reversible); nothing sent again' : rehearsal ? 'Subscription paused (rehearsal, reversible)' : 'Subscription cancelled (final)',
+          paypalId: r.subscription.id,
+          status: r.subscription.status,
+          tone: 'ok',
+          amount: item.amount ? `${item.amount.value} ${item.amount.currency_code} / month` : undefined,
+        });
       }
     } catch (e) {
       const message = friendlyError(e instanceof Error ? e.message : String(e));
@@ -362,7 +447,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
                     {running
                       ? `Working in PayPal · ${running.index} of ${running.total} · ${running.label}`
                       : blocked
-                        ? 'Blocked until the documents match.'
+                        ? 'Preview only: nothing can run in PayPal until the documents match.'
                         : settled
                           ? 'Done. PayPal confirmed every action.'
                           : actionableCount === 0
@@ -420,6 +505,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
               recovered={recovered}
               unlocked={settled}
               refundedBefore={rows.some((r) => r.captureId && r.progress.step === 'skipped' && /refunded/i.test(r.progress.message ?? ''))}
+              publicDemo={publicDemo}
               payout={payout}
               onStart={() => setPayout({ step: 'confirm' })}
               onConfirm={sendPayout}

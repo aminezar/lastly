@@ -201,7 +201,7 @@ export default function Home() {
               <div>
                 <p className="text-[14px] font-semibold uppercase tracking-[0.14em] text-[#7cc8ff]">Why it is safe</p>
                 <h2 className="mt-4 text-balance font-[family-name:var(--font-serif)] text-[34px] font-medium leading-tight tracking-[-0.01em] sm:text-[40px]">
-                  Built so a forged document can&rsquo;t move a cent.
+                  Built so a forged document can&rsquo;t redirect a cent.
                 </h2>
                 <p className="mt-5 text-[15px] leading-relaxed text-[#c9d5ec]">
                   Settling an estate is a target for fraud. Lastly leans on how PayPal already moves money, and adds checks a person signs off on.

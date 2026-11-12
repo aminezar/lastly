@@ -98,7 +98,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
     triage: 'stop_and_refund',
     confidence: 'medium',
     source: 'rules',
-    reason: 'Personal recurring payment with no shared use or contract flag: cancel it, and refund any post-death charge.',
+    reason: 'Personal recurring payment with no shared use or contract flag: stop it, and refund any post-death charge.',
   };
 }
 
@@ -206,18 +206,21 @@ const normName = (v?: string) =>
  */
 export function compareReadings(rules: { certificate: ParsedDocument; notary: ParsedDocument }, ai: SecondReading): TrustCheck {
   const facts: { doc: 'certificate' | 'notary'; label: string; field: keyof FactReading; name: boolean }[] = [
-    { doc: 'certificate', label: 'certificate, deceased', field: 'deceased', name: true },
-    { doc: 'certificate', label: 'certificate, date of death', field: 'dateOfDeath', name: false },
-    { doc: 'notary', label: 'notary act, deceased', field: 'deceased', name: true },
-    { doc: 'notary', label: 'notary act, date of death', field: 'dateOfDeath', name: false },
-    { doc: 'notary', label: 'notary act, executor', field: 'executor', name: true },
+    { doc: 'certificate', label: "The certificate's name of the deceased", field: 'deceased', name: true },
+    { doc: 'certificate', label: "The certificate's date of death", field: 'dateOfDeath', name: false },
+    { doc: 'notary', label: "The notary act's name of the deceased", field: 'deceased', name: true },
+    { doc: 'notary', label: "The notary act's date of death", field: 'dateOfDeath', name: false },
+    { doc: 'notary', label: "The notary act's executor", field: 'executor', name: true },
   ];
   const differences = facts
     .map((f) => {
       const r = rules[f.doc][f.field];
       const a = ai[f.doc][f.field];
       const agree = f.name ? normName(r) === normName(a) && Boolean(normName(r)) : Boolean(r) && r === a;
-      return agree ? null : `${f.label}: rules read ${r ?? 'nothing'}, AI read ${a ?? 'nothing'}`;
+      if (agree) return null;
+      if (!r) return `${f.label} could not be read automatically; the AI read ${a ?? 'nothing either'}`;
+      if (!a) return `${f.label} was read as ${r}; the AI could not find it`;
+      return `${f.label} was read as ${r}, but the AI read ${a}`;
     })
     .filter((d): d is string => Boolean(d));
   return {
@@ -225,7 +228,7 @@ export function compareReadings(rules: { certificate: ParsedDocument; notary: Pa
     label: differences.length ? 'A second reading by AI found a difference: held for a person to check' : 'A second reading by AI agrees with the rules',
     pass: differences.length === 0,
     detail: differences.length
-      ? differences.join(' · ')
+      ? `${differences.join('. ')}. Held for a person to check.`
       : `The AI read ${ai.certificate.from === 'scan' && ai.notary.from === 'scan' ? 'both uploaded files' : 'both documents'} separately and found the same ${facts.length} facts: names, date of death and executor.`,
     model: ai.model,
   };

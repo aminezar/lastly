@@ -24,7 +24,8 @@ export default function DashboardError({ error, retry }: { error: Error & { dige
             The PayPal sandbox didn&apos;t respond as expected. Check the API credentials in{' '}
             <code className="rounded bg-pp-canvas px-1">.env.local</code> and try again.
           </p>
-          {error.message && (
+          {/* A raw framework error (e.g. "Minified React error #…") means nothing to a reader: show only plain messages. */}
+          {error.message && !/Minified React error|react\.dev\/errors/i.test(error.message) && (
             <p className="mt-4 break-words rounded-lg bg-pp-canvas px-4 py-3 text-left font-mono text-xs text-pp-muted">
               {error.message}
               {error.digest && <span className="block pt-1">Reference: {error.digest}</span>}

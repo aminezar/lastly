@@ -1,8 +1,10 @@
 // Hosted public demo (server-only). Set LASTLY_PUBLIC_DEMO=1 on the host (render.yaml does).
 // Every judge who opens the case should see the whole story, so before the case is read:
 //   - seeded subscriptions a previous visitor paused (rehearsal) are re-activated, and
-//   - when the post-death charge is already refunded, a fresh one is created with PayPal's
-//     Sandbox test card (same as scripts/seed-capture.mjs), and used for this server's run.
+//   - the post-death charge is given to this case alone: when the current one is already
+//     refunded, or was given to another case opened in the last few minutes (a visitor who may
+//     still be running it), a fresh one is created with PayPal's Sandbox test card (same as
+//     scripts/seed-capture.mjs). So two judges at once never race for the same refund.
 // Final mode (permanent cancel) is refused, so no visitor can break the demo for the next.
 // All of it is real Sandbox calls; nothing is simulated. Locally, without the flag, nothing
 // here runs and the seed file is used as before.
@@ -16,15 +18,24 @@ export const publicDemo = () => setting('PUBLIC_DEMO') === '1';
 type Ids = { subscription_ids?: Record<string, string>; capture_ids?: Record<string, string> };
 const firstToken = (v?: string) => v?.split(' ')[0];
 
-// The capture this server created, which replaces the seed file's (the file is not rewritten).
+// A charge given to a case stays that case's own for this long (time to read the plan and run it).
+const CLAIM_MS = 10 * 60_000;
+// At most this many fresh charges an hour, so reloading the page cannot pile up Sandbox charges.
+// Past it, cases share the latest unrefunded charge, as before.
+const FRESH_PER_HOUR = 30;
+
+// The latest unrefunded charge per capture key, which replaces the seed file's (the file is not rewritten).
 let freshCaptures: Record<string, string> = {};
 // Every capture this server has made for the demo, so a refund from a run that started before
 // the latest reset still counts as the estate's own when its payout is sent.
 const madeCaptures = new Set<string>();
-let running: Promise<void> | null = null;
-let lastRun = 0;
+// When each charge was last given to an opened case.
+const claimedAt = new Map<string, number>();
+let created: number[] = [];
+// Case openings run one after another, so each one sees the claims of the one before.
+let queue: Promise<unknown> = Promise.resolve();
 
-/** Seed IDs with this server's fresh captures applied. */
+/** Seed IDs with this server's latest fresh captures applied. */
 export function demoIds(ids: Ids): Ids {
   if (!publicDemo()) return ids;
   return { ...ids, capture_ids: { ...(ids.capture_ids ?? {}), ...freshCaptures } };
@@ -44,20 +55,20 @@ export function estateIds(ids: Ids): { subscriptions: Set<string>; captures: Set
   };
 }
 
-/** Put the Sandbox back in its starting state. Runs at most once at a time, and not more than every 20 s. */
-export function prepareDemo(ids: Ids, captureKeys: string[]): Promise<void> {
-  if (!publicDemo()) return Promise.resolve();
-  if (running) return running;
-  if (Date.now() - lastRun < 20_000) return Promise.resolve();
-  running = reset(ids, captureKeys).finally(() => {
-    lastRun = Date.now();
-    running = null;
-  });
-  return running;
+/**
+ * Put the Sandbox back in its starting state for one case opening and return the IDs that case
+ * should read. Off the public demo it returns the seed IDs untouched.
+ */
+export function prepareDemo(ids: Ids, captureKeys: string[]): Promise<Ids> {
+  if (!publicDemo()) return Promise.resolve(ids);
+  const next = queue.then(() => reset(ids, captureKeys));
+  queue = next.catch(() => undefined);
+  return next;
 }
 
-async function reset(ids: Ids, captureKeys: string[]) {
+async function reset(ids: Ids, captureKeys: string[]): Promise<Ids> {
   const current = demoIds(ids);
+  const mine: Record<string, string> = {};
   await Promise.all([
     ...Object.values(current.subscription_ids ?? {}).map(async (raw) => {
       const id = firstToken(raw);
@@ -66,10 +77,19 @@ async function reset(ids: Ids, captureKeys: string[]) {
       if (sub?.status === 'SUSPENDED') await activateSubscription(id, 'Lastly public demo reset').catch((e) => console.warn(`[demo] could not re-activate ${id}: ${String(e)}`));
     }),
     ...captureKeys.map(async (key) => {
+      const now = Date.now();
       const id = firstToken(current.capture_ids?.[key]);
       const cap = id ? await getCapture(id).catch(() => undefined) : undefined;
-      if (cap?.status === 'COMPLETED') return;
+      const free = cap?.status === 'COMPLETED' && now - (claimedAt.get(id!) ?? 0) > CLAIM_MS;
+      created = created.filter((t) => now - t < 3_600_000);
+      // Reuse the charge when it is free, or when the hourly cap is reached and it is still unrefunded.
+      if (id && (free || (cap?.status === 'COMPLETED' && created.length >= FRESH_PER_HOUR))) {
+        mine[key] = id;
+        return;
+      }
+      if (created.length >= FRESH_PER_HOUR) return;
       try {
+        created.push(now);
         const order = await createTestCardCapture({
           customId: 'lastly-post-death-charge',
           amount: { currency_code: 'EUR', value: '9.99' },
@@ -80,6 +100,7 @@ async function reset(ids: Ids, captureKeys: string[]) {
         if (fresh?.id && fresh.status === 'COMPLETED') {
           freshCaptures = { ...freshCaptures, [key]: fresh.id };
           madeCaptures.add(fresh.id);
+          mine[key] = fresh.id;
           console.log(`[demo] fresh post-death charge ${fresh.id} for ${key}`);
         }
       } catch (e) {
@@ -87,4 +108,7 @@ async function reset(ids: Ids, captureKeys: string[]) {
       }
     }),
   ]);
+  for (const capId of Object.values(mine)) claimedAt.set(capId, Date.now());
+  if (claimedAt.size > 500) claimedAt.delete(claimedAt.keys().next().value as string);
+  return { ...current, capture_ids: { ...(current.capture_ids ?? {}), ...mine } };
 }

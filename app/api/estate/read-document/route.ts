@@ -14,7 +14,7 @@ const MAX_BYTES = 8 * 1024 * 1024;
 export async function POST(request: Request) {
   const limited = aiLimited(request);
   if (limited) return limited;
-  if (!aiEnabled()) return NextResponse.json({ ok: false, error: 'AI document reading is not configured' }, { status: 503 });
+  if (!aiEnabled()) return NextResponse.json({ ok: false, error: 'AI document reading is not configured: set OPENAI_API_KEY on the server (.env.local). "Use demo document" works without it.' }, { status: 503 });
   const form = await request.formData().catch(() => null);
   const file = form?.get('file');
   if (!(file instanceof File)) return NextResponse.json({ ok: false, error: 'Send the document as a "file" field' }, { status: 400 });

@@ -63,8 +63,8 @@ export function TopBar({ mode, hasCase, user, onReset, onSignOut, busy }: { mode
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center gap-4 px-6 lg:px-10">
         <Link href="/" className="hl-serif hl-focus rounded text-[21px] text-white">Lastly</Link>
         {hasCase && (
-          <span className={`ml-2 hidden rounded-full px-3 py-1 text-[12px] font-semibold sm:inline ${mode === 'rehearsal' ? 'bg-white/10 text-[var(--hl-header-muted)]' : 'bg-[var(--hl-final)] text-white'}`}>
-            {mode === 'rehearsal' ? 'Rehearsal' : 'Final'}
+          <span title={mode === 'rehearsal' ? 'Rehearsal: subscriptions are paused, not cancelled, so every step can be undone' : 'Final: subscriptions are cancelled for good'} className={`ml-2 hidden rounded-full px-3 py-1 text-[12px] font-semibold sm:inline ${mode === 'rehearsal' ? 'bg-white/10 text-[var(--hl-header-muted)]' : 'bg-[var(--hl-final)] text-white'}`}>
+            {mode === 'rehearsal' ? 'Rehearsal · reversible' : 'Final'}
           </span>
         )}
         <span className="ml-auto hidden text-[12px] text-[var(--hl-header-muted)] lg:block">Sandbox demo · fictional estate</span>
@@ -92,7 +92,7 @@ export function CaseHero({ analysis }: { analysis: Analysis }) {
   const name = (c.deceased_name ?? 'Unknown person').replace(fictional, '');
   return (
     <section className="bg-[var(--hl-header)] text-white print:hidden">
-      <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-end justify-between gap-x-10 gap-y-6 px-6 py-8 lg:px-10">
+      <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-start justify-between gap-x-10 gap-y-6 px-6 py-8 lg:px-10">
         <div>
           <p className="text-[15px] text-[var(--hl-header-muted)]">Estate of</p>
           <h1 className="hl-serif mt-1 text-balance text-[38px] leading-[1.05] sm:text-[46px]">{name}</h1>
@@ -277,6 +277,7 @@ export function Settlement(props: {
   recovered: Money;
   unlocked: boolean;
   refundedBefore: boolean;
+  publicDemo?: boolean;
   payout: PayoutState;
   onStart: () => void;
   onConfirm: () => void;
@@ -323,7 +324,13 @@ export function Settlement(props: {
               {props.refundedBefore
                 ? 'Nothing to pay out: the post-death charge was already refunded before this case was opened, so this run recovered nothing new.'
                 : 'Nothing to pay out: no refunds were made in this run.'}
-              <span className="mt-1 block text-[13px] text-pp-muted">Demo: run <code className="font-mono">npm run demo:reset</code> for a fresh refundable charge, then open the case again.</span>
+              {props.refundedBefore && (
+                <span className="mt-1 block text-[13px] text-pp-muted">
+                  {props.publicDemo
+                    ? 'Another visitor refunded this charge a moment ago. Start over from the documents to open the case again with a fresh charge.'
+                    : <>Demo: run <code className="font-mono">npm run demo:reset</code> for a fresh refundable charge, then open the case again.</>}
+                </span>
+              )}
             </p>
           )}
           {props.unlocked && value > 0 && payout.step === 'idle' && (
@@ -365,6 +372,8 @@ export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRo
   const yearlyCurrency = stoppedRows.find((r) => r.amount)?.amount?.currency_code ?? recovered.currency_code;
   const handed = done.filter((r) => r.triage === 'keep_for_family').length;
   const notices = done.filter((r) => r.triage === 'formal_notice_only').length;
+  // Handovers wait for the family to approve, notices for the merchant to answer.
+  const waiting = handed + notices;
   // Only what actually happened: a zero or an empty figure is noise on the closing screen.
   const stats = [
     { label: 'Subscriptions stopped', value: String(stopped), show: stopped > 0 },
@@ -381,9 +390,12 @@ export function Resolved({ rows, recovered, paid, onDownload }: { rows: LedgerRo
           <span className="grid size-12 place-items-center rounded-full bg-[var(--hl-done-on-board)] text-[var(--hl-header)]">
             <Icon name="check" className="size-6" />
           </span>
-          <h2 id="resolved-title" className="hl-serif text-[38px] sm:text-[46px]">Estate resolved</h2>
+          <h2 id="resolved-title" className="hl-serif text-[38px] sm:text-[46px]">{waiting ? 'Approved steps done' : 'Estate resolved'}</h2>
         </div>
-        <p className="mt-3 text-[16px] text-[var(--hl-board-text)]">Every approved step is confirmed by PayPal.</p>
+        <p className="mt-3 text-[16px] text-[var(--hl-board-text)]">
+          Every approved step is confirmed by PayPal.
+          {waiting > 0 && ` ${waiting} now ${waiting === 1 ? 'waits' : 'wait'} on others: ${[handed && `the family approves the handover`, notices && `the merchant answers the formal notice`].filter(Boolean).join(', and ')}.`}
+        </p>
         <dl className="mt-8 flex flex-wrap gap-x-14 gap-y-6">
           {stats.map((s) => (
             <div key={s.label}>

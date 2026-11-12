@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getBalances, listSubscriptions, getSubscription } from '@/lib/paypal';
 import { setting } from '@/lib/env';
+import { publicDemo } from '@/lib/demo-mode';
 
 export async function GET() {
+  // A developer check only: on the public demo it is off, so the Sandbox account details stay private.
+  if (publicDemo()) return NextResponse.json({ ok: false, error: 'Not available on the public demo.' }, { status: 404 });
   try {
     const balances = await getBalances();
     const list = await listSubscriptions(10);
