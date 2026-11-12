@@ -22,7 +22,7 @@ Requires Node.js 20.9 or later and a PayPal sandbox REST app ([developer.paypal.
 
 ```bash
 npm install
-cp env.example .env.local   # then fill in the values
+cp .env.example .env.local   # then fill in the values
 npm run dev
 ```
 

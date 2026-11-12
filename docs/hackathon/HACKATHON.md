@@ -28,11 +28,10 @@ Jo, Eddie, Marco, Karthik (PayPal-side; will spot API misuse — esp. merchant-s
 ## Competition audit (Nov 6, kills)
 Crowded/dead: disputes (#6–8: stood, warrant), agent wallets/A2A (#12–14: Mandat, Permit), invoice/CFO (#26/#28), group buying (#1/#18: Haggle Court, Harambee), disaster payouts (#46: amanah-paypal), subscription-killers generic. **Bereavement/estate: zero entries found.** Full list: Notion subpage "EBU - CLAUDE IDEAS" + decision log in SPEC.
 
-## Sponsor stack for Heirloom
+## Sponsor stack for Lastly
 AG Grid/Studio (ledger, official boilerplate `paypaldev/hackathon-paypal-ag-grid-boilerplate`), APIMatic (Context Plugin while writing PayPal calls; document it), Render (host). Bryntum only if time.
 
 ## Local sources
 - Notion main: https://app.notion.com/p/3fef7e4d97868097aff4f8bc2ca54244
 - Notion spec subpage: https://app.notion.com/p/412f7e4d97868169b48be3eaec534662
 - Spike: docs/hackathon/spike-001-paypal-estate-apis.md
-- Devpost cached page: docs/hackathon/devpost-page-cache.md (may be stale — re-check live before submitting)

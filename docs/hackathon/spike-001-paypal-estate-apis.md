@@ -1,7 +1,7 @@
-# 001: PayPal Estate APIs (Heirloom)
+# 001: PayPal Estate APIs (Lastly)
 
 ## Question
-Given a PayPal sandbox account, when Heirloom needs to (1) read transactions/subscriptions, (2) cancel a subscription, (3) refund a post-death charge, (4) create a family handover order, and (5) pay out the estate balance to heirs, then each action maps to a real, documented sandbox endpoint reachable today.
+Given a PayPal sandbox account, when Lastly needs to (1) read transactions/subscriptions, (2) cancel a subscription, (3) refund a post-death charge, (4) create a family handover order, and (5) pay out the estate balance to heirs, then each action maps to a real, documented sandbox endpoint reachable today.
 
 ## What was checked
 - Cloned official boilerplate `paypaldev/hackathon-paypal-ag-grid-boilerplate` (Next.js + plain-fetch PayPal client in `lib/paypal.ts`, AG Studio dashboard). Verified `lib/paypal.ts` covers Transaction Search + balances; env needs `PAYPAL_CLIENT_ID` / `PAYPAL_SECRET`.
@@ -38,7 +38,7 @@ Given a PayPal sandbox account, when Heirloom needs to (1) read transactions/sub
 
 ### Surprises
 - `GET /v1/payments/payouts` returns 404 unauthenticated because payouts is POST-create + GET-by-id only; not a bug.
-- Refunds always return to the original payment source — this is the anti-fraud property Heirloom relies on (a forged certificate cannot redirect a refund).
+- Refunds always return to the original payment source — this is the anti-fraud property Lastly relies on (a forged certificate cannot redirect a refund).
 
 ### Recommendation for the real build
 - Fork the AG Grid boilerplate; extend its `lib/paypal.ts` fetch client with cancel/refund/payouts instead of adding the SDK for only 3 calls (one client, one auth path). Use the APIMatic Context Plugin while writing those calls and document it for the APIMatic prize.
