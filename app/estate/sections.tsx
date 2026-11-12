@@ -303,7 +303,7 @@ export function Settlement(props: {
     <section aria-labelledby="settle-title" className="mt-10">
       <h2 id="settle-title" className="hl-serif text-[28px] text-pp-navy">Passing the money on</h2>
       <p className="mt-1 max-w-[70ch] text-[15px] text-pp-muted">
-        Money returned by a refund goes back to {owner} first. When you are ready, it goes on to the heirs named in the notary act. Nobody else can receive it.
+        Money returned by a refund goes back to {owner} first. When you are ready, it goes on to the heir on file for this estate. Nobody else can receive it.
       </p>
       <div className="mt-5 overflow-hidden rounded-xl border border-pp-border bg-white">
         <div className="grid gap-px bg-pp-border md:grid-cols-[1fr_1.3fr]">
