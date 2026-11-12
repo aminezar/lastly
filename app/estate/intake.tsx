@@ -338,7 +338,7 @@ function TrustExplainer() {
         </div>
         <div>
           <h3 className="font-semibold">3. Money cannot be redirected</h3>
-          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">PayPal refunds always go back to the original payment source, and payouts only go to the heirs in the notary act. A forged document gains nothing.</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-pp-muted">PayPal refunds always go back to the original payment source, and payouts only go to the heir on file for this estate. A forged document gains nothing.</p>
         </div>
         <p className="text-[13px] text-pp-muted md:col-span-3">
           In a real product, PayPal would also confirm the notary act with the notary or the official register before any money moves. In this demo the mandate and sign-in are simulated and the documents are fictional.

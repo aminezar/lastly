@@ -329,6 +329,8 @@ i.pd-dot-accent, .pd-dot-accent { background: var(--accent); }
 .pd-hud button { width: 28px; height: 28px; border-radius: 50%; color: #fff; }
 .pd-hud button:hover { background: rgba(255, 255, 255, 0.15); }
 .pd-hud-keys { color: var(--board-muted); }
+.pd-hud > * { white-space: nowrap; }
+@media (max-width: 640px) { .pd-hud-keys { display: none; } }
 .pd-notes {
   position: fixed;
   right: 16px;
