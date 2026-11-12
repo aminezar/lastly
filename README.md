@@ -6,7 +6,7 @@ The whole case in 30 seconds, from the documents to the letter for the family.
 
 When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
-![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, send FitGym a formal notice, refund the €9.99 charged after his death](docs/portal-plan.png)
+![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, write to FitGym to end the contract, refund the €9.99 charged after his death](docs/portal-plan.png)
 
 We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
 
@@ -57,7 +57,7 @@ The hosted demo resets the estate for each visitor. It pauses subscriptions inst
 |---|---|---|
 | StreamFlix, charged €9.99 after the date of death | Stop and refund | Subscription paused or cancelled; capture refunded to the original card |
 | FamilyCloud, shared with the household | Keep for the family | New subscription on the same plan, for the partner to approve |
-| FitGym, under contract | Formal notice | No payment is stopped; AI writes the bereavement letter to the merchant |
+| FitGym, under contract | Write to end the contract | No payment is stopped; AI writes the bereavement letter to the merchant |
 | Money recovered | Paid to the heir | One payout per refund, only to the heir account on file |
 
 ## Where the AI is used
