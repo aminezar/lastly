@@ -277,6 +277,9 @@ export function ApprovePanel(props: {
   );
 }
 
+// PayPal's payout states, in words. The code itself stays beside the payout ID.
+const PAYOUT_WORDS: Record<string, string> = { PENDING: 'Accepted by PayPal', PROCESSING: 'On its way', SUCCESS: 'Received', DENIED: 'Not delivered', CANCELED: 'Not delivered' };
+
 // --- Settlement --------------------------------------------------------------------------
 export function Settlement(props: {
   analysis: Analysis;
@@ -356,9 +359,10 @@ export function Settlement(props: {
           )}
           {(busy || payout.step === 'done' || payout.step === 'stalled' || (payout.step === 'error' && payout.batchId)) && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px]">
+              {busy && <span className="hl-breathe size-2 shrink-0 rounded-full bg-pp-blue" aria-hidden="true" />}
               <span className="font-semibold">{busy ? 'PayPal is sending it. This usually takes under a minute, and you don\u2019t need to watch: it finishes on its own.' : payout.status === 'SUCCESS' ? `Received in ${heirAccount(analysis.case).to}` : 'Sent, waiting for PayPal to confirm'}</span>
-              {payout.batchId && <span className="text-pp-muted">Payout <span className="font-mono text-pp-ink">{payout.batchId}</span></span>}
-              {payout.status && <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${payout.status === 'SUCCESS' ? 'bg-[var(--hl-success-bg)] text-[var(--hl-success-ink)]' : 'bg-[#fff4e5] text-[#8a4600]'}`}>{payout.status}</span>}
+              {payout.status && payout.status !== 'SUCCESS' && <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${payout.status === 'SUCCESS' ? 'bg-[var(--hl-success-bg)] text-[var(--hl-success-ink)]' : 'bg-pp-highlight text-pp-navy'}`}>{PAYOUT_WORDS[payout.status] ?? payout.status}</span>}
+              {payout.batchId && <span className="text-[13px] text-pp-muted">Payout <span className="font-mono">{payout.batchId}</span>{payout.status ? <> · <span className="font-mono">{payout.status}</span></> : null}</span>}
             </div>
           )}
           {payout.message && <p role={payout.step === 'error' ? 'alert' : undefined} className={`mt-2 text-[14px] ${payout.step === 'error' ? 'text-pp-danger' : 'text-pp-muted'}`}>{payout.message}</p>}
@@ -436,11 +440,11 @@ export function Resolved({ rows, recovered, paid, heir, onDownload }: { rows: Le
             </ul>
           </div>
         )}
-        <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-5">
+        <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 border-t border-[var(--hl-board-line)] pt-5">
           {stats.map((s) => (
             <div key={s.label}>
               <dt className="text-[13px] text-[var(--hl-board-muted)]">{s.label}</dt>
-              <dd className="mt-1 text-[20px] font-semibold tabular-nums">{s.value}</dd>
+              <dd className="mt-0.5 text-[16px] tabular-nums text-[var(--hl-board-text)]">{s.value}</dd>
             </div>
           ))}
         </dl>
@@ -559,90 +563,19 @@ function AuditList({ entries }: { entries: AuditEntry[] }) {
   return (
     <ol className="divide-y divide-pp-border overflow-hidden rounded-xl border border-pp-border bg-white">
       {entries.map((e, i) => (
-        <li key={i} className="grid grid-cols-[88px_minmax(0,1fr)_auto] gap-4 px-6 py-3.5 text-[15px]">
-          <time dateTime={e.at} className="tabular-nums text-pp-muted">{new Date(e.at).toLocaleTimeString('en-GB')}</time>
+        <li key={i} className="px-5 py-3.5 text-[15px] sm:grid sm:grid-cols-[88px_minmax(0,1fr)_auto] sm:gap-4 sm:px-6">
+          <time dateTime={e.at} className="block text-[13px] tabular-nums text-pp-muted sm:text-[15px]">{new Date(e.at).toLocaleTimeString('en-GB')}</time>
           <div className="min-w-0">
             <p><span className="font-semibold">{e.item}</span> · {e.action}</p>
-            {e.paypalId && <p className="mt-0.5 font-mono text-[13px] text-pp-muted">{e.paypalId}</p>}
+            {e.paypalId && <p className="mt-0.5 break-all font-mono text-[13px] text-pp-muted">{e.paypalId}</p>}
           </div>
-          <div className="text-right">
+          <div className="mt-1 flex gap-3 sm:mt-0 sm:block sm:text-right">
             <p className={`text-[13px] font-semibold ${tone[e.tone]}`}>{e.status}</p>
             {e.amount && <p className="text-[13px] tabular-nums text-pp-muted">{e.amount}</p>}
           </div>
         </li>
       ))}
     </ol>
-  );
-}
-
-// --- Print-only notary report -----------------------------------------------------------
-export function PrintReport({ analysis, audit, mode, rows = [], payout }: { analysis: Analysis; audit: AuditEntry[]; mode: Mode; rows?: LedgerRow[]; payout?: PayoutState }) {
-  const c = analysis.case;
-  // A plain statement of what was done and what still waits on others, for the notary and the other heirs.
-  const done: string[] = [];
-  const waiting: string[] = [];
-  const notDone: string[] = [];
-  for (const r of rows) {
-    const m = merchantName(r.merchant);
-    const p = r.progress;
-    if (p.step === 'skipped') continue;
-    if (p.step !== 'done') {
-      if (p.step !== 'running') notDone.push(`${m}: not changed${p.step === 'error' ? ' (PayPal did not complete the action)' : p.step === 'excluded' ? ' (left out by the executor)' : ''}.`);
-      continue;
-    }
-    if (r.triage === 'formal_notice_only') {
-      done.push(`${m}: formal notice written for the executor to send. Payment continues, as the membership is contract-bound.`);
-      waiting.push(`${m}: reply to the formal notice.`);
-    } else if (r.triage === 'keep_for_family') {
-      done.push(`${m}: kept running. New subscription on the same plan created${p.resultId ? ` (${p.resultId})` : ''}.`);
-      waiting.push(`${m}: a family member approves the new subscription in PayPal.`);
-    } else if (r.captureId) {
-      done.push(p.refunded ? `${m}: ${money(p.refunded)} charged${r.chargedAt ? ` on ${longDate(r.chargedAt)}` : ''}, after the date of death, refunded to its original payment source${p.refundId ? ` (refund ${p.refundId})` : ''}.` : `${m}: refund ${(p.paypalStatus ?? 'pending').toLowerCase()}${p.refundId ? ` (refund ${p.refundId})` : ''}.`);
-    } else if (r.subscriptionId) {
-      done.push(`${m}: subscription ${p.paypalStatus === 'CANCELLED' ? 'cancelled' : 'paused'} (${r.subscriptionId}).`);
-    }
-  }
-  if (payout?.step === 'done' && payout.batchId) done.push(`Refunded money paid out to the heir (payout ${payout.batchId}, ${payout.status}).`);
-  return (
-    <div className="hidden text-black print:block">
-      <h1 className="text-2xl font-bold">Lastly estate resolution: audit report</h1>
-      <p className="mt-1 text-sm">PayPal Sandbox demo · fictional estate · executor authority simulated · {mode === 'rehearsal' ? 'rehearsal (subscriptions paused)' : 'final (subscriptions cancelled)'}</p>
-      <dl className="mt-4 grid grid-cols-3 gap-4 text-sm">
-        <div><dt className="font-semibold">Estate of</dt><dd>{(c.deceased_name ?? '—').replace(fictional, '')}</dd></div>
-        <div><dt className="font-semibold">Date of death</dt><dd>{c.date_of_death ? longDate(c.date_of_death) : '—'}</dd></div>
-        <div><dt className="font-semibold">Executor</dt><dd>{c.executor_name ?? '—'}</dd></div>
-      </dl>
-      {done.length + waiting.length + notDone.length > 0 && (
-        <div className="mt-5 grid grid-cols-2 gap-6 text-sm">
-          <div>
-            <h2 className="font-semibold">Done</h2>
-            <ul className="mt-1 list-disc pl-5">{done.map((l) => <li key={l}>{l}</li>)}</ul>
-            {notDone.length > 0 && (
-              <>
-                <h2 className="mt-3 font-semibold">Not done</h2>
-                <ul className="mt-1 list-disc pl-5">{notDone.map((l) => <li key={l}>{l}</li>)}</ul>
-              </>
-            )}
-          </div>
-          <div>
-            <h2 className="font-semibold">Still waiting on others</h2>
-            {waiting.length ? <ul className="mt-1 list-disc pl-5">{waiting.map((l) => <li key={l}>{l}</li>)}</ul> : <p className="mt-1">Nothing.</p>}
-          </div>
-        </div>
-      )}
-      <table className="mt-6 w-full border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-black text-left"><th className="py-1 pr-2">Date and time</th><th className="pr-2">Item</th><th className="pr-2">Action</th><th className="pr-2">PayPal ID</th><th className="pr-2">Status</th><th>Amount</th></tr>
-        </thead>
-        <tbody>
-          {audit.map((e, i) => (
-            <tr key={i} className="border-b border-gray-300 align-top">
-              <td className="py-1 pr-2">{new Date(e.at).toLocaleString('en-GB')}</td><td className="pr-2">{e.item}</td><td className="pr-2">{e.action}</td><td className="pr-2 font-mono">{e.paypalId ?? ''}</td><td className="pr-2">{e.status}</td><td>{e.amount ?? ''}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   );
 }
 

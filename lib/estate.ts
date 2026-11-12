@@ -7,6 +7,10 @@
 import { aiEnabled } from '@/lib/ai';
 import { readDocumentFacts, UnusableAnswer, type FactReading, type SecondReading } from '@/lib/estate-ai';
 
+// Dates in on-screen reasons, written the way a person writes them: "20 October 2026".
+const spoken = (iso: string) =>
+  new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
 export type Triage = 'stop_and_refund' | 'keep_for_family' | 'formal_notice_only';
 
 export type TriageDecision = {
@@ -82,7 +86,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'stop_and_refund',
       confidence: 'high',
       source: 'rules',
-      reason: `Charged on ${item.chargedAt.slice(0, 10)}, before the death on ${dateOfDeath}: a fair charge, nothing to refund.`,
+      reason: `Charged on ${spoken(item.chargedAt)}, before the death on ${spoken(dateOfDeath)}: a fair charge, nothing to refund.`,
       noAction: true,
     };
   }
@@ -91,7 +95,7 @@ export function classifyWithRules(item: MerchantFacts, dateOfDeath?: string): Tr
       triage: 'stop_and_refund',
       confidence: 'high',
       source: 'rules',
-      reason: `Taken after the death${dateOfDeath ? ` on ${dateOfDeath}` : ''}: it goes back to the account it was taken from.`,
+      reason: `Taken after the death${dateOfDeath ? ` on ${spoken(dateOfDeath)}` : ''}: it goes back to the account it was taken from.`,
     };
   }
   return {

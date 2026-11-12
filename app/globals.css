@@ -106,8 +106,13 @@ body {
 .hl-grid .ag-row.hl-row-excluded { opacity: 0.45; }
 .hl-grid .ag-header-cell-text { letter-spacing: 0.01em; }
 
+@page { size: A4; margin: 18mm 17mm 20mm; }
 @media print {
   .hl { background: #fff; }
+  html, body { background: #fff !important; }
+  .report { font-size: 10.5pt; }
+  .report-keep, .report-row { break-inside: avoid; }
+  .report thead { display: table-header-group; }
   nextjs-portal { display: none; }
 }
 
@@ -121,6 +126,10 @@ body {
 .hl-fade { animation: hl-fade-in 700ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .hl-fade { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .hl-pill { animation: none; } }
+/* A slow sign of life while PayPal works: nothing is stuck. */
+@keyframes hl-breathe { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.hl-breathe { animation: hl-breathe 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hl-breathe { animation: none; } }
 
 /*
  * Lastly landing page (app/page.tsx): warm paper, navy ink, a serif for the voice.

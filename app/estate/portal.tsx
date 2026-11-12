@@ -13,7 +13,6 @@ import {
   CaseHero,
   Icon,
   Journey,
-  PrintReport,
   Records,
   Resolved,
   Settlement,
@@ -23,6 +22,7 @@ import {
   type Stage,
 } from './sections';
 import { draftNotice } from './letter';
+import { PrintReport } from './report';
 import { fictional, heirAccount, merchantName, money, type NoticeLetter, type MandateInfo, type Analysis, type AuditEntry, type EstateItem, type LedgerRow, type Money, type RowProgress } from './types';
 
 async function call<T>(url: string, body: unknown): Promise<T> {
@@ -33,6 +33,8 @@ async function call<T>(url: string, body: unknown): Promise<T> {
 }
 
 const now = () => new Date().toISOString();
+// Scrolling glides, unless the person asked their device for less motion.
+const gentle = (): ScrollBehavior => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 const newRunId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
 // The open case is kept in this tab's session storage, so a reload or the back button does not
@@ -287,7 +289,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
     if (!analysis) return;
     setApproving(false);
     // Bring the board into view so every row flip is seen as PayPal answers.
-    document.getElementById('plan')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('plan')?.scrollIntoView({ behavior: gentle(), block: 'start' });
     const queue = analysis.items.filter((i) => included[i.key] && ['ready', 'error'].includes(progressRef.current[i.key]?.step ?? ''));
     for (const [index, item] of queue.entries()) {
       setRunning({ index: index + 1, total: queue.length, label: merchantName(item.merchant) });
@@ -351,7 +353,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         const ok = p.payoutBatch.status === 'SUCCESS';
         log({ at: p.at, item: 'Heirs', action: ok ? 'Payout delivered' : 'Payout not delivered', paypalId: batchId, status: p.payoutBatch.status, tone: ok ? 'ok' : 'error' });
         setPayout({ step: ok ? 'done' : 'error', batchId, status: p.payoutBatch.status, at: p.at, message: ok ? undefined : `PayPal reported ${p.payoutBatch.status}.` });
-        if (ok) window.setTimeout(() => document.getElementById('resolved')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        if (ok) window.setTimeout(() => document.getElementById('resolved')?.scrollIntoView({ behavior: gentle(), block: 'start' }), 150);
         return;
       }
     }
@@ -460,7 +462,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
                     onClick={() => {
                       setApproving(true);
                       // The panel opens below the ledger, often off screen: bring it into view.
-                      window.setTimeout(() => document.getElementById('approve-title')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                      window.setTimeout(() => document.getElementById('approve-title')?.scrollIntoView({ behavior: gentle(), block: 'center' }), 50);
                     }}
                     disabled={blocked} className="w-full sm:w-auto sm:min-w-[200px]">
                     {anyRan ? 'Review what is left' : 'Review and approve'} <Icon name="arrow" />
@@ -520,7 +522,7 @@ export function Portal({ mandate, demo, publicDemo = false }: { mandate: Mandate
         )}
       </main>
 
-      {analysis && <PrintReport analysis={analysis} audit={audit} mode={mode} rows={rows} payout={payout} />}
+      {analysis && <PrintReport analysis={analysis} audit={audit} mode={mode} rows={rows} recovered={recovered} payout={payout} />}
     </div>
   );
 }
