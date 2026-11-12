@@ -111,7 +111,7 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
 .btn .done { position: absolute; inset: 0; border-radius: 999px; background: #1d3a7a; color: #fff; display: flex; align-items: center; justify-content: center; gap: 12px;
   animation: fin 700ms ease var(--d) both; }
 .btn .done svg { width: 24px; height: 24px; }
-.grid { display: grid; grid-template-columns: 300px 620px 320px 1fr; }
+.grid { display: grid; grid-template-columns: 290px 600px 300px 1fr; }
 .grid > div { padding: 22px 0 22px 40px; border-top: 2px solid rgba(255, 255, 255, 0.08); }
 .grid .hd { font-size: 22px; font-weight: 600; color: var(--board-muted); padding-top: 16px; padding-bottom: 16px; }
 .m1 { font-size: 30px; font-weight: 700; }
@@ -119,6 +119,7 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
 .pl { display: flex; gap: 16px; }
 .pl .d { flex: none; width: 14px; height: 14px; margin-top: 13px; border-radius: 50%; }
 .pl .p1 { font-size: 29px; font-weight: 700; }
+.ex { display: inline-block; margin-right: 10px; padding: 1px 8px; border-radius: 5px; background: rgba(124, 200, 255, 0.2); color: #9fdcff; font-size: 17px; font-weight: 600; vertical-align: 2px; }
 .pl .p2 { margin-top: 6px; font-size: 23px; line-height: 1.35; color: var(--board-text); }
 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 6px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); font-size: 23px; font-weight: 600; }
 .id { margin-top: 10px; font-family: var(--mono); font-size: 20px; color: var(--board-muted); letter-spacing: 0.02em; }
@@ -163,12 +164,10 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
   <div class="sc" style="--a:3.2s;--b:27.4s"><div class="sc-i">
     <div class="stepper">
       <div class="brand">Lastly</div>
-      <div class="st" style="--a:3.5s;--b:6.9s"><span class="dot">1<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Documents</span></div><i class="bar"></i>
-      <div class="st" style="--a:6.9s;--b:10.2s"><span class="dot">2<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Read by AI</span></div><i class="bar"></i>
-      <div class="st" style="--a:10.2s;--b:13.4s"><span class="dot">3<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Checked</span></div><i class="bar"></i>
-      <div class="st" style="--a:13.4s;--b:17.2s"><span class="dot">4<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The plan</span></div><i class="bar"></i>
-      <div class="st" style="--a:17.2s;--b:21.8s"><span class="dot">5<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">In PayPal</span></div><i class="bar"></i>
-      <div class="st" style="--a:21.8s;--b:27s"><span class="dot">6<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The family letter</span></div>
+      <div class="st" style="--a:3.5s;--b:13.4s"><span class="dot">1<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">Documents</span></div><i class="bar"></i>
+      <div class="st" style="--a:13.4s;--b:17.2s"><span class="dot">2<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The plan</span></div><i class="bar"></i>
+      <div class="st" style="--a:17.2s;--b:21.8s"><span class="dot">3<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">In PayPal</span></div><i class="bar"></i>
+      <div class="st" style="--a:21.8s;--b:27s"><span class="dot">4<i class="ck"><svg><use href="#tick"/></svg></i></span><span class="lbl">The letter for the family</span></div>
     </div>
   </div></div>
 
@@ -238,30 +237,30 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
   <div class="sc" style="--a:13.4s;--b:21.8s"><div class="sc-i"><div class="board in" style="--d:13.5s">
     <div class="top">
       <div><div class="bt">What happens to each payment</div><div class="bs">Jean Dupont · PayPal Sandbox</div></div>
-      <div class="btn">Review and approve →<span class="done" style="--d:17.6s"><svg><use href="#tick"/></svg>Approved by Marie</span></div>
+      <div class="btn">Approve these 4 steps<span class="done" style="--d:17.6s"><svg><use href="#tick"/></svg>Approved</span></div>
     </div>
     <div class="grid">
-      <div class="hd">Payment</div><div class="hd">Plan and why</div><div class="hd">PayPal</div><div class="hd">Now</div>
+      <div class="hd">Payment</div><div class="hd">Plan and why</div><div class="hd">PayPal</div><div class="hd">What happened</div>
 
       <div class="in" style="--d:14.1s"><div class="m1">StreamFlix</div><div class="m2">€9.99 / month</div></div>
-      <div class="in" style="--d:14.1s"><div class="pl"><i class="d" style="background:var(--calm)"></i><div><div class="p1">Pause the subscription</div><div class="p2">His alone. No more charges.</div></div></div></div>
+      <div class="in" style="--d:14.1s"><div class="pl"><i class="d" style="background:var(--calm)"></i><div><div class="p1">Pause the subscription</div><div class="p2"><span class="ex">AI explains</span>His alone. No more charges.</div></div></div></div>
       <div class="in" style="--d:14.1s"><span class="pill">Active</span><div class="id">I-MN83BBV5ENFM</div></div>
       <div class="res"><i class="dash" style="--d:18.2s"></i><div class="in" style="--d:18.2s"><div class="ok"><span class="c" style="background:var(--calm)"><svg><use href="#tick-n"/></svg></span>Paused</div></div></div>
 
       <div class="in" style="--d:14.6s"><div class="m1">FamilyCloud</div><div class="m2">€12.00 / month</div></div>
-      <div class="in" style="--d:14.6s"><div class="pl"><i class="d" style="background:var(--sky)"></i><div><div class="p1">Hand over to the family</div><div class="p2">Shared at home. It keeps running.</div></div></div></div>
+      <div class="in" style="--d:14.6s"><div class="pl"><i class="d" style="background:var(--sky)"></i><div><div class="p1">Hand over to the family</div><div class="p2"><span class="ex">AI explains</span>Shared at home. It keeps running.</div></div></div></div>
       <div class="in" style="--d:14.6s"><span class="pill">Active</span><div class="id">I-AKDGPFEWRSNA</div></div>
-      <div class="res"><i class="dash" style="--d:19s"></i><div class="in" style="--d:19s"><div class="ok"><span class="c" style="background:var(--sky)"><svg><use href="#tick-n"/></svg></span>Waiting for the family</div><div class="id">I-YSS51GUS9UJF</div></div></div>
+      <div class="res"><i class="dash" style="--d:19s"></i><div class="in" style="--d:19s"><div class="ok"><span class="c" style="background:var(--sky)"><svg><use href="#tick-n"/></svg></span>Waiting for family</div><div class="id">I-YSS51GUS9UJF</div></div></div>
 
       <div class="in" style="--d:15.1s"><div class="m1">FitGym</div><div class="m2">€39.00 / month</div></div>
-      <div class="in" style="--d:15.1s"><div class="pl"><i class="d" style="background:var(--notice)"></i><div><div class="p1">Send a formal notice</div><div class="p2">Under contract. A letter, written for her.</div></div></div></div>
+      <div class="in" style="--d:15.1s"><div class="pl"><i class="d" style="background:var(--notice)"></i><div><div class="p1">Write to end the contract</div><div class="p2"><span class="ex">AI explains</span>Under contract, so a letter comes first.</div></div></div></div>
       <div class="in" style="--d:15.1s"><span class="pill">Active</span><div class="id">I-91KEVMRAV679</div></div>
-      <div class="res"><i class="dash" style="--d:19.8s"></i><div class="in" style="--d:19.8s"><div class="ok"><span class="c" style="background:var(--notice)"><svg><use href="#tick-n"/></svg></span>Letter written</div></div></div>
+      <div class="res"><i class="dash" style="--d:19.8s"></i><div class="in" style="--d:19.8s"><div class="ok"><span class="c" style="background:var(--notice)"><svg><use href="#tick-n"/></svg></span>Letter written, for you to send</div></div></div>
 
       <div class="in" style="--d:15.6s"><div class="m1">StreamFlix</div><div class="m2">One charge · €9.99</div></div>
-      <div class="in" style="--d:15.6s"><div class="pl"><i class="d" style="background:var(--green)"></i><div><div class="p1">Refund €9.99</div><div class="p2">Taken after he died. It goes back.</div></div></div></div>
+      <div class="in" style="--d:15.6s"><div class="pl"><i class="d" style="background:var(--green)"></i><div><div class="p1">Refund €9.99</div><div class="p2"><span class="ex">AI explains</span>Taken after he died. It goes back.</div></div></div></div>
       <div class="in" style="--d:15.6s"><span class="pill">Charged</span><div class="id">7CS27202KU453884G</div></div>
-      <div class="res"><i class="dash" style="--d:20.6s"></i><div class="in" style="--d:20.6s"><div class="ok"><span class="c" style="background:var(--green)"><svg><use href="#tick-n"/></svg></span>Back on his card</div><div class="id">3A784550RV3218429</div></div></div>
+      <div class="res"><i class="dash" style="--d:20.6s"></i><div class="in" style="--d:20.6s"><div class="ok"><span class="c" style="background:var(--green)"><svg><use href="#tick-n"/></svg></span>Refunded</div><div class="id">3A784550RV3218429</div></div></div>
     </div>
   </div></div></div>
 
@@ -272,8 +271,8 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
     </div>
     <div class="letter in" style="--d:22.1s">
       <p class="greet fade" style="--d:22.6s">Dear Luc,</p>
-      <p class="fade" style="--d:23.1s">Jean died on 20 October 2026. Since then, Jean's PayPal account went on paying for things as if nothing had changed. I have now been through each of them, and I wanted you to have a plain account of what was done.</p>
-      <p class="fade m" style="--d:24s">StreamFlix was still charging €9.99 every month. I have paused it, so nothing more will be taken. …</p>
+      <p class="fade" style="--d:23.1s">Jean died on 20 October 2026. Since then, the PayPal account went on paying for things as if nothing had changed. I have now been through each of them, and I wanted you to have a plain account of what was done.</p>
+      <p class="fade m" style="--d:24s">StreamFlix was still charging €9.99 every month. I have paused it, so nothing more will be taken, and it can be closed for good once the estate is settled. …</p>
       <p class="fade" style="--d:24.8s">Apart from that one approval, nothing is needed from you. Take care of yourselves.</p>
       <p class="sign fade" style="--d:25.5s">With love,<br>Marie</p>
     </div>
