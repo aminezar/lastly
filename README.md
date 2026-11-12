@@ -1,5 +1,7 @@
 # Lastly
 
+*8 minute read. The top, through the judges' table, takes about 2.*
+
 ![Lastly in 30 seconds: Marie adds her father Jean's death certificate and notary act, AI reads them, rules check they agree, she approves the plan, PayPal Sandbox pauses StreamFlix, returns the €9.99 taken after he died, hands FamilyCloud to the family, and a letter for the family is written](docs/stages/lastly-stages.gif)
 
 The whole case in 30 seconds, from the documents to the letter for the family.
@@ -9,6 +11,11 @@ When someone dies, their PayPal subscriptions keep charging. Lastly is for the p
 ![The executor's plan for Jean Dupont's estate: pause StreamFlix, hand FamilyCloud over to the family, write to FitGym to end the contract, refund the €9.99 charged after his death](docs/portal-plan.png)
 
 We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
+
+We live in Belgium, so the demo estate is Belgian: amounts are in euros and dates are written day first. The same flow works anywhere PayPal does. Three terms, in US terms:
+- **Notary act:** the document a Belgian notary draws up after a death, naming the heirs and the executor. It does the job that letters testamentary from a probate court do in the US.
+- **Mandate:** the note Jean signed while alive naming who settles his affairs, much like a legacy contact on a phone.
+- **Executor and heir:** the executor settles the affairs, and the heir inherits the money. In the demo, Marie is both.
 
 **Live demo: https://lastly-rdeo.onrender.com/estate**
 
