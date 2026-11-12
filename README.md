@@ -1,76 +1,79 @@
-# Lastly — Nobody should keep paying after they're gone
+# Lastly
 
-**PayPal AI Hackathon — Build What's Next with PayPal and AI** (deadline Nov 12, 2026)
+When someone dies, their PayPal subscriptions keep charging. Lastly is for the person they chose to settle their affairs. It stops those charges and refunds the ones taken after the death to the card they came from. It hands a shared subscription over to the surviving partner and writes the letter for a merchant with a contract. Then it pays the recovered money to the heir.
 
-After a death, recurring PayPal payments keep charging a person who is gone, refunds for post-death charges go unclaimed, and families contact every merchant by hand. Lastly is an Estate Resolution Portal for the pre-authorized family executor: upload the death certificate and notary act, and Lastly checks them against the Legacy Mandate the account holder signed while alive, reads the estate's subscriptions and post-death charge from PayPal by ID, and sorts each one into **Stop & Refund**, **Keep for Family**, or **Formal Notice Only**. Approved actions execute live in PayPal Sandbox (pause or cancel, refund to source, family handover), and the recovered money is paid out to the heir named in the notary act, with a notary-ready audit report.
+We built it for the PayPal AI Hackathon. It runs on the PayPal Sandbox only, and every person in it is fictional.
 
-**AI reads and writes, rules decide.** AI (OpenAI `gpt-5.4-mini` through the Responses API) does four jobs: it reads uploaded PDFs and photos of the documents; it reads both documents a second time on its own, and any fact where its reading differs from the rules' reading holds the case for a person to check; it explains each payment's decision in plain words and flags anything a person should check; and it writes the formal bereavement letter for contract-bound merchants. Which payments are stopped, refunded or kept, and whether the documents match, is decided by explicit rules in `lib/estate.ts`, and the executor approves every PayPal action. No money moves on a model's say.
+**Live demo: https://heirloom-vxgl.onrender.com/heirloom**
 
-Full product spec: [`PRODUCT.md`](PRODUCT.md) · Hackathon facts: [`docs/hackathon/HACKATHON.md`](docs/hackathon/HACKATHON.md)
+It runs on Render's free plan, so the first load after a quiet spell can take about a minute.
 
 ## Try it
 
-Live demo: **https://heirloom-vxgl.onrender.com/heirloom** (PayPal Sandbox only, fictional people).
+1. Click **Open the demo case**. You're Marie Dupont, the executor her father Jean named before he died.
+2. In each upload box, click **Download a sample PDF**, then upload it. The samples are scans with no text layer, so the AI has to read the page itself.
+3. Read the ledger. Each payment has a decision and a reason. Approve it, and the actions run against PayPal Sandbox. Each row shows the PayPal ID that comes back.
+4. Finish with **Print the report for the notary**.
 
-The hosted demo runs in public demo mode: when a visitor opens the case, the shared Sandbox estate is put back in its starting state (paused subscriptions re-activated, a fresh post-death charge created if the last one was refunded), and permanent subscription cancel is turned off, so subscriptions are paused instead and the estate stays intact for the next judge.
+The hosted demo resets the estate for each visitor. It pauses subscriptions instead of cancelling them, so the next judge finds the same case.
 
-To see the AI read documents, choose **Download a sample PDF** in each upload box (or take them from [`public/samples/`](public/samples)) and upload them. They are fictional, scan-style specimens with no text layer, so the model has to read the page itself. It is on Render's free plan, so the first load after a quiet period can take up to a minute while the server wakes.
+## What happens to each payment
 
-## Run locally
+| Demo estate | Lastly's decision | In PayPal |
+|---|---|---|
+| StreamFlix, charged €9.99 after the date of death | Stop and refund | Subscription paused or cancelled; capture refunded to the original card |
+| FamilyCloud, shared with the household | Keep for the family | New subscription on the same plan, for the partner to approve |
+| FitGym, under contract | Formal notice | No payment is stopped; AI writes the bereavement letter to the merchant |
+| Money recovered | Paid to the heir | One payout per refund, only to the heir account on file |
 
-Requires Node 20.9+ and a PayPal Sandbox REST app ([developer.paypal.com](https://developer.paypal.com/dashboard/applications/sandbox)) with Transaction Search enabled.
+## Where the AI is used
 
-```bash
-npm install
-cp .env.example .env.local   # fill in PAYPAL_CLIENT_ID / PAYPAL_SECRET (Sandbox)
-node scripts/paypal-smoke.mjs   # verify credentials before building
-npm run dev                     # http://localhost:3000/heirloom
+The AI (OpenAI `gpt-5.4-mini`) reads the uploaded documents. It then reads them a second time on its own and explains each decision. It also writes the merchant letter.
 
-node scripts/test-estate-api.mjs     # 26 contract tests (read-only / rejected before PayPal)
-node scripts/test-estate-flow.mjs    # live Sandbox money flow (refund, payout, handover); rehearsal only
-node scripts/reset-estate.mjs        # after a rehearsal: re-activate paused subs + fresh capture
-```
-
-Credentials live only in `.env.local` (gitignored) and never leave the server.
+The AI doesn't decide anything. The rules in `lib/estate.ts` check that the death certificate, the notary act and the mandate Jean signed all agree on five facts, and they decide what happens to each payment. The executor approves every PayPal action. If the AI's second reading differs from the rules on any of the five facts, the case is held for a person to check. If OpenAI can't be reached, the screen says the check did not run, and the rules decide on their own.
 
 ## We attacked it
 
-We tried to get a forged case through, and to trick the AI, with 21 attacks: changed dates, a different executor or deceased, a court correction hidden in the text, prompt injection in typed documents, faint and printed instructions to the AI inside scanned documents, garbage and oversized input, and direct requests to the money routes. The latest run against the hosted demo stopped **21 of 21**, and both genuine cases (typed and scanned) still opened. Full table: [`docs/red-team-results.md`](docs/red-team-results.md).
+We ran 21 attacks against the hosted demo, and all 21 were stopped. They included changed dates, a different executor, a court correction buried in the text, and hidden instructions to the AI inside scanned documents. We also sent requests straight to the money routes, and the server refused them before any PayPal call. Both genuine cases, typed and scanned, still opened. The first hosted run had one transient 502 while reading a scan, which we counted as a failure. The rerun was clean.
 
-What it showed:
+Two results we didn't expect:
 
-- **Fixed patterns alone miss things.** A court correction of the date, and an addendum replacing the executor, passed the rules. The AI second reader held both.
-- **Injection can fool one AI reading, not two.** A faint hidden line on a scanned certificate made the transcribing model write 20 October where the page says 2 October, so the rules passed it. The second reader, reading the original file with its own prompt, read 2 October and held the case.
-- **Money never depends on the AI.** Foreign charge or subscription IDs, a payout to another account, and a payout with no refund behind it were all refused by the server before any PayPal call.
-- One earlier hosted run got a transient 502 while reading one scan (no verdict, counted as a failure); the rerun passed. Model outputs can vary, which is why a difference or an unusable answer holds the case instead of opening it.
+- A court correction of the date, and an addendum replacing the executor, both got past the rules. The AI's second reading held both.
+- A faint hidden line on a scan made the AI write 20 October where the page says 2 October, and the rules passed it. The second reading, done on the original file, read 2 October and held the case.
 
-Rerun it yourself (AI and rule checks only, nothing is read or changed in PayPal; needs an OpenAI key on the server):
+The full table is in [`docs/red-team-results.md`](docs/red-team-results.md). You can rerun it yourself. It only calls the AI and the rule checks, and touches nothing in PayPal:
 
 ```bash
-python3 scripts/red-team/make-attack-documents.py   # optional: rebuild the attack scans
 BASE=https://heirloom-vxgl.onrender.com node scripts/red-team/run.mjs
 ```
 
-## Honest limits (read this, judges)
+## What it doesn't do
 
-- PayPal's Subscriptions and Transaction Search APIs are **merchant-scoped**. The demo estate is **seeded under our Sandbox business app** and labelled seeded. Lastly does not claim a consumer API that lists anyone's third-party subscriptions.
-- Executor authority is **simulated**: a seeded Legacy Mandate (named while alive) + a rule-based cross-check of death certificate × notary act. The check proves the documents agree with each other and with the mandate, not that they are authentic. Production requires real notary/legal verification.
-- PayPal refunds return only to the original payment source — that real behaviour is the anti-fraud core: a forged upload cannot redirect money.
-- If Sandbox Payouts is unavailable on the test account, that step is labelled simulated in the UI. No PayPal response is ever faked.
-- **Merchant facts are seeded.** Whether a service is shared with the household or bound by a contract comes from notes in `data/seed-estate.json`, not from PayPal. In production that needs merchant metadata or the executor's confirmation.
-- **Who plays whom in the Sandbox.** One Sandbox business account plays every merchant (StreamFlix, FamilyCloud, FitGym): refunds come from it and the heir payout is sent from it. One Sandbox personal account plays the deceased's payer account and also receives the heir payout (it is the only real Sandbox personal account; the `heirs[]` emails are placeholders). In production only PayPal itself could act across merchants like this, so Lastly is presented as a bereavement feature PayPal could build, not a third-party app.
-- **Document check is rules, not magic.** The portal reads the death certificate and the notary act separately and compares deceased, date of death and executor with each other and with the seeded Legacy Mandate. Any mismatch blocks the case, in the UI and again on the server before every PayPal action. When a PDF or photo is uploaded, AI transcribes it; the same rules then check the transcript, which the executor can read on screen. Separately, a second AI call reads the facts of each document (for an upload, straight from the original file, not from the transcript), and the portal compares that reading with the rules' reading fact by fact (5 facts). A difference holds the case: for example, a certificate saying "20 October 2026, corrected by court order: the date of death is 2 October 2026" passes the fixed patterns but not the AI. An AI answer that cannot be used (no facts, malformed) also holds the case. Only when OpenAI cannot be reached at all (no key, an error, or no answer within 15 seconds) is the check shown as "not run", and the rules decide alone, so the demo keeps working if OpenAI is down. The AI can hold a case, never open one. Documents are capped at 6,000 characters each, and the AI routes are rate-limited on the public demo.
-- **What the document check proves.** It proves that both documents agree with each other and with the mandate. It does not prove they are genuine: someone who knows the names on the mandate could type matching documents. That is why money has only two exits, both fixed in code: refunds go back to the original payment source, and the payout goes only to the heir account recorded for the estate, once per refund.
-- **Payout guard.** The server only pays the recorded heir account, only from refunds of this estate's own charges that PayPal confirms as completed, and pays each refund out in its own payout batch whose ID is derived from that refund. PayPal rejects a repeated batch ID, so a refund that was already paid out is skipped, even from a new case run or another browser.
-- **The post-death charge is staged.** The refunded €9.99 charge is a separate Sandbox order paid with PayPal's test card and recorded in the seed file (on the hosted demo, re-created when it has been refunded). Lastly reads it by ID; it does not discover it by searching the account's transactions.
-- **Family handover** creates a new subscription on the same plan for the family member to approve; the deceased's subscription keeps running until then. It is not a transfer of the original subscription.
+- **It can't spot a good forgery.** Someone who knows the names on the mandate could type documents that match, and they would pass. That's why money only goes to two places, both fixed in code: refunds go back to the original payment source, and the payout goes only to the heir account on file, once per refund.
+- **The estate is seeded.** PayPal's Subscriptions and Transaction Search APIs only show a merchant its own data. The demo subscriptions are set up under our Sandbox business app, and Lastly reads them by ID. It can't list anyone's subscriptions with third parties.
+- **The merchant facts are seeded too.** "Shared with the household" and "under contract" come from notes in `data/seed-estate.json`, not from PayPal. In production those would come from the merchant or from the executor.
+- **The post-death charge is staged.** It's a Sandbox order paid with PayPal's test card. The hosted demo re-creates it after it has been refunded.
+- **Handover isn't a transfer.** The partner approves a new subscription. The old one keeps running until then.
+- **Only PayPal could run this for real.** One Sandbox business account plays all three merchants. One personal account plays both Jean and the heir. That's why we present Lastly as a feature PayPal could build, not as a third-party app.
+- **The executor's authority is simulated.** The mandate is seeded data. In production it would need real legal or notary verification.
 
-## Tools used
+## Run it locally
 
-PayPal Sandbox REST API · AG Grid (the Estate Ledger in the executor portal, `app/heirloom/ledger.tsx`) · Next.js / React / TypeScript · OpenAI `gpt-5.4-mini` via the Responses API (reads uploaded documents, second-reads them against the rules, explains the plan, writes merchant letters; model set by `HEIRLOOM_AI_MODEL`) · Render (hosting)
+You need Node 20.9 or later and a PayPal Sandbox REST app with Transaction Search enabled.
 
-Built on the official `paypaldev/hackathon-paypal-ag-grid-boilerplate`. Its AG Studio dashboard at `/dashboard` is kept as it came from the boilerplate, except that on the hosted public demo its free-form AI assistant is off and its OpenAI proxy (`/api/ai/responses`) refuses requests; the Lastly portal itself uses AG Grid.
+```bash
+npm install
+cp .env.example .env.local     # add your Sandbox PAYPAL_CLIENT_ID and PAYPAL_SECRET
+node scripts/paypal-smoke.mjs  # checks the credentials
+npm run dev                    # http://localhost:3000/heirloom
+```
 
-## Licence
+`scripts/test-estate-api.mjs` runs the API contract tests. `scripts/test-estate-flow.mjs` runs the full money flow against Sandbox, and `scripts/reset-estate.mjs` puts the estate back afterwards. Credentials stay in `.env.local` and never reach the browser.
 
-MIT — see [`LICENSE`](LICENSE). Boilerplate base © its authors (PayPal/AG Grid hackathon boilerplate).
+## Built with
+
+PayPal Sandbox REST APIs (Subscriptions, Orders, Refunds, Payouts) · AG Grid for the estate ledger · Next.js 16 / React 19 / TypeScript · OpenAI Responses API · Render
+
+The project started from the official PayPal × AG Grid hackathon boilerplate. Its dashboard at `/dashboard` is unchanged, except that its AI assistant is switched off on the public demo.
+
+MIT licence, see [`LICENSE`](LICENSE).
