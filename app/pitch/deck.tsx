@@ -46,6 +46,8 @@ type Slide = {
   say: string[];
   /** For the demo cue: the screen-recording shot list, each with its line. */
   shots?: { at: string; show: string; say: string }[];
+  /** When to cut back from the screen recording to the deck. */
+  cutBack?: string;
   body: ReactNode;
 };
 
@@ -169,6 +171,7 @@ const SLIDES: Slide[] = [
     id: 'demo',
     title: 'Demo cue',
     time: '0:36–0:38, then demo to 2:05',
+    cutBack: '2:05 · Cut back to the deck, next slide',
     tone: 'navy',
     say: ['Here it is, live on the PayPal Sandbox. Every PayPal call you’ll see is real.'],
     shots: [
@@ -184,7 +187,7 @@ const SLIDES: Slide[] = [
       },
       {
         at: '1:20',
-        show: '“Review and approve”, then “Approve and run 4 actions”, and let the rows flip green one by one. Zoom on a PayPal ID.',
+        show: '“Review and approve”, then “Approve and run 4 actions”, and let the rows flip green one by one. Each row’s PayPal column shows its real ID in small type under the status: zoom in on the StreamFlix refund ID in the edit, or pause and zoom while recording.',
         say: 'Nothing moves until Marie approves. Now watch: each row flips as PayPal confirms it. Subscription paused, refund issued, each with its real Sandbox ID.',
       },
       {
@@ -248,12 +251,10 @@ const SLIDES: Slide[] = [
   {
     id: 'how',
     title: 'Under the hood',
-    time: '2:05–2:22',
+    time: '2:05–2:17',
     tone: 'paper',
     say: [
-      'Under the hood: AI reads the documents, then reads them again as a second check, explains every decision and writes the letters.',
-      'Rules make the decisions, and a person approves them.',
-      'And every action is a real PayPal call: subscriptions, refunds, payouts and balances.',
+      'Under the hood: AI reads the documents and writes the letters, rules decide, and every action is a real PayPal call.',
     ],
     body: (
       <div className="pd-pad pd-col">
@@ -310,13 +311,19 @@ const SLIDES: Slide[] = [
   {
     id: 'safe',
     title: 'Can it be abused?',
-    time: '2:22–2:42',
+    time: '2:17–2:33, then recording to 2:43',
+    cutBack: '2:43 · Cut back to the deck, closing slide',
     tone: 'navy',
     say: [
-      'So, can it be abused? Here are the three locks before any money moves.',
-      'Only the executor Jean chose while he was alive can open the case. Both documents must match his mandate, or the case stops for a person. And the AI reads them again on its own: it can hold a case, never open one.',
-      'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on file. The server re-checks all of it on every single action.',
-      'We attacked it ourselves on the hosted demo: 21 attacks, 21 held, and both genuine cases still opened. One scan hid an instruction that fooled the AI transcribing it, and the second AI reader caught it.',
+      'So, can it be abused? Three locks before any money moves.',
+      'Only the executor Jean chose while he was alive can open the case. Both documents must match his mandate. And money only goes home: refunds to their source, the payout only to the heir on file.',
+    ],
+    shots: [
+      {
+        at: '2:33',
+        show: 'Fresh private window, “Continue as Marie”. Upload scripts/red-team/docs/scan-hidden-injection-date.png as the death certificate and the sample notary act PDF, click “Check documents and open the case”, hold on the red “Case held: the AI read the documents differently”. If it opens instead, redo it with scan-different-person.png, which the rules block.',
+        say: 'We attacked it ourselves: 21 attacks, 21 held. This scan hides an instruction that fooled the AI reading it. The second AI reader caught it, and the case is held.',
+      },
     ],
     body: (
       <div className="pd-pad pd-split pd-split-safe">
@@ -354,7 +361,7 @@ const SLIDES: Slide[] = [
   {
     id: 'close',
     title: 'Close',
-    time: '2:42–2:52',
+    time: '2:43–2:53',
     tone: 'paper',
     say: [`${BRAND.name}. Nobody should keep paying after they’re gone.`, 'Try it yourself at the link below.'],
     body: (
@@ -609,7 +616,7 @@ function Notes({ slide }: { slide: Slide }) {
               <span className="pd-say">“{s.say}”</span>
             </li>
           ))}
-          <li className="pd-shots-cut">2:05 · Cut back to the deck, next slide</li>
+          {slide.cutBack && <li className="pd-shots-cut">{slide.cutBack}</li>}
         </ol>
       )}
     </div>
