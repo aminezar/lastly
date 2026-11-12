@@ -252,7 +252,7 @@ const SLIDES: Slide[] = [
     say: [
       'Under the hood: AI reads the documents, then reads them again as a second check, explains every decision and writes the letters.',
       'Rules make the decisions, and a person approves them.',
-      'And every action is a real PayPal call: subscriptions, refunds, payouts and reporting.',
+      'And every action is a real PayPal call: subscriptions, refunds, payouts and balances.',
     ],
     body: (
       <div className="pd-pad pd-col">
@@ -293,7 +293,7 @@ const SLIDES: Slide[] = [
                 ['Refund post-death charges', 'POST /v2/payments/captures/{id}/refund'],
                 ['Hand over to the family', 'POST /v1/billing/subscriptions'],
                 ['Pay the heir', 'POST /v1/payments/payouts'],
-                ['Read the estate', 'GET /v1/reporting/transactions · /balances'],
+                ['Read the estate', 'GET /v1/billing/subscriptions · /v1/reporting/balances'],
               ].map(([what, route], i) => (
                 <li key={what} className="pd-in" style={d(2750 + i * 160)}>
                   <b>{what}</b>
@@ -313,7 +313,7 @@ const SLIDES: Slide[] = [
     tone: 'navy',
     say: [
       'So how do we know it can’t be abused? Three locks, before any money moves.',
-      'Only the executor Jean chose while he was alive can open the case. Two independent readers, the rules and the AI, must agree on both documents, or the case stops for a person.',
+      'Only the executor Jean chose while he was alive can open the case. Both documents must match his mandate, or the case stops for a person. And the AI reads them again on its own: it can hold a case, never open one.',
       'And money only goes home: refunds return to where they came from, and the payout goes only to the heir on the notary act. The server re-checks all of it on every single action.',
     ],
     body: (
@@ -328,7 +328,7 @@ const SLIDES: Slide[] = [
         <div className="pd-locks">
           {[
             ['Chosen while alive', 'Only the Trusted Executor Jean named in his Legacy Mandate can open the case.'],
-            ['Two readers must agree', 'Rules match both documents to the mandate. AI reads them again on its own. Any difference holds the case for a person.'],
+            ['Documents must match', 'Both documents must match the mandate, or the case stops for a person. A second AI reading can hold a case, never open one.'],
             ['Money only goes home', 'Refunds return to the original payment source. The payout goes only to the heir on the notary act, capped at what PayPal confirmed.'],
           ].map(([t, b], i) => (
             <div key={t} className="pd-in pd-lock" style={d(1000 + i * 350)}>
